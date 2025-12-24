@@ -1,9 +1,9 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Footer } from "@/components/ui/footer";
-import { Github, Instagram, Linkedin, Mail, Twitter } from "lucide-react";
+import { Github, Instagram, Linkedin, Mail, Twitter, MousePointer2 } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router";
 import PillNav from "@/components/PillNav";
 import { usePage, useSiteSettings, useFooterSettings } from "@/hooks/use-cms";
@@ -98,7 +98,9 @@ export default function Landing() {
   const finalVideoElementRef = useRef<HTMLVideoElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const pillNavRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   const { data: pageData } = usePage("home");
   const { data: siteSettings } = useSiteSettings();
@@ -131,6 +133,7 @@ export default function Landing() {
       });
     }
 
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrapperRef.current,
@@ -139,6 +142,23 @@ export default function Landing() {
         pin: true,
         scrub: 1,
         invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          // Hide scroll indicator when scrolling starts
+          if (self.progress > 0.01 && scrollIndicatorRef.current && !hasScrolled) {
+            setHasScrolled(true);
+            gsap.to(scrollIndicatorRef.current, {
+              opacity: 0,
+              autoAlpha: 0,
+              duration: 0.5,
+              ease: "power2.out",
+              onComplete: () => {
+                if (scrollIndicatorRef.current) {
+                  scrollIndicatorRef.current.style.display = 'none';
+                }
+              }
+            });
+          }
+        }
       }
     });
 
@@ -286,6 +306,79 @@ export default function Landing() {
 
   }, { scope: wrapperRef });
 
+  // Cleanup ScrollTrigger when navigating away to prevent reverse animations
+  useEffect(() => {
+    // Only cleanup if we're navigating away from the landing page
+    if (location.pathname !== '/') {
+      // Kill all ScrollTrigger instances immediately
+      ScrollTrigger.getAll().forEach(st => {
+        if (st.vars?.trigger === wrapperRef.current) {
+          st.kill();
+        }
+      });
+      // Also kill any GSAP timelines
+      gsap.killTweensOf([wrapperRef.current, headerRef.current, heroRef.current, videoRef.current, horizontalTextRef.current, finalVideoRef.current, footerRef.current, pillNavRef.current]);
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      ScrollTrigger.getAll().forEach(st => {
+        if (st.vars?.trigger === wrapperRef.current) {
+          st.kill();
+        }
+      });
+      gsap.killTweensOf([wrapperRef.current, headerRef.current, heroRef.current, videoRef.current, horizontalTextRef.current, finalVideoRef.current, footerRef.current, pillNavRef.current]);
+    };
+  }, [location.pathname]);
+
+  // Animate scroll indicator (bouncing mouse animation)
+  useEffect(() => {
+    if (scrollIndicatorRef.current && !hasScrolled) {
+      const scrollDot = scrollIndicatorRef.current.querySelector('.scroll-dot');
+      if (scrollDot) {
+        const animation = gsap.to(scrollDot, {
+          y: 8,
+          duration: 1.5,
+          ease: "power2.inOut",
+          repeat: -1,
+          yoyo: true
+        });
+
+        return () => {
+          animation.kill();
+        };
+      }
+    }
+  }, [hasScrolled]);
+
+  // Also listen to wheel and touch events as fallback
+  useEffect(() => {
+    const handleInteraction = () => {
+      if (!hasScrolled && scrollIndicatorRef.current) {
+        setHasScrolled(true);
+        gsap.to(scrollIndicatorRef.current, {
+          opacity: 0,
+          autoAlpha: 0,
+          duration: 0.5,
+          ease: "power2.out",
+          onComplete: () => {
+            if (scrollIndicatorRef.current) {
+              scrollIndicatorRef.current.style.display = 'none';
+            }
+          }
+        });
+      }
+    };
+
+    window.addEventListener('wheel', handleInteraction, { passive: true, once: true });
+    window.addEventListener('touchstart', handleInteraction, { passive: true, once: true });
+
+    return () => {
+      window.removeEventListener('wheel', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
+  }, [hasScrolled]);
+
   return (
     <div className="bg-background min-h-screen text-foreground overflow-x-hidden">
       {/* Header */}
@@ -399,6 +492,19 @@ export default function Landing() {
             <h3 className="text-xl md:text-2xl font-bold tracking-tight text-white" style={{ textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5)' }}>{content.bottomTextRightTitle}</h3>
             <p className="text-sm text-gray-200 tracking-widest uppercase mt-1" style={{ textShadow: '1px 1px 6px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 0, 0, 0.5)' }}>{content.bottomTextRightSubtitle}</p>
           </div>
+
+          {/* Scroll Indicator */}
+          {!hasScrolled && (
+            <div 
+              ref={scrollIndicatorRef}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none mix-blend-difference"
+            >
+              <MousePointer2 className="w-6 h-6 text-white/80" />
+              <div className="w-6 h-10 border-2 border-white/60 rounded-full flex items-start justify-center p-1.5">
+                <div className="scroll-dot w-1.5 h-1.5 bg-white/80 rounded-full" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* FOOTER SECTION */}

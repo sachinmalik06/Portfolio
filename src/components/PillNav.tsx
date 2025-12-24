@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export type PillNavItem = {
   label: string;
@@ -41,13 +42,25 @@ const PillNav: React.FC<PillNavProps> = ({
   const resolvedPillTextColor = pillTextColor ?? baseColor;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // Handle navigation with scroll to top
+  // Handle navigation with instant scroll to top
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-      navigate(href);
-    }, 100);
+    
+    // Kill ScrollTrigger animations immediately to prevent reverse animations
+    // This is especially important for the Landing page which has a pinned ScrollTrigger
+    if (typeof window !== 'undefined' && ScrollTrigger) {
+      ScrollTrigger.getAll().forEach(st => {
+        // Kill any pinned ScrollTrigger instances that might cause reverse animations
+        if (st.vars?.pin) {
+          st.kill();
+        }
+      });
+    }
+    
+    // Instant scroll to top
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Navigate immediately without delay
+    navigate(href);
   };
   const circleRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const tlRefs = useRef<Array<gsap.core.Timeline | null>>([]);
