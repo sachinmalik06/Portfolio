@@ -1,0 +1,230 @@
+import { convexAuth } from "@convex-dev/auth/server";
+import { Anonymous } from "@convex-dev/auth/providers/Anonymous";
+import { Password } from "@convex-dev/auth/providers/Password";
+import { emailOtp } from "./auth/emailOtp";
+
+/**
+ * Get the current signed in user. Returns null if the user is not signed in.
+ * Usage: const signedInUser = await ctx.runQuery(api.authHelpers.currentUser);
+ * THIS FUNCTION IS READ-ONLY. DO NOT MODIFY.
+ */
+export const currentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+
+    if (user === null) {
+      return null;
+    }
+
+    return user;
+  },
+});
+
+/**
+ * Use this function internally to get the current user data. Remember to handle the null user case.
+ * @param ctx
+ * @returns
+ */
+export const getCurrentUser = async (ctx: QueryCtx) => {
+  const userId = await getAuthUserId(ctx);
+  if (userId === null) {
+    return null;
+  }
+  return await ctx.db.get(userId);
+};
+
+// Check if an email exists in the users table (for pre-approval)
+export const checkEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), args.email.toLowerCase()))
+      .first();
+    return !!user;
+  },
+});
+
+// Admin: Create a new user (pre-approval)
+export const createUser = mutation({
+  args: {
+    email: v.string(),
+    name: v.string(),
+    role: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || !identity.email) throw new Error("Unauthorized");
+    
+    // Check if admin
+    const currentUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .first();
+      
+    if (currentUser?.role !== "admin") {
+      // Allow initial seed if no users exist
+      const anyUser = await ctx.db.query("users").first();
+      if (anyUser) throw new Error("Unauthorized: Only admins can create users");
+    }
+
+    const email = args.email.toLowerCase();
+    const existing = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), email))
+      .first();
+
+    if (existing) throw new Error("User already exists");
+
+    await ctx.db.insert("users", {
+      email: email,
+      name: args.name,
+      role: args.role,
+    });
+  },
+});
+
+// Admin: Get all users
+export const getUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || !identity.email) return []; // Secure by default
+
+    const currentUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .first();
+
+    if (currentUser?.role !== "admin") return [];
+
+    return await ctx.db.query("users").collect();
+  },
+});
+
+// Seed initial admin
+export const seedAdmin = mutation({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const email = args.email.toLowerCase();
+    const existing = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), email))
+      .first();
+
+    if (!existing) {
+      await ctx.db.insert("users", {
+        email: email,
+        name: "Admin",
+        role: "admin",
+      });
+      return "Admin seeded";
+    }
+    return "Admin already exists";
+  },
+});
+
+export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+  providers: [emailOtp, Anonymous, Password],
+  callbacks: {
+    async createOrUpdateUser(ctx, args) {
+      if (args.existingUserId) {
+        return args.existingUserId;
+      }
+
+      const email = args.profile.email;
+      
+      if (!email) {
+        // Handle anonymous users
+        return ctx.db.insert("users", {
+          role: "anonymous",
+        });
+      }
+
+      // Check for existing user with this email (pre-approved or seeded)
+      const existingUser = await ctx.db
+        .query("users")
+        .filter((q) => q.eq(q.field("email"), email))
+        .first();
+
+      if (existingUser) {
+        return existingUser._id;
+      }
+
+      // Block uninvited users
+      throw new Error("Access denied. Please contact an administrator.");
+    },
+  },
+});
+
+function Auth({ redirectAfterAuth }: AuthProps = {}) {
+  const { isLoading: authLoading, isAuthenticated, signIn } = useAuth();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const seedAdmin = useMutation(api.users.seedAdmin);
+
+  useEffect(() => {
+    // Ensure initial admin exists
+    seedAdmin({ email: "harshjeswani30@gmail.com" }).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (isAuthenticated) {
+      navigate(redirectAfterAuth || "/");
+    }
+  }, [authLoading, isAuthenticated, redirectAfterAuth, navigate]);
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Welcome to Convex Auth</h2>
+          <p className="text-gray-600">Sign in to continue</p>
+        </div>
+        
+        {error && (
+          <div className="text-red-600 text-sm p-2 bg-red-100 rounded">
+            {error}
+          </div>
+        )}
+        
+        <button
+          onClick={async () => {
+            setIsLoading(true);
+            try {
+              await signIn();
+            } catch (err) {
+              setError(err instanceof Error ? err.message : "An error occurred");
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+          disabled={isLoading}
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          {isLoading ? (
+            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          ) : (
+            "Sign in with Email"
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Define the users table
+export const users = defineTable({
+  name: v.optional(v.string()),
+  email: v.optional(v.string()),
+  image: v.optional(v.string()),
+  tokenIdentifier: v.optional(v.string()),
+  role: v.optional(v.string()), // "admin"
+}).index("by_token", ["tokenIdentifier"]);

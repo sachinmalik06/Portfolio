@@ -1,0 +1,34 @@
+--primary: #5D1C34;
+--primary-foreground: #CDBCAB;
+  
+--secondary: #A67D44;
+--secondary-foreground: #11100F;
+  
+--muted: #11100F; /* Strictly using palette background */
+--muted-foreground: #899481;
+  
+--accent: #A67D44;
+--accent-foreground: #11100F;
+
+.dark {
+  /* Enforce the same dark theme in dark mode */
+  --background: #11100F;
+  --foreground: #CDBCAB;
+  --card: #11100F;
+  --card-foreground: #CDBCAB;
+  --popover: #11100F;
+  --popover-foreground: #CDBCAB;
+  --primary: #5D1C34;
+  --primary-foreground: #CDBCAB;
+  --secondary: #A67D44;
+  --secondary-foreground: #11100F;
+  --muted: #11100F;
+  --muted-foreground: #899481;
+  --accent: #A67D44;
+  --accent-foreground: #11100F;
+  --destructive: #5D1C34;
+}
+
+@theme inline {
+  --color-muted-foreground: var(--muted-foreground);
+}

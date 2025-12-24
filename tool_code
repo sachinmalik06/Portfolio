@@ -1,0 +1,1 @@
+print(default_api.executeCommandTool(command="npx convex run debug:listUsers"))

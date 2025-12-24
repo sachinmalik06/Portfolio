@@ -1,0 +1,17 @@
+{
+  "name": "Cinematic Strategy",
+  "short_name": "Cinematic Strategy",
+  "description": "Strategic consulting and creative direction portfolio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0e0d",
+  "theme_color": "#0f0e0d",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

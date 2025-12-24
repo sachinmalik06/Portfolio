@@ -1,0 +1,1 @@
+const { nodes, materials } = useGLTF(cardGLB);
