@@ -119,7 +119,7 @@ export default function ExpertiseManager() {
                   </TableCell>
                 </TableRow>
               ) : cards && cards.length > 0 ? (
-                cards.map((card) => (
+                (cards as any[]).map((card: any) => (
                   <TableRow key={card.id} className="hover:bg-white/5 border-white/5">
                     <TableCell>
                       <GripVertical className="w-4 h-4 text-muted-foreground cursor-move" />

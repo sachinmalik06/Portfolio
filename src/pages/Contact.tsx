@@ -25,7 +25,7 @@ const Contact = () => {
   const pillNavRef = useRef<HTMLDivElement>(null);
   const { data: pageData } = usePage("contact");
   
-  const content = pageData?.content || {
+  const content = (pageData as any)?.content || {
     tagline: "Get in Touch",
     title: "Let's Connect",
     description: "Available for strategic consulting, creative collaborations, and meaningful conversations about design and innovation.",

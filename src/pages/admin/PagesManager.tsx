@@ -32,7 +32,7 @@ export default function PagesManager() {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .upsert({ key: 'general', value: { headerTitle } }, { onConflict: 'key' });
+        .upsert({ key: 'general', value: { headerTitle } } as any, { onConflict: 'key' });
       if (error) throw error;
       toast.success("Site settings updated successfully");
     } catch (error) {
@@ -58,14 +58,14 @@ export default function PagesManager() {
 
         <TabsContent value="home" className="mt-6">
           <HomeEditor 
-            initialData={homePage?.content} 
+            initialData={(homePage as any)?.content} 
             onSave={(data) => handleSave("home", data)} 
           />
         </TabsContent>
 
         <TabsContent value="about" className="mt-6 space-y-6">
           <AboutEditor 
-            initialData={aboutPage?.content} 
+            initialData={(aboutPage as any)?.content} 
             onSave={(data) => handleSave("about", data)} 
           />
           <AboutFooterTextEditor />
@@ -73,7 +73,7 @@ export default function PagesManager() {
         
         <TabsContent value="contact" className="mt-6">
           <ContactEditor 
-            initialData={contactPage?.content} 
+            initialData={(contactPage as any)?.content} 
             onSave={(data) => handleSave("contact", data)} 
           />
         </TabsContent>

@@ -64,7 +64,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
         return;
       }
 
-      if (!userData.is_admin) {
+      if (!(userData as any)?.is_admin) {
         setError("Access denied. You don't have administrator privileges.");
         setIsLoading(false);
         return;

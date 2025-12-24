@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/components/providers/SupabaseAuthProvider";
 import { Home, LogOut, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router";
 

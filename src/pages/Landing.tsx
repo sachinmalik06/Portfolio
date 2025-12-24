@@ -104,7 +104,7 @@ export default function Landing() {
   const { data: siteSettings } = useSiteSettings();
   const { data: footerData } = useFooterSettings();
   
-  const content = pageData?.content || {
+  const content = (pageData as any)?.content || {
     heroTitle1: "PORT",
     heroTitle2: "FOLIO",
     videoUrl: "https://videos.pexels.com/video-files/5377684/5377684-uhd_2560_1440_25fps.mp4",

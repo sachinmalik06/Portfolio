@@ -24,25 +24,24 @@ export async function getExpertiseCards(includeInactive = false) {
 export async function createExpertiseCard(card: Database['public']['Tables']['expertise_cards']['Insert']) {
   const { data, error } = await supabase
     .from('expertise_cards')
-    .insert(card)
+    .insert(card as any)
     .select()
     .single();
   if (error) throw error;
-  return data;
+  return data as ExpertiseCard;
 }
 
 export async function updateExpertiseCard(
   id: string,
   updates: Database['public']['Tables']['expertise_cards']['Update']
 ) {
-  const { data, error } = await supabase
-    .from('expertise_cards')
+  const result = await ((supabase.from('expertise_cards') as any)
     .update(updates)
     .eq('id', id)
     .select()
-    .single();
-  if (error) throw error;
-  return data;
+    .single());
+  if (result.error) throw result.error;
+  return result.data as ExpertiseCard;
 }
 
 export async function deleteExpertiseCard(id: string) {
@@ -65,14 +64,14 @@ export async function getPage(slug: string) {
 }
 
 export async function getSiteSettings() {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from('site_settings')
     .select('*')
     .eq('key', 'general')
-    .single();
+    .single() as any);
   
   if (error && error.code !== 'PGRST116') throw error;
-  const settings = (data?.value as any) || { headerTitle: "CINEMATIC STRATEGY" };
+  const settings = ((data as any)?.value as any) || { headerTitle: "CINEMATIC STRATEGY" };
   return settings;
 }
 
@@ -90,7 +89,7 @@ export async function getProfileCardSettings() {
     };
   }
   
-  return (data?.value as any) || {
+  return ((data as any)?.value as any) || {
     cardImageUrl: ''
   };
 }
@@ -107,7 +106,7 @@ export async function getFooterSettings() {
     return null;
   }
   
-  return (data?.value as any) || null;
+  return ((data as any)?.value as any) || null;
 }
 
 export async function updateFooterSettings(settings: any) {
@@ -118,22 +117,21 @@ export async function updateFooterSettings(settings: any) {
     .single();
 
   if (existing) {
-    const { error } = await supabase
-      .from('site_settings')
+    const result = await ((supabase.from('site_settings') as any)
       .update({ value: settings, updated_at: new Date().toISOString() })
-      .eq('key', 'footer');
+      .eq('key', 'footer'));
     
-    if (error) throw error;
+    if (result.error) throw result.error;
     return settings;
   } else {
     const { data, error } = await supabase
       .from('site_settings')
-      .insert({ key: 'footer', value: settings })
+      .insert({ key: 'footer', value: settings } as any)
       .select()
       .single();
     
     if (error) throw error;
-    return data.value as any;
+    return (data as any)?.value as any;
   }
 }
 
@@ -142,14 +140,14 @@ export async function getAboutFooterText() {
     .from('site_settings')
     .select('*')
     .eq('key', 'about_footer_text')
-    .single();
+    .single() as any;
   
   if (error && error.code !== 'PGRST116') {
     console.error('Error fetching about footer text:', error);
     return null;
   }
   
-  return (data?.value as any) || null;
+  return ((data as any)?.value as any) || null;
 }
 
 export async function updateAboutFooterText(settings: any) {
@@ -157,25 +155,24 @@ export async function updateAboutFooterText(settings: any) {
     .from('site_settings')
     .select('id, value')
     .eq('key', 'about_footer_text')
-    .single();
+    .single() as any;
 
   if (existing) {
-    const { error } = await supabase
-      .from('site_settings')
+    const result = await ((supabase.from('site_settings') as any)
       .update({ value: settings, updated_at: new Date().toISOString() })
-      .eq('key', 'about_footer_text');
+      .eq('key', 'about_footer_text'));
     
-    if (error) throw error;
+    if (result.error) throw result.error;
     return settings;
   } else {
     const { data, error } = await supabase
       .from('site_settings')
-      .insert({ key: 'about_footer_text', value: settings })
+      .insert({ key: 'about_footer_text', value: settings } as any)
       .select()
       .single();
     
     if (error) throw error;
-    return data.value as any;
+    return (data as any)?.value as any;
   }
 }
 
@@ -185,14 +182,14 @@ export async function getMetaTags() {
     .from('site_settings')
     .select('*')
     .eq('key', 'meta_tags')
-    .single();
+    .single() as any;
   
   if (error && error.code !== 'PGRST116') {
     console.error('Error fetching meta tags:', error);
     return null;
   }
   
-  return (data?.value as any) || null;
+  return ((data as any)?.value as any) || null;
 }
 
 export async function updateMetaTags(settings: any) {
@@ -200,25 +197,24 @@ export async function updateMetaTags(settings: any) {
     .from('site_settings')
     .select('id, value')
     .eq('key', 'meta_tags')
-    .single();
+    .single() as any;
 
   if (existing) {
-    const { error } = await supabase
-      .from('site_settings')
+    const result = await ((supabase.from('site_settings') as any)
       .update({ value: settings, updated_at: new Date().toISOString() })
-      .eq('key', 'meta_tags');
+      .eq('key', 'meta_tags'));
     
-    if (error) throw error;
+    if (result.error) throw result.error;
     return settings;
   } else {
     const { data, error } = await supabase
       .from('site_settings')
-      .insert({ key: 'meta_tags', value: settings })
+      .insert({ key: 'meta_tags', value: settings } as any)
       .select()
       .single();
     
     if (error) throw error;
-    return data.value as any;
+    return (data as any)?.value as any;
   }
 }
 
@@ -227,7 +223,7 @@ export async function updateProfileCardSettings(settings: { cardImageUrl?: strin
     .from('site_settings')
     .select('id, value')
     .eq('key', 'profile_card')
-    .single();
+    .single() as any;
 
   const currentValue = (existing?.value as any) || {};
   const newValue = {
@@ -236,22 +232,21 @@ export async function updateProfileCardSettings(settings: { cardImageUrl?: strin
   };
 
   if (existing) {
-    const { data, error } = await supabase
-      .from('site_settings')
+    const result = await ((supabase.from('site_settings') as any)
       .update({ value: newValue })
-      .eq('id', existing.id)
+      .eq('id', (existing as any).id)
       .select()
-      .single();
-    if (error) throw error;
-    return data;
+      .single());
+    if (result.error) throw result.error;
+    return result.data as any;
   } else {
     const { data, error } = await supabase
       .from('site_settings')
-      .insert({ key: 'profile_card', value: newValue })
+      .insert({ key: 'profile_card', value: newValue } as any)
       .select()
       .single();
     if (error) throw error;
-    return data;
+    return data as any;
   }
 }
 
@@ -264,25 +259,24 @@ export async function updatePage(
     .from('pages')
     .select('id')
     .eq('slug', slug)
-    .single();
+    .single() as any;
 
   if (existing) {
-    const { data, error } = await supabase
-      .from('pages')
+    const result = await ((supabase.from('pages') as any)
       .update({ content, ...(title ? { title } : {}) })
-      .eq('id', existing.id)
+      .eq('id', (existing as any).id)
       .select()
-      .single();
-    if (error) throw error;
-    return data;
+      .single());
+    if (result.error) throw result.error;
+    return result.data as Page;
   } else {
     const { data, error } = await supabase
       .from('pages')
-      .insert({ slug, title: title || slug, content })
+      .insert({ slug, title: title || slug, content } as any)
       .select()
       .single();
     if (error) throw error;
-    return data;
+    return data as Page;
   }
 }
 
@@ -303,27 +297,26 @@ export async function getTimeline(includeInactive = false) {
 }
 
 export async function createTimelineEntry(entry: Database['public']['Tables']['timeline_entries']['Insert']) {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from('timeline_entries')
-    .insert(entry)
+    .insert(entry as any)
     .select()
-    .single();
+    .single() as any);
   if (error) throw error;
-  return data;
+  return data as TimelineEntry;
 }
 
 export async function updateTimelineEntry(
   id: string,
   updates: Database['public']['Tables']['timeline_entries']['Update']
 ) {
-  const { data, error } = await supabase
-    .from('timeline_entries')
+  const result = await ((supabase.from('timeline_entries') as any)
     .update(updates)
     .eq('id', id)
     .select()
-    .single();
-  if (error) throw error;
-  return data;
+    .single());
+  if (result.error) throw result.error;
+  return result.data as TimelineEntry;
 }
 
 export async function deleteTimelineEntry(id: string) {

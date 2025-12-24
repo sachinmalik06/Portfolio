@@ -51,13 +51,13 @@ export default function Settings() {
       // Update email if changed
       if (credentials.newEmail && credentials.newEmail !== user?.email) {
         // Check if email is already taken
-        const { data: existingUser } = await supabase
+        const { data: existingUser } = await (supabase
           .from('users')
           .select('id')
           .eq('email', credentials.newEmail.toLowerCase())
-          .single();
+          .single() as any);
 
-        if (existingUser && existingUser.id !== user?.id) {
+        if (existingUser && (existingUser as any).id !== user?.id) {
           throw new Error("Email already in use");
         }
 
@@ -74,12 +74,11 @@ export default function Settings() {
 
       // Update profile in public.users table
       if (Object.keys(updates).length > 0 && user?.id) {
-        const { error: profileError } = await supabase
-          .from('users')
+        const result = await ((supabase.from('users') as any)
           .update(updates)
-          .eq('id', user.id);
+          .eq('id', user.id));
 
-        if (profileError) throw profileError;
+        if (result.error) throw result.error;
       }
 
       if (Object.keys(updates).length === 0) {

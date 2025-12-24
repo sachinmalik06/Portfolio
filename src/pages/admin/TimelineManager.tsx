@@ -97,7 +97,7 @@ export default function TimelineManager() {
                   </TableCell>
                 </TableRow>
               ) : entries && entries.length > 0 ? (
-                entries.map((entry) => (
+                (entries as any[]).map((entry: any) => (
                   <TableRow key={entry.id} className="hover:bg-white/5 border-white/5">
                     <TableCell className="font-bold">{entry.year}</TableCell>
                     <TableCell>{entry.title}</TableCell>
