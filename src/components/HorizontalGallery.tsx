@@ -53,7 +53,8 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
 
         const promise = new Promise<void>((resolve, reject) => {
           const img = new Image();
-          img.crossOrigin = 'anonymous';
+          // Don't set crossOrigin for background images - it causes CORS errors for external domains
+          // crossOrigin is only needed for canvas operations, not for CSS background images
           
           img.onload = () => {
             loadedState[item.id] = true;
@@ -87,6 +88,26 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
         setImagesErrored(erroredState);
       });
     }, [items]);
+
+    // Update background images when imagesLoaded state changes
+    useEffect(() => {
+      items.forEach((item, index) => {
+        if (item.image && imagesLoaded[item.id] && !imagesErrored[item.id]) {
+          const div = imageInnerRefs.current[index];
+          if (div) {
+            const imageUrl = convertDriveUrlToDirectImageUrl(item.image);
+            // Ensure background image is set
+            if (imageUrl) {
+              div.style.backgroundImage = `url(${imageUrl})`;
+              div.style.backgroundSize = 'cover';
+              div.style.backgroundPosition = '50% 0';
+              div.style.backgroundRepeat = 'no-repeat';
+              div.style.opacity = '1';
+            }
+          }
+        }
+      });
+    }, [imagesLoaded, imagesErrored, items]);
 
     useImperativeHandle(ref, () => ({
       containerRef,
@@ -180,11 +201,6 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                   ref={(el) => {
                     if (el) {
                       imageInnerRefs.current[index] = el;
-                      // Update background image once element is ready (convert Google Drive URLs if needed)
-                      if (item.image && !imagesErrored[item.id] && imagesLoaded[item.id]) {
-                        el.style.backgroundImage = `url(${convertDriveUrlToDirectImageUrl(item.image)})`;
-                        el.style.opacity = '1';
-                      }
                     }
                   }}
                   className="gallery__item-imginner"
@@ -198,7 +214,7 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                     marginTop: '-7vh',
                     willChange: 'transform',
                     filter: 'saturate(0) brightness(0)', // Initial filter state
-                    opacity: item.image && (imagesLoaded[item.id] || !imagesErrored[item.id]) ? 1 : 0,
+                    opacity: item.image && imagesLoaded[item.id] && !imagesErrored[item.id] ? 1 : 0,
                     transition: 'opacity 0.3s ease-in-out',
                   }}
                 >
@@ -215,15 +231,18 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                         pointerEvents: 'none',
                       }}
                       loading="eager"
-                      crossOrigin="anonymous"
+                      // Removed crossOrigin - not needed for background images and causes CORS errors
                       onLoad={(e) => {
                         const img = e.currentTarget;
                         if (img.src) {
                           setImagesLoaded(prev => ({ ...prev, [item.id]: true }));
                           // Update the background image once loaded
                           const div = imageInnerRefs.current[index];
-                          if (div) {
+                          if (div && img.src) {
                             div.style.backgroundImage = `url(${img.src})`;
+                            div.style.backgroundSize = 'cover';
+                            div.style.backgroundPosition = '50% 0';
+                            div.style.backgroundRepeat = 'no-repeat';
                             div.style.opacity = '1';
                           }
                         }

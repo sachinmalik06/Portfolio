@@ -22,66 +22,128 @@ export function EncryptedText({
 }: EncryptedTextProps) {
   const [displayText, setDisplayText] = useState<string[]>([]);
   const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set());
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
   const hasStarted = useRef(false);
   const revealedIndicesRef = useRef<Set<number>>(new Set());
+  const lastUpdateTime = useRef<number>(0);
+  const textArrayRef = useRef<string[]>([]);
+  const previousAnimateRef = useRef<boolean | undefined>(undefined);
 
   const getRandomChar = useCallback(() => {
     return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
   }, []);
 
-  useEffect(() => {
-    if (!animate) {
-      // Reset to initial scrambled state when not animating
-      setDisplayText(text.split("").map((char) => (char === " " ? " " : getRandomChar())));
-      setRevealedIndices(new Set());
-      revealedIndicesRef.current = new Set();
-      hasStarted.current = false;
-      if (intervalRef.current) clearInterval(intervalRef.current);
+  // Optimized animation loop using requestAnimationFrame
+  const animateChars = useCallback(() => {
+    const now = performance.now();
+    // Throttle updates to ~60fps (every ~16ms)
+    if (now - lastUpdateTime.current < 16) {
+      animationFrameRef.current = requestAnimationFrame(animateChars);
       return;
     }
+    lastUpdateTime.current = now;
 
-    if (hasStarted.current) return;
+    setDisplayText((prev) => {
+      const newText = prev.map((char, index) => {
+        if (revealedIndicesRef.current.has(index) || textArrayRef.current[index] === " ") {
+          return textArrayRef.current[index];
+        }
+        return getRandomChar();
+      });
+      return newText;
+    });
+
+    animationFrameRef.current = requestAnimationFrame(animateChars);
+  }, [getRandomChar]);
+
+  useEffect(() => {
+    // Cleanup function
+    const cleanup = () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      timeoutRefs.current.forEach(clearTimeout);
+      timeoutRefs.current = [];
+      hasStarted.current = false;
+      revealedIndicesRef.current = new Set();
+    };
+
+    // Initialize text array ref
+    const initialText = text.split("");
+    textArrayRef.current = initialText;
+
+    // Initialize display text if empty (first mount)
+    if (displayText.length === 0 && initialText.length > 0) {
+      setDisplayText(initialText.map((char) => (char === " " ? " " : getRandomChar())));
+    }
+
+    // Track animate changes to allow restart
+    const isFirstMount = previousAnimateRef.current === undefined;
+    const previousAnimate = previousAnimateRef.current;
+    const animateChanged = !isFirstMount && previousAnimate !== animate;
+    const changedFromFalseToTrue = animateChanged && previousAnimate === false && animate === true;
+    
+    // Update ref for next render
+    previousAnimateRef.current = animate;
+
+    if (!animate) {
+      // Cleanup and reset when not animating
+      cleanup();
+      // Reset to initial scrambled state when not animating
+      if (displayText.length !== initialText.length) {
+        setDisplayText(initialText.map((char) => (char === " " ? " " : getRandomChar())));
+      }
+      setRevealedIndices(new Set());
+      return cleanup;
+    }
+
+    // Determine if we should start/restart animation
+    // Start if: first mount with animate=true, or animate changed from false to true, or not started yet
+    const shouldStart = (isFirstMount && animate) || changedFromFalseToTrue || !hasStarted.current;
+
+    if (!shouldStart) {
+      // Already started and shouldn't restart
+      return cleanup;
+    }
+
+    // Reset and start animation
+    cleanup(); // Clean up any existing animation first
     hasStarted.current = true;
 
-    // Initialize with random characters, scramble, then reveal one by one
-    const initialDisplay = text.split("").map((char) => (char === " " ? " " : getRandomChar()));
+    // Initialize with scrambled text
+    const initialDisplay = initialText.map((char) => (char === " " ? " " : getRandomChar()));
     setDisplayText(initialDisplay);
     revealedIndicesRef.current = new Set();
+    lastUpdateTime.current = performance.now();
 
-    intervalRef.current = setInterval(() => {
-      setDisplayText((prev) =>
-        prev.map((char, index) => {
-          if (revealedIndicesRef.current.has(index) || text[index] === " ") return text[index];
-          return getRandomChar();
-        })
-      );
-    }, 50);
+    // Start animation loop
+    animationFrameRef.current = requestAnimationFrame(animateChars);
 
-    text.split("").forEach((_, index) => {
-      setTimeout(() => {
+    // Schedule character reveals
+    initialText.forEach((_, index) => {
+      const timeout = setTimeout(() => {
         revealedIndicesRef.current.add(index);
         setRevealedIndices(new Set(revealedIndicesRef.current));
       }, index * revealDelayMs);
+      timeoutRefs.current.push(timeout);
     });
 
-    const totalTime = text.length * revealDelayMs + 500;
-    setTimeout(() => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setDisplayText(text.split(""));
+    // Final cleanup - ensure all characters are revealed
+    const totalTime = initialText.length * revealDelayMs + 500;
+    const finalTimeout = setTimeout(() => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      setDisplayText(initialText);
+      setRevealedIndices(new Set(initialText.map((_, i) => i)));
     }, totalTime);
+    timeoutRefs.current.push(finalTimeout);
 
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [text, revealDelayMs, animate, getRandomChar]);
-
-  // Update display text when revealed indices change (but only if we have the same length)
-  useEffect(() => {
-    if (displayText.length === text.length) {
-      setDisplayText((prev) =>
-        prev.map((char, index) => (revealedIndices.has(index) ? text[index] : char))
-      );
-    }
-  }, [revealedIndices, text, displayText.length]);
+    return cleanup;
+  }, [text, revealDelayMs, animate, getRandomChar, animateChars]);
 
   return (
     <span className={cn("font-mono", className)}>

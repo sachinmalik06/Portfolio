@@ -112,3 +112,4 @@ After seeding, you can:
 **Your data is now in Supabase!** 🎉
 
 
+

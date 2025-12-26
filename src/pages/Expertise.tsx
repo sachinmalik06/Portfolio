@@ -41,6 +41,8 @@ const Expertise = () => {
   const [cardsAnimatedIn, setCardsAnimatedIn] = useState(false);
   const touchStartRef = useRef<number>(0);
   const isOpeningRef = useRef<boolean>(false);
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+  const touchMovedRef = useRef<boolean>(false);
 
   // Fetch data from Supabase
   const { data: expertiseAreas } = useExpertiseCards();
@@ -391,7 +393,9 @@ const Expertise = () => {
                   style={{
                     opacity: 0,
                     transform: 'translateY(60px) scale(0.9)',
-                    zIndex: hoveredCard === cardId ? 9999 : 'auto'
+                    zIndex: hoveredCard === cardId ? 9999 : 'auto',
+                    touchAction: 'pan-y', // Allow vertical scrolling, prevent default touch behaviors
+                    WebkitTapHighlightColor: 'transparent'
                   }}
                   onMouseEnter={() => {
                     // Only hover on desktop (not mobile at all)
@@ -405,8 +409,23 @@ const Expertise = () => {
                     }
                   }}
                   onTouchStart={(e) => {
-                    // Track touch start time
+                    // Track touch start time and position
                     touchStartRef.current = Date.now();
+                    const touch = e.touches[0];
+                    touchStartPosRef.current = { x: touch.clientX, y: touch.clientY };
+                    touchMovedRef.current = false;
+                  }}
+                  onTouchMove={(e) => {
+                    // Track if user is scrolling (touch moved)
+                    if (touchStartPosRef.current) {
+                      const touch = e.touches[0];
+                      const deltaX = Math.abs(touch.clientX - touchStartPosRef.current.x);
+                      const deltaY = Math.abs(touch.clientY - touchStartPosRef.current.y);
+                      // If moved more than 10px, consider it a scroll
+                      if (deltaX > 10 || deltaY > 10) {
+                        touchMovedRef.current = true;
+                      }
+                    }
                   }}
                   onClick={(e) => {
                     // Prevent double opening on mobile - if touch was recent, ignore click
@@ -414,6 +433,11 @@ const Expertise = () => {
                     if (timeSinceTouch < 500 || isOpeningRef.current) {
                       e.preventDefault();
                       e.stopPropagation();
+                      return;
+                    }
+                    
+                    // Only handle click on desktop (not mobile)
+                    if (isMobileLandscape || isMobilePortrait) {
                       return;
                     }
                     
@@ -427,18 +451,52 @@ const Expertise = () => {
                   }}
                   onTouchEnd={(e) => {
                     e.stopPropagation();
-                    e.preventDefault();
                     
                     // Only open if not already opening or open (prevent double opening)
                     if (isOpeningRef.current || selectedCard) {
+                      touchStartPosRef.current = null;
+                      touchMovedRef.current = false;
                       return;
                     }
                     
+                    // Check if this was a scroll or a tap
+                    if (touchMovedRef.current || !touchStartPosRef.current) {
+                      touchStartPosRef.current = null;
+                      touchMovedRef.current = false;
+                      return;
+                    }
+                    
+                    // Calculate final touch position
+                    const touch = e.changedTouches[0];
+                    const deltaX = Math.abs(touch.clientX - touchStartPosRef.current.x);
+                    const deltaY = Math.abs(touch.clientY - touchStartPosRef.current.y);
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    
+                    // Only open if movement was minimal (less than 15px) - indicating a tap, not a scroll
+                    if (distance > 15) {
+                      touchStartPosRef.current = null;
+                      touchMovedRef.current = false;
+                      return;
+                    }
+                    
+                    // Also check time - taps should be quick (less than 300ms)
+                    const touchDuration = Date.now() - touchStartRef.current;
+                    if (touchDuration > 300) {
+                      touchStartPosRef.current = null;
+                      touchMovedRef.current = false;
+                      return;
+                    }
+                    
+                    // This was a tap, open the card
+                    e.preventDefault();
                     isOpeningRef.current = true;
                     setSelectedCard(area);
                     setTimeout(() => {
                       isOpeningRef.current = false;
                     }, 300);
+                    
+                    touchStartPosRef.current = null;
+                    touchMovedRef.current = false;
                   }}
                 >
                   {/* Floating Images on Hover (Desktop only - not mobile) */}

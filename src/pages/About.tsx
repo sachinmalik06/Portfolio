@@ -102,6 +102,20 @@ const About = () => {
       console.log('Profile Card Settings:', profileCardSettings);
     }
   }, [profileCardSettings]);
+
+  // Start encryption animation when masking is complete (backup trigger)
+  useEffect(() => {
+    if (maskingComplete && !startEncryption) {
+      // Small delay to ensure masking animation is fully complete
+      const timer = setTimeout(() => {
+        setStartEncryption(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else if (!maskingComplete && startEncryption) {
+      // Stop encryption when masking is not complete (scrolling back)
+      setStartEncryption(false);
+    }
+  }, [maskingComplete, startEncryption]);
   
   const infoCards = [
     { label: "Role", value: content.role },
@@ -147,13 +161,18 @@ const About = () => {
       });
 
       // Create a simple timeline for masking animation
+      // Pin the wrapper to keep introduction section fixed during scroll
+      // For mobile portrait, we need to pin the wrapper so it stays fixed during scroll
       const maskTl = gsap.timeline({
         scrollTrigger: {
           trigger: scrollSpacerRef.current,
           start: "top top",
           end: "bottom bottom",
           scrub: 2,
+          pin: wrapperRef.current, // Pin the wrapper to keep introduction section fixed
+          pinSpacing: true,
           invalidateOnRefresh: true,
+          anticipatePin: 1,
         }
       });
 
@@ -165,7 +184,18 @@ const About = () => {
         transformOrigin: "center center",
         ease: "power2.inOut",
         duration: 1,
-        willChange: "transform, opacity"
+        willChange: "transform, opacity",
+        onComplete: () => {
+          // Start encryption animation and show profile card when masking is complete
+          setMaskingComplete(true);
+          setStartEncryption(true);
+          setIntroVisible(true); // Show profile card when masking completes
+        },
+        onReverseComplete: () => {
+          setMaskingComplete(false);
+          setStartEncryption(false);
+          setIntroVisible(false); // Hide profile card when scrolling back
+        }
       });
 
       // Animate text elements to slide up smoothly (mobile portrait)
@@ -173,7 +203,7 @@ const About = () => {
       if (textElements.length > 0) {
         // Calculate when the last element finishes animating
         const totalStaggerTime = (textElements.length - 1) * 0.15;
-        const totalAnimationTime = 1 + totalStaggerTime;
+        const totalAnimationTime = 1.2 + totalStaggerTime;
         
         maskTl.fromTo(
           textElements,
@@ -185,27 +215,24 @@ const About = () => {
             duration: 1.2,
             stagger: 0.15,
             ease: "power3.out",
-            willChange: "transform, opacity"
+            willChange: "transform, opacity",
+            onReverseComplete: () => {
+              // Hide intro and encryption when scrolling back
+              setIntroVisible(false);
+              setStartEncryption(false);
+            }
           },
           "-=0.5" // Start slightly before masking completes
         );
         
-        // Set intro visible after all text animations complete, with smooth delay
-        maskTl.call(() => {
-          setTimeout(() => {
-            setIntroVisible(true);
-          }, 300);
-        }, [], `+=${totalAnimationTime - 1}`);
+        // Profile card visibility is handled in masking animation's onComplete callback
+        // No need for separate callback here since onComplete already sets introVisible
       } else {
-        // If no text elements, set intro visible after masking starts
-        maskTl.call(() => {
-          setTimeout(() => {
-            setIntroVisible(true);
-          }, 300);
-        }, [], "-=0.5");
+        // Profile card visibility is handled in masking animation's onComplete callback
+        // No need for separate callback here since onComplete already sets introVisible
       }
 
-      // Track when masking animation completes (at 50% progress) - works in reverse too
+      // Track scroll progress for additional state management
       const progressTrigger = ScrollTrigger.create({
         trigger: scrollSpacerRef.current,
         start: "top top",
@@ -214,20 +241,15 @@ const About = () => {
         onUpdate: (self) => {
           if (self.progress >= 0.5) {
             setMaskingComplete(true);
-            setStartEncryption(true);
           } else {
             setMaskingComplete(false);
             setStartEncryption(false);
           }
         },
-        onEnter: () => {
-          setMaskingComplete(true);
-          setStartEncryption(true);
-        },
         onLeaveBack: () => {
           setMaskingComplete(false);
           setStartEncryption(false);
-          setIntroVisible(false);
+          setIntroVisible(false); // Hide intro (which hides profile card) when scrolling back
         }
       });
 
@@ -235,6 +257,12 @@ const About = () => {
       maskTl.to({}, { duration: 1.5 });
 
       // Fade out wrapper and fade in timeline (mobile portrait)
+      // Also hide intro and profile card when wrapper fades out
+      maskTl.call(() => {
+        setIntroVisible(false);
+        setStartEncryption(false);
+      }, [], "-=0.5");
+      
       maskTl.to(wrapperRef.current, {
         opacity: 0,
         autoAlpha: 0,
@@ -334,15 +362,38 @@ const About = () => {
         }
       },
       onComplete: () => {
+        // Start encryption animation when masking is complete
         setMaskingComplete(true);
+        setStartEncryption(true);
       },
       onReverseComplete: () => {
         setMaskingComplete(false);
+        setStartEncryption(false);
       }
     });
 
     // 2. Reveal Content & Profile Card (After image is cleared)
-    // Profile Card Reveal - start from right side (skip animation in mobile landscape)
+    // Text Reveal (Staggered) - Start first
+    const textElements = gsap.utils.toArray(".animate-text");
+    tl.fromTo(textElements, 
+      { y: 30, opacity: 0, autoAlpha: 0 },
+      { 
+        y: 0, 
+        opacity: 1, 
+        autoAlpha: 1, 
+        duration: 0.8, 
+        stagger: 0.1, 
+        ease: "power2.out", 
+        willChange: "transform, opacity",
+        onReverseComplete: () => {
+          // Hide encryption when text reverses
+          setStartEncryption(false);
+        }
+      },
+      "-=0.25" // Start slightly before image is fully gone for smoothness
+    );
+
+    // Profile Card Reveal - start from right side, synced with text (skip animation in mobile landscape)
     if (!isMobileLandscape) {
       // For desktop, ensure inner card uses CSS classes, not GSAP scale
       const innerCard = profileCardRef.current?.querySelector('div');
@@ -353,38 +404,69 @@ const About = () => {
         });
       }
       
+      // Profile card appears at the same time as text (synced)
+      // Profile card stays visible until fade out phase
       tl.fromTo(profileCardRef.current, 
-        { x: 200, opacity: 0, autoAlpha: 0 },
+        { x: 200, opacity: 0, autoAlpha: 0, visibility: 'hidden' },
         { 
-          x: 0, opacity: 1, autoAlpha: 1, duration: 0.8, ease: "power2.out",
-          onStart: () => setStartEncryption(true),
-          onReverseComplete: () => setStartEncryption(false),
-          willChange: "transform, opacity"
+          x: 0, 
+          opacity: 1, 
+          autoAlpha: 1, 
+          visibility: 'visible',
+          duration: 0.8, 
+          ease: "power2.out",
+          willChange: "transform, opacity",
+          onReverseComplete: () => {
+            // Hide profile card when scrolling back (before text disappears)
+            if (profileCardRef.current) {
+              gsap.set(profileCardRef.current, {
+                visibility: 'hidden',
+                autoAlpha: 0,
+                opacity: 0
+              });
+            }
+            setStartEncryption(false);
+          },
+          onReverseStart: () => {
+            // Start hiding profile card when reverse animation starts
+            setStartEncryption(false);
+          }
         },
-        "-=0.25" // Start slightly before image is fully gone for smoothness
+        "<" // Start at the same time as text reveal
       );
+      
+      // Keep profile card visible during hold phase - it will fade out with wrapper
+      // No need to hide it separately, it stays visible until fade out
     }
-
-    // Text Reveal (Staggered)
-    const textElements = gsap.utils.toArray(".animate-text");
-    tl.fromTo(textElements, 
-      { y: 30, opacity: 0, autoAlpha: 0 },
-      { y: 0, opacity: 1, autoAlpha: 1, duration: 0.8, stagger: 0.1, ease: "power2.out", willChange: "transform, opacity" },
-      "<" // Sync with Profile Card reveal
-    );
 
     // 3. Hold Phase (2 seconds equivalent in scroll distance)
     tl.to({}, { duration: 1.5 });
 
     // 4. Fade Out Main Frame (Intro & Profile Card)
-    // Completely fade out the wrapper to reveal the timeline underneath
-    tl.to(wrapperRef.current, {
+    // Fade out profile card and wrapper together - profile card stays until fade out
+    tl.to([profileCardRef.current, wrapperRef.current], {
       opacity: 0,
       autoAlpha: 0,
       duration: 1,
       ease: "power2.inOut",
-      pointerEvents: "none", // Ensure clicks go through to timeline
-      willChange: "opacity"
+      willChange: "opacity",
+      onStart: () => {
+        // Stop encryption when fade out starts
+        setStartEncryption(false);
+      },
+      onComplete: () => {
+        // Ensure profile card is hidden after fade out
+        if (profileCardRef.current) {
+          gsap.set(profileCardRef.current, {
+            visibility: 'hidden',
+            pointerEvents: 'none'
+          });
+        }
+        // Ensure wrapper pointer events are disabled
+        if (wrapperRef.current) {
+          wrapperRef.current.style.pointerEvents = "none";
+        }
+      }
     });
     
     // Fade In Timeline (Cross-fade)
@@ -611,12 +693,14 @@ const About = () => {
                       {content.introText}
                     </p>
                     
-                    <div className="text-lg md:text-xl leading-relaxed font-light text-muted-foreground">
+                    <div 
+                      className={`text-lg md:text-xl leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'min-h-[3rem]' : ''}`}
+                    >
                       <EncryptedText 
                         text={content.encryptedText}
                         encryptedClassName="text-muted-foreground/30"
                         revealedClassName="text-foreground"
-                        revealDelayMs={30}
+                        revealDelayMs={isMobilePortrait ? 40 : 30}
                         animate={startEncryption}
                       />
                     </div>

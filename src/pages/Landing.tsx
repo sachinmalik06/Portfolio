@@ -862,7 +862,7 @@ export default function Landing() {
                  playsInline
                  loop
                  preload="auto"
-                  crossOrigin="anonymous"
+                 // Removed crossOrigin - causes CORS errors for external videos unless server supports it
                  onError={(e) => {
                     console.error('Final video error:', e);
                     // Don't hide the video, just log the error

@@ -117,3 +117,4 @@ The profile card settings are stored in `site_settings` table:
 **The lanyard texture update works immediately!** Just add a URL and save. 🎉
 
 
+
