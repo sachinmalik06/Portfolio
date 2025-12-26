@@ -1,6 +1,12 @@
 import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
 import { convertDriveUrlToDirectImageUrl } from '@/lib/image-utils';
 
+// Helper to check if device is mobile
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return window.innerWidth <= 768;
+};
+
 interface GalleryItem {
   id: string;
   title: string;
@@ -68,16 +74,18 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
           };
           
           // Set src after handlers to ensure they're attached (convert Google Drive URLs if needed)
-          img.src = convertDriveUrlToDirectImageUrl(item.image);
+          const imageUrl = convertDriveUrlToDirectImageUrl(item.image);
+          img.src = imageUrl;
           
-          // Timeout after 10 seconds
+          // Timeout after 10 seconds (longer on mobile for slower connections)
+          const timeout = isMobileDevice() ? 15000 : 10000;
           setTimeout(() => {
             if (!loadedState[item.id] && !erroredState[item.id]) {
               console.warn(`Image load timeout for item ${item.id}:`, item.image);
               erroredState[item.id] = true;
               resolve();
             }
-          }, 10000);
+          }, timeout);
         });
 
         loadPromises.push(promise);
@@ -98,12 +106,35 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
             const imageUrl = convertDriveUrlToDirectImageUrl(item.image);
             // Ensure background image is set
             if (imageUrl) {
+              // Force update background image and visibility
               div.style.backgroundImage = `url(${imageUrl})`;
               div.style.backgroundSize = 'cover';
               div.style.backgroundPosition = '50% 0';
               div.style.backgroundRepeat = 'no-repeat';
               div.style.opacity = '1';
+              div.style.display = 'block';
+              div.style.visibility = 'visible';
+              // Force a reflow to ensure styles are applied (especially on mobile)
+              div.offsetHeight;
+              
+              // On mobile, also ensure parent container is visible
+              if (isMobileDevice()) {
+                const parent = div.parentElement;
+                if (parent) {
+                  parent.style.display = 'block';
+                  parent.style.visibility = 'visible';
+                  parent.style.opacity = '1';
+                }
+              }
             }
+          }
+        } else if (item.image && !imagesLoaded[item.id] && !imagesErrored[item.id]) {
+          // Ensure div exists and is ready even if image hasn't loaded yet
+          const div = imageInnerRefs.current[index];
+          if (div) {
+            div.style.opacity = '0';
+            div.style.display = 'block';
+            div.style.visibility = 'visible';
           }
         }
       });
@@ -128,6 +159,8 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
           visibility: 'hidden',
           opacity: 0,
           pointerEvents: 'none',
+          display: 'block', // Ensure it's displayed when visible
+          WebkitTransform: 'translateY(100%)', // Safari mobile support
         }}
       >
         <div
@@ -181,10 +214,13 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                 margin: '0 3vw',
                 display: 'grid',
                 gridTemplateAreas: "'... ...' '... gallery-image' '... ...'",
-                gridTemplateColumns: '8rem 21vmax',
-                gridTemplateRows: '8rem 28vmax 3rem',
-                paddingTop: index % 2 === 1 ? '10vh' : '0',
+                // Use responsive sizing - smaller on mobile
+                gridTemplateColumns: isMobileDevice() ? '6rem 18vmax' : '8rem 21vmax',
+                gridTemplateRows: isMobileDevice() ? '6rem 24vmax 2rem' : '8rem 28vmax 3rem',
+                paddingTop: index % 2 === 1 ? (isMobileDevice() ? '8vh' : '10vh') : '0',
                 willChange: 'transform',
+                minWidth: isMobileDevice() ? '240px' : '280px', // Ensure minimum width on mobile
+                minHeight: isMobileDevice() ? '250px' : '300px', // Ensure minimum height on mobile
               }}
             >
               <div 
@@ -201,6 +237,12 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                   ref={(el) => {
                     if (el) {
                       imageInnerRefs.current[index] = el;
+                      // Ensure image is set immediately if already loaded
+                      if (item.image && !imagesErrored[item.id] && imagesLoaded[item.id]) {
+                        const imageUrl = convertDriveUrlToDirectImageUrl(item.image);
+                        el.style.backgroundImage = `url(${imageUrl})`;
+                        el.style.opacity = '1';
+                      }
                     }
                   }}
                   className="gallery__item-imginner"
@@ -216,6 +258,9 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                     filter: 'saturate(0) brightness(0)', // Initial filter state
                     opacity: item.image && imagesLoaded[item.id] && !imagesErrored[item.id] ? 1 : 0,
                     transition: 'opacity 0.3s ease-in-out',
+                    minHeight: '200px', // Ensure minimum height on mobile
+                    display: 'block', // Ensure it's displayed
+                    position: 'relative', // Ensure positioning works
                   }}
                 >
                   {/* Preload image using img tag for better browser handling */}
@@ -244,6 +289,10 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                             div.style.backgroundPosition = '50% 0';
                             div.style.backgroundRepeat = 'no-repeat';
                             div.style.opacity = '1';
+                            div.style.display = 'block';
+                            div.style.visibility = 'visible';
+                            // Force a reflow to ensure styles are applied (especially on mobile)
+                            div.offsetHeight;
                           }
                         }
                       }}
