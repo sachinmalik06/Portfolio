@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { Mail, Linkedin, Twitter, ArrowUpRight, User, Briefcase, Github, Instagram, Facebook, Youtube, MessageCircle, Send, MessageSquare, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -113,7 +113,15 @@ const Contact = () => {
     });
   }
 
-  const allLinks = pageSocialLinks.length > 0
+  type ContactLink = {
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    href: string;
+    value: string;
+    platform?: string;
+  };
+
+  const allLinks: ContactLink[] = pageSocialLinks.length > 0
     ? pageSocialLinks.map((link: any) => {
         const IconComponent = getIcon(link.platform);
         const platformLabel = getPlatformLabel(link.platform);
@@ -123,8 +131,9 @@ const Contact = () => {
           label: platformLabel,
           href: link.href,
           value: isEmail 
-            ? link.href.replace("mailto:", "") // Show email address for email links
-            : link.href, // Show URL for social links
+            ? (link.label || link.href.replace("mailto:", "")) // Use label if provided, otherwise email address
+            : (link.label || link.href), // Use label if provided, otherwise URL
+          platform: link.platform,
         };
       })
     : [];
@@ -256,7 +265,7 @@ const Contact = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="grid md:grid-cols-3 gap-8 mb-16"
           >
-            {allLinks.map((link, index) => (
+            {allLinks.map((link: ContactLink, index: number) => (
               <motion.a
                 key={link.label}
                 href={link.href}
@@ -268,7 +277,7 @@ const Contact = () => {
                 className="group relative p-8 rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm hover:border-primary/30 hover:bg-card/50 transition-all duration-500"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <link.icon className="w-6 h-6 text-primary" />
+                  {React.createElement(link.icon, { className: "w-6 h-6 text-primary" })}
                   <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
                 </div>
                 <h3 className="text-lg font-display text-foreground">
@@ -298,8 +307,8 @@ const Contact = () => {
             </p>
             {(() => {
               // Find first email link (Gmail platform or mailto: href)
-              const firstEmailLink = allLinks.find((link) => 
-                link.href.startsWith("mailto:") || link.icon === Mail
+              const firstEmailLink = allLinks.find((link: ContactLink) => 
+                link.href.startsWith("mailto:") || link.platform === "gmail"
               );
               return firstEmailLink ? (
                 <a href={firstEmailLink.href}>
