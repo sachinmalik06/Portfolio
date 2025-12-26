@@ -1,8 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
 import { InstrumentationProvider } from "@/instrumentation.tsx";
 import { SupabaseAuthProvider } from "@/components/providers/SupabaseAuthProvider";
+import { ThemeProvider, useTheme } from "@/components/providers/ThemeProvider";
 import { MetaTags } from "@/components/MetaTags";
-import { StrictMode, useEffect, lazy, Suspense } from "react";
+import { StrictMode, useEffect, lazy, Suspense, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
@@ -22,6 +23,7 @@ const Dashboard = lazy(() => import("./pages/admin/Dashboard.tsx"));
 const ExpertiseManager = lazy(() => import("./pages/admin/ExpertiseManager.tsx"));
 const TimelineManager = lazy(() => import("./pages/admin/TimelineManager.tsx"));
 const PagesManager = lazy(() => import("./pages/admin/PagesManager.tsx"));
+const GalleryManager = lazy(() => import("./pages/admin/GalleryManager.tsx"));
 const FooterManager = lazy(() => import("./pages/admin/FooterManager.tsx"));
 const MetaTagsManager = lazy(() => import("./pages/admin/MetaTagsManager.tsx"));
 const Settings = lazy(() => import("./pages/admin/Settings.tsx"));
@@ -68,14 +70,66 @@ function ScrollToTop() {
   return null;
 }
 
+// Component to enforce light mode only on Landing page
+function ThemeRouteGuard() {
+  const location = useLocation();
+  const { setTheme } = useTheme();
+  const prevPathRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Store Landing theme preference separately
+    const landingThemeKey = 'landingTheme';
+    const currentPath = location.pathname;
+    const prevPath = prevPathRef.current;
+    
+    // Only run when route actually changes (not on initial mount if already on Landing)
+    if (prevPath === currentPath) {
+      return;
+    }
+    
+    // Update prev path after checking
+    const wasOnLanding = prevPath === '/';
+    prevPathRef.current = currentPath;
+    
+    if (currentPath === '/') {
+      // Just navigated TO Landing page: restore saved landing theme
+      const savedLandingTheme = localStorage.getItem(landingThemeKey) as 'light' | 'dark' | null;
+      if (savedLandingTheme) {
+        setTheme(savedLandingTheme);
+      } else {
+        // First time on Landing page - default to dark
+        setTheme('dark');
+        localStorage.setItem(landingThemeKey, 'dark');
+      }
+    } else if (wasOnLanding) {
+      // Just navigated AWAY from Landing: save current theme and force dark
+      // Only force dark for non-admin pages
+      if (currentPath !== '/admin' && !currentPath.startsWith('/admin/') && !currentPath.startsWith('/auth')) {
+        // Save current theme as landing theme (check localStorage for current theme)
+        const currentTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+        if (currentTheme === 'light') {
+          localStorage.setItem(landingThemeKey, 'light');
+        }
+        // Force dark mode on all non-admin pages
+        setTheme('dark');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]); // Only run on route change
+
+  return null;
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <InstrumentationProvider>
-      <SupabaseAuthProvider>
-        <BrowserRouter>
+    <ThemeProvider>
+      <InstrumentationProvider>
+        <SupabaseAuthProvider>
+          <BrowserRouter>
           <MetaTags />
           <RouteSyncer />
           <ScrollToTop />
+          <ThemeRouteGuard />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
               <Route path="/" element={<Landing />} />
@@ -90,7 +144,8 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="expertise" element={<ExpertiseManager />} />
                 <Route path="timeline" element={<TimelineManager />} />
                 <Route path="pages" element={<PagesManager />} />
-              <Route path="footer" element={<FooterManager />} />
+                <Route path="gallery" element={<GalleryManager />} />
+                <Route path="footer" element={<FooterManager />} />
               <Route path="meta-tags" element={<MetaTagsManager />} />
               <Route path="settings" element={<Settings />} />
               </Route>
@@ -98,9 +153,10 @@ createRoot(document.getElementById("root")!).render(
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
-        </BrowserRouter>
-        <Toaster />
-      </SupabaseAuthProvider>
-    </InstrumentationProvider>
+          </BrowserRouter>
+          <Toaster />
+        </SupabaseAuthProvider>
+      </InstrumentationProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

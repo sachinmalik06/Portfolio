@@ -288,3 +288,102 @@ export function useDeleteTimelineEntry() {
   return { mutate, isLoading, error };
 }
 
+// Gallery Items
+export function useGalleryItems(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getGalleryItems(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateGalleryItem() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (item: Parameters<typeof cms.createGalleryItem>[0]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createGalleryItem(item);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateGalleryItem() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: Parameters<typeof cms.updateGalleryItem>[1]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateGalleryItem(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteGalleryItem() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteGalleryItem(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+// Gallery Text Settings
+export function useGalleryTextSettings() {
+  return useSupabaseQuery(
+    () => cms.getGalleryTextSettings(),
+    []
+  );
+}
+
+export function useUpdateGalleryTextSettings() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (settings: Parameters<typeof cms.updateGalleryTextSettings>[0]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateGalleryTextSettings(settings);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+

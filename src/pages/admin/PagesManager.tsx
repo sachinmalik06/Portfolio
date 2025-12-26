@@ -91,6 +91,7 @@ function HomeEditor({ initialData, onSave }: { initialData: any, onSave: (data: 
     heroTitle1: "PORT",
     heroTitle2: "FOLIO",
     videoUrl: "https://videos.pexels.com/video-files/5377684/5377684-uhd_2560_1440_25fps.mp4",
+    finalVideoUrl: "https://videos.pexels.com/video-files/3222356/3222356-hd_1920_1080_25fps.mp4",
     bottomTextLeftTitle: "CINEMATIC",
     bottomTextLeftSubtitle: "Showreel 2024",
     bottomTextRightTitle: "STRATEGY",
@@ -127,6 +128,12 @@ function HomeEditor({ initialData, onSave }: { initialData: any, onSave: (data: 
         <div className="space-y-2">
           <Label>Main Video URL</Label>
           <Input name="videoUrl" value={formData.videoUrl} onChange={handleChange} />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Second Video URL (After GSAP Text Animation)</Label>
+          <Input name="finalVideoUrl" value={formData.finalVideoUrl} onChange={handleChange} />
+          <p className="text-xs text-muted-foreground">This video appears after the horizontal scrolling text animation section.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-6">

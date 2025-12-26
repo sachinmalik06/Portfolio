@@ -166,7 +166,43 @@ export interface Database {
           updated_at?: string
         }
       }
+      gallery_items: {
+        Row: {
+          id: string
+          title: string
+          number: string
+          image: string
+          tags: string[] | null
+          order: number
+          active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          number: string
+          image: string
+          tags?: string[] | null
+          order?: number
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          number?: string
+          image?: string
+          tags?: string[] | null
+          order?: number
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
+
 

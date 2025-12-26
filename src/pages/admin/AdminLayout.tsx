@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, Outlet, useLocation, Navigate } from "react-router";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,9 @@ import {
   Globe
 } from "lucide-react";
 import { useAuth } from "@/components/providers/SupabaseAuthProvider";
+import { useTheme } from "@/components/providers/ThemeProvider";
+
+type Theme = 'light' | 'dark';
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +36,34 @@ import { Separator } from "@/components/ui/separator";
 export default function AdminLayout() {
   const location = useLocation();
   const { isAuthenticated, isLoading, signOut, isAdmin } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const originalThemeRef = useRef<Theme | null>(null);
+
+  // Force dark theme for admin panel
+  useEffect(() => {
+    // Store original theme before forcing dark
+    if (originalThemeRef.current === null) {
+      originalThemeRef.current = theme;
+    }
+    
+    const root = document.documentElement;
+    root.classList.add('dark');
+    root.classList.remove('light');
+    
+    return () => {
+      // Restore original theme when leaving admin
+      const originalTheme = originalThemeRef.current || 'dark';
+      if (originalTheme === 'light') {
+        root.classList.add('light');
+        root.classList.remove('dark');
+      } else {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      }
+      // Reset ref for next time
+      originalThemeRef.current = null;
+    };
+  }, [theme]);
 
   if (isLoading) {
     return (
@@ -62,10 +93,12 @@ export default function AdminLayout() {
     { icon: Layers, label: "Expertise Cards", to: "/admin/expertise" },
     { icon: Clock, label: "Timeline", to: "/admin/timeline" },
     { icon: FileText, label: "Pages", to: "/admin/pages" },
+    { icon: Layers, label: "Gallery", to: "/admin/gallery" },
     { icon: FileText, label: "Footer", to: "/admin/footer" },
     { icon: Globe, label: "Meta Tags", to: "/admin/meta-tags" },
     { icon: SettingsIcon, label: "Settings", to: "/admin/settings" },
   ];
+
 
   return (
     <SidebarProvider>

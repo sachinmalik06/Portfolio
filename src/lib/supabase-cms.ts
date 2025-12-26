@@ -4,6 +4,7 @@ import type { Database } from './database.types';
 type ExpertiseCard = Database['public']['Tables']['expertise_cards']['Row'];
 type TimelineEntry = Database['public']['Tables']['timeline_entries']['Row'];
 type Page = Database['public']['Tables']['pages']['Row'];
+type GalleryItem = Database['public']['Tables']['gallery_items']['Row'];
 
 // --- EXPERTISE CARDS ---
 export async function getExpertiseCards(includeInactive = false) {
@@ -178,18 +179,23 @@ export async function updateAboutFooterText(settings: any) {
 
 // --- META TAGS ---
 export async function getMetaTags() {
-  const { data, error } = await supabase
-    .from('site_settings')
-    .select('*')
-    .eq('key', 'meta_tags')
-    .single() as any;
-  
-  if (error && error.code !== 'PGRST116') {
-    console.error('Error fetching meta tags:', error);
+  try {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('*')
+      .eq('key', 'meta_tags')
+      .maybeSingle() as any;
+    
+    if (error && error.code !== 'PGRST116') {
+      // Silently handle 406 and other errors - return null if not found
+      return null;
+    }
+    
+    return ((data as any)?.value as any) || null;
+  } catch (err) {
+    // Silently handle any errors
     return null;
   }
-  
-  return ((data as any)?.value as any) || null;
 }
 
 export async function updateMetaTags(settings: any) {
@@ -325,6 +331,103 @@ export async function deleteTimelineEntry(id: string) {
     .delete()
     .eq('id', id);
   if (error) throw error;
+}
+
+// --- GALLERY ITEMS ---
+export async function getGalleryItems(includeInactive = false) {
+  let query = supabase
+    .from('gallery_items')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createGalleryItem(item: Database['public']['Tables']['gallery_items']['Insert']) {
+  const { data, error } = await supabase
+    .from('gallery_items')
+    .insert(item as any)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as GalleryItem;
+}
+
+export async function updateGalleryItem(
+  id: string,
+  updates: Database['public']['Tables']['gallery_items']['Update']
+) {
+  const result = await ((supabase.from('gallery_items') as any)
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single());
+  if (result.error) throw result.error;
+  return result.data as GalleryItem;
+}
+
+export async function deleteGalleryItem(id: string) {
+  const { error } = await supabase
+    .from('gallery_items')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// --- GALLERY TEXT SETTINGS ---
+export async function getGalleryTextSettings() {
+  const { data, error } = await supabase
+    .from('site_settings')
+    .select('*')
+    .eq('key', 'gallery_text')
+    .maybeSingle();
+  
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching gallery text settings:', error);
+    return null;
+  }
+  
+  return ((data as any)?.value as any) || {
+    startText: { first: 'Ariel', second: 'Croze' },
+    endText: { first: 'Daria', second: 'Gaita' }
+  };
+}
+
+export async function updateGalleryTextSettings(settings: any) {
+  const existingQuery = supabase
+    .from('site_settings')
+    .select('id')
+    .eq('key', 'gallery_text')
+    .maybeSingle();
+  
+  const { data: existing } = await (existingQuery as any);
+  
+  if (existing && (existing as any).id) {
+    const updateQuery = (supabase
+      .from('site_settings') as any)
+      .update({ value: settings, updated_at: new Date().toISOString() })
+      .eq('id', (existing as any).id)
+      .select()
+      .single();
+    const { data, error } = await updateQuery;
+    if (error) throw error;
+    return (data as any)?.value as any;
+  } else {
+    const insertQuery = (supabase
+      .from('site_settings') as any)
+      .insert({ key: 'gallery_text', value: settings })
+      .select()
+      .single();
+    const { data, error } = await insertQuery;
+    if (error) throw error;
+    return (data as any)?.value as any;
+  }
 }
 
 

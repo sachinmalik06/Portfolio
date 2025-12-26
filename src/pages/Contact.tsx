@@ -1,10 +1,11 @@
 import { useRef, useEffect } from "react";
-import { Mail, Linkedin, Twitter, ArrowUpRight } from "lucide-react";
+import { Mail, Linkedin, Twitter, ArrowUpRight, User, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { usePage } from "@/hooks/use-cms";
 import PillNav from "@/components/PillNav";
+import FloatingActionMenu from "@/components/FloatingActionMenu";
 import gsap from "gsap";
 
 const fadeInUp = {
@@ -21,6 +22,7 @@ const lineReveal = {
 
 const Contact = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const pillNavRef = useRef<HTMLDivElement>(null);
   const { data: pageData } = usePage("contact");
@@ -55,9 +57,9 @@ const Contact = () => {
     },
   ];
 
-  // Animate pill navbar from top on mount
+  // Animate pill navbar from top on mount (Desktop only)
   useEffect(() => {
-    if (pillNavRef.current) {
+    if (pillNavRef.current && window.innerWidth >= 768) {
       gsap.set(pillNavRef.current, {
         y: -100,
         opacity: 0,
@@ -72,6 +74,13 @@ const Contact = () => {
         ease: "back.out(1.2)",
         delay: 0.3
       });
+    } else if (pillNavRef.current) {
+      // On mobile, ensure it's completely hidden
+      gsap.set(pillNavRef.current, {
+        display: 'none',
+        visibility: 'hidden',
+        opacity: 0
+      });
     }
   }, []);
 
@@ -80,8 +89,31 @@ const Contact = () => {
       ref={containerRef}
       className="min-h-screen bg-background text-foreground relative overflow-hidden"
     >
-      {/* PILL NAV - Appears from top */}
-      <div ref={pillNavRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto w-full max-w-fit px-4" style={{ visibility: 'hidden', opacity: 0 }}>
+      {/* Floating Action Menu - Mobile Only */}
+      <div className="fixed top-4 right-4 z-[60] md:hidden">
+        <FloatingActionMenu
+          options={[
+            {
+              label: "Home",
+              onClick: () => navigate("/"),
+              Icon: <User className="w-4 h-4" />,
+            },
+            {
+              label: "About",
+              onClick: () => navigate("/about"),
+              Icon: <User className="w-4 h-4" />,
+            },
+            {
+              label: "Expertise",
+              onClick: () => navigate("/expertise"),
+              Icon: <Briefcase className="w-4 h-4" />,
+            },
+          ]}
+        />
+      </div>
+
+      {/* PILL NAV - Appears from top (Desktop Only) */}
+      <div ref={pillNavRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto w-full max-w-fit px-4 hidden md:block" style={{ visibility: 'hidden', opacity: 0, display: 'none' }}>
         <PillNav
           items={[
             { label: 'Home', href: '/' },

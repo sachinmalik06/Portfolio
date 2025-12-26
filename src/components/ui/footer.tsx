@@ -31,24 +31,24 @@ export function Footer({
   copyright,
 }: FooterProps) {
   return (
-    <footer className="pb-6 pt-16 lg:pb-8 lg:pt-24 bg-background text-foreground">
-      <div className="px-4 lg:px-8">
-        <div className="md:flex md:items-start md:justify-between">
+    <footer className="pb-3 pt-8 sm:pb-4 sm:pt-10 md:pb-6 md:pt-12 lg:pb-8 lg:pt-24 bg-background text-foreground">
+      <div className="px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-0">
           <a
             href="/"
             className="flex items-center gap-x-2"
             aria-label={brandName}
           >
             {logo}
-            <span className="font-bold text-xl">{brandName}</span>
+            <span className="font-bold text-base sm:text-lg md:text-xl">{brandName}</span>
           </a>
-          <ul className="flex list-none mt-6 md:mt-0 space-x-3">
+          <ul className="flex list-none sm:mt-0 space-x-1.5 sm:space-x-2 md:space-x-3">
             {socialLinks.map((link, i) => (
               <li key={i}>
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="h-10 w-10 rounded-full"
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-full"
                   asChild
                 >
                   <a href={link.href} target="_blank" aria-label={link.label}>
@@ -59,14 +59,14 @@ export function Footer({
             ))}
           </ul>
         </div>
-        <div className="border-t border-border mt-6 pt-6 md:mt-4 md:pt-8 lg:grid lg:grid-cols-10">
+        <div className="border-t border-border mt-4 pt-4 sm:mt-5 sm:pt-5 md:mt-6 md:pt-6 lg:grid lg:grid-cols-10">
           <nav className="lg:mt-0 lg:col-[4/11]">
-            <ul className="list-none flex flex-wrap -my-1 -mx-2 lg:justify-end">
+            <ul className="list-none flex flex-wrap -my-0.5 -mx-1.5 sm:-my-1 sm:-mx-2 justify-end lg:justify-end">
               {mainLinks.map((link, i) => (
-                <li key={i} className="my-1 mx-2 shrink-0">
+                <li key={i} className="my-0.5 mx-1.5 sm:my-1 sm:mx-2 shrink-0">
                   <a
                     href={link.href}
-                    className="text-sm text-primary underline-offset-4 hover:underline"
+                    className="text-[11px] sm:text-xs md:text-sm text-primary underline-offset-4 hover:underline"
                   >
                     {link.label}
                   </a>
@@ -74,13 +74,13 @@ export function Footer({
               ))}
             </ul>
           </nav>
-          <div className="mt-6 lg:mt-0 lg:col-[4/11]">
-            <ul className="list-none flex flex-wrap -my-1 -mx-3 lg:justify-end">
+          <div className="mt-3 sm:mt-4 md:mt-6 lg:mt-0 lg:col-[4/11]">
+            <ul className="list-none flex flex-wrap -my-0.5 -mx-1.5 sm:-my-1 sm:-mx-2 md:-mx-3 justify-end lg:justify-end">
               {legalLinks.map((link, i) => (
-                <li key={i} className="my-1 mx-3 shrink-0">
+                <li key={i} className="my-0.5 mx-1.5 sm:my-1 sm:mx-2 md:mx-3 shrink-0">
                   <a
                     href={link.href}
-                    className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+                    className="text-[11px] sm:text-xs md:text-sm text-muted-foreground underline-offset-4 hover:underline"
                   >
                     {link.label}
                   </a>
@@ -88,9 +88,9 @@ export function Footer({
               ))}
             </ul>
           </div>
-          <div className="mt-6 text-sm leading-6 text-muted-foreground whitespace-nowrap lg:mt-0 lg:row-[1/3] lg:col-[1/4]">
-            <div>{copyright.text}</div>
-            {copyright.license && <div>{copyright.license}</div>}
+          <div className="mt-3 sm:mt-4 md:mt-6 text-[10px] sm:text-xs md:text-sm leading-5 sm:leading-6 text-muted-foreground lg:mt-0 lg:row-[1/3] lg:col-[1/4]">
+            <div className="break-words sm:break-normal">{copyright.text}</div>
+            {copyright.license && <div className="break-words sm:break-normal mt-1">{copyright.license}</div>}
           </div>
         </div>
       </div>

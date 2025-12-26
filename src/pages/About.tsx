@@ -1,5 +1,5 @@
 import { EncryptedText } from "@/components/ui/encrypted-text";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import DecayCard from "@/components/DecayCard";
 import { Suspense, useRef, useState, useEffect, type RefObject } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -10,6 +10,8 @@ import { Timeline } from "@/components/ui/timeline";
 import VariableProximity from "@/components/VariableProximity";
 import { usePage, useTimeline, useProfileCardSettings, useAboutFooterText } from "@/hooks/use-cms";
 import PillNav from "@/components/PillNav";
+import FloatingActionMenu from "@/components/FloatingActionMenu";
+import { User, Briefcase, Mail } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,8 +26,35 @@ const About = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const pillNavRef = useRef<HTMLDivElement>(null);
+  const profileCardInnerRef = useRef<HTMLDivElement>(null);
   const [startEncryption, setStartEncryption] = useState(false);
+  const [isMobileLandscape, setIsMobileLandscape] = useState(false);
+  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
+  const [maskingComplete, setMaskingComplete] = useState(false);
+  const [overlayDismissed, setOverlayDismissed] = useState(false);
 
+  // Check for mobile landscape and portrait view
+  useEffect(() => {
+    const checkMobileView = () => {
+      const isMobileDevice = window.innerWidth <= 768;
+      const isLandscape = window.innerHeight < window.innerWidth;
+      const isPortrait = window.innerHeight >= window.innerWidth;
+      setIsMobileLandscape(isMobileDevice && isLandscape);
+      setIsMobilePortrait(isMobileDevice && isPortrait);
+    };
+
+    checkMobileView();
+    window.addEventListener('resize', checkMobileView);
+    window.addEventListener('orientationchange', checkMobileView);
+
+    return () => {
+      window.removeEventListener('resize', checkMobileView);
+      window.removeEventListener('orientationchange', checkMobileView);
+    };
+  }, []);
+
+  const navigate = useNavigate();
+  
   // Fetch Page Content
   const { data: pageData } = usePage("about");
   const pageContent = pageData ? ((pageData as any).content) : null;
@@ -98,6 +127,99 @@ const About = () => {
   useGSAP(() => {
     if (!wrapperRef.current || !imageRef.current || !profileCardRef.current || !textContentRef.current || !scrollSpacerRef.current || !timelineRef.current) return;
 
+    // For mobile portrait, create a simple masking animation and track completion
+    if (isMobilePortrait) {
+      // Create a simple timeline for masking animation
+      const maskTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: scrollSpacerRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 2,
+        }
+      });
+
+      // Masking Animation (Image Zoom & Fade Out)
+      maskTl.to(imageRef.current, {
+        scale: 3,
+        z: 500,
+        opacity: 0,
+        transformOrigin: "center center",
+        ease: "power2.inOut",
+        duration: 1,
+        willChange: "transform, opacity"
+      });
+
+      // Track when masking animation completes (at 50% progress) - works in reverse too
+      ScrollTrigger.create({
+        trigger: scrollSpacerRef.current,
+        start: "top top",
+        end: "+=50%",
+        onUpdate: (self) => {
+          if (self.progress >= 0.5) {
+            setMaskingComplete(true);
+            setStartEncryption(true);
+          } else {
+            setMaskingComplete(false);
+            setStartEncryption(false);
+          }
+        },
+        onEnter: () => {
+          setMaskingComplete(true);
+          setStartEncryption(true);
+        },
+        onLeaveBack: () => {
+          setMaskingComplete(false);
+          setStartEncryption(false);
+        }
+      });
+
+      return; // Exit early for mobile portrait
+    }
+
+    // Set profile card to visible and fixed position in mobile landscape
+    if (isMobileLandscape && profileCardRef.current) {
+      gsap.set(profileCardRef.current, {
+        x: 20,
+        opacity: 1,
+        autoAlpha: 1,
+        visibility: 'visible',
+      });
+      if (profileCardInnerRef.current) {
+        // Kill any existing animations
+        gsap.killTweensOf(profileCardInnerRef.current);
+        gsap.set(profileCardInnerRef.current, {
+          scale: 0.2, // Smaller scale for mobile landscape (20%)
+          force3D: true,
+          immediateRender: true
+        });
+        // Also set inline style directly as backup
+        profileCardInnerRef.current.style.setProperty('transform', 'scale(0.2)', 'important');
+        profileCardInnerRef.current.style.setProperty('-webkit-transform', 'scale(0.2)', 'important');
+        console.log('Mobile landscape in useGSAP: Applied scale 0.2');
+      }
+      setStartEncryption(true);
+    } else if (!isMobileLandscape && profileCardInnerRef.current) {
+      // Desktop: clear all GSAP transforms so CSS classes can work
+      gsap.killTweensOf(profileCardInnerRef.current);
+      gsap.set(profileCardInnerRef.current, {
+        clearProps: "all",
+      });
+      profileCardInnerRef.current.style.removeProperty('transform');
+      profileCardInnerRef.current.style.removeProperty('-webkit-transform');
+    }
+
+    // Disable scroll animation for mobile landscape - keep profile card fixed and small
+    if (isMobileLandscape) {
+      // Kill any existing ScrollTriggers
+      ScrollTrigger.getAll().forEach(st => {
+        if (st.trigger === scrollSpacerRef.current) {
+          st.kill();
+        }
+      });
+      return; // Exit early for mobile landscape - don't create timeline
+    }
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: scrollSpacerRef.current,
@@ -115,21 +237,46 @@ const About = () => {
       transformOrigin: "center center",
       ease: "power2.inOut",
       duration: 1,
-      willChange: "transform, opacity"
+      willChange: "transform, opacity",
+      onUpdate: function() {
+        // Track progress - when animation is 50% complete, masking is done
+        if (this.progress() >= 0.5) {
+          setMaskingComplete(true);
+        } else {
+          setMaskingComplete(false);
+        }
+      },
+      onComplete: () => {
+        setMaskingComplete(true);
+      },
+      onReverseComplete: () => {
+        setMaskingComplete(false);
+      }
     });
 
     // 2. Reveal Content & Profile Card (After image is cleared)
-    // Profile Card Reveal - start from right side
-    tl.fromTo(profileCardRef.current, 
-      { x: 200, opacity: 0, autoAlpha: 0, scale: 1 },
-      { 
-        x: 0, opacity: 1, autoAlpha: 1, scale: 1, duration: 0.8, ease: "power2.out",
-        onStart: () => setStartEncryption(true),
-        onReverseComplete: () => setStartEncryption(false),
-        willChange: "transform, opacity"
-      },
-      "-=0.25" // Start slightly before image is fully gone for smoothness
-    );
+    // Profile Card Reveal - start from right side (skip animation in mobile landscape)
+    if (!isMobileLandscape) {
+      // For desktop, ensure inner card uses CSS classes, not GSAP scale
+      const innerCard = profileCardRef.current?.querySelector('div');
+      if (innerCard) {
+        gsap.killTweensOf(innerCard);
+        gsap.set(innerCard, {
+          clearProps: "all",
+        });
+      }
+      
+      tl.fromTo(profileCardRef.current, 
+        { x: 200, opacity: 0, autoAlpha: 0 },
+        { 
+          x: 0, opacity: 1, autoAlpha: 1, duration: 0.8, ease: "power2.out",
+          onStart: () => setStartEncryption(true),
+          onReverseComplete: () => setStartEncryption(false),
+          willChange: "transform, opacity"
+        },
+        "-=0.25" // Start slightly before image is fully gone for smoothness
+      );
+    }
 
     // Text Reveal (Staggered)
     const textElements = gsap.utils.toArray(".animate-text");
@@ -161,11 +308,106 @@ const About = () => {
       "<" // Start at the same time as wrapper fade out
     );
 
-  }, { scope: wrapperRef });
+  }, { scope: wrapperRef, dependencies: [isMobileLandscape] });
 
-  // Animate pill navbar from top on mount
+  // Ensure mobile landscape scale persists even if timeline tries to interfere
   useEffect(() => {
-    if (pillNavRef.current) {
+    if (!isMobileLandscape || !profileCardInnerRef.current) return;
+
+    // Set up an interval to re-apply scale if it gets overridden
+    const interval = setInterval(() => {
+      if (profileCardInnerRef.current) {
+        const currentTransform = window.getComputedStyle(profileCardInnerRef.current).transform;
+        const currentScale = parseFloat(currentTransform.match(/matrix.*\(([^)]+)\)/)?.[1]?.split(',')[0] || '1');
+        
+        // If scale is not 0.2, re-apply it
+        if (Math.abs(currentScale - 0.2) > 0.1) {
+          gsap.set(profileCardInnerRef.current, {
+            scale: 0.2,
+            force3D: true,
+            immediateRender: true
+          });
+          profileCardInnerRef.current.style.setProperty('transform', 'scale(0.2)', 'important');
+          profileCardInnerRef.current.style.setProperty('-webkit-transform', 'scale(0.2)', 'important');
+        }
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [isMobileLandscape]);
+
+  // Update profile card scale when mobile landscape changes
+  useEffect(() => {
+    console.log('Profile card scale useEffect triggered', { isMobileLandscape, hasRef: !!profileCardInnerRef.current });
+    
+    if (!profileCardInnerRef.current) {
+      // Retry after a short delay if ref is not ready
+      const timer = setTimeout(() => {
+        if (profileCardInnerRef.current) {
+          const innerCard = profileCardInnerRef.current;
+          
+          if (isMobileLandscape) {
+            console.log('Applying scale 0.2 (delayed)');
+            gsap.killTweensOf(innerCard);
+            gsap.set(innerCard, {
+              scale: 0.2,
+              force3D: true,
+              immediateRender: true
+            });
+            innerCard.style.setProperty('transform', 'scale(0.2) !important');
+            innerCard.style.setProperty('-webkit-transform', 'scale(0.2) !important');
+            innerCard.style.setProperty('transform-origin', 'center center');
+            
+            // Force a reflow
+            innerCard.offsetHeight;
+          }
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    
+    const innerCard = profileCardInnerRef.current;
+    
+    // Kill any existing animations first
+    gsap.killTweensOf(innerCard);
+    
+    if (isMobileLandscape) {
+      // Mobile landscape: apply small scale via GSAP AND inline style
+      gsap.set(innerCard, {
+        scale: 0.2,
+        force3D: true,
+        immediateRender: true
+      });
+      // Also set inline style directly as backup (with !important)
+      innerCard.style.setProperty('transform', 'scale(0.2) !important');
+      innerCard.style.setProperty('-webkit-transform', 'scale(0.2) !important');
+      innerCard.style.setProperty('transform-origin', 'center center');
+      
+      // Force a reflow to ensure styles are applied
+      innerCard.offsetHeight;
+      
+      // Log computed style to verify
+      const computed = window.getComputedStyle(innerCard);
+      console.log('Mobile landscape: Applied scale 0.2 to profile card', {
+        transform: computed.transform,
+        width: computed.width,
+        height: computed.height
+      });
+    } else {
+      // Desktop: clear all GSAP transforms and inline styles so CSS classes can work
+      gsap.set(innerCard, {
+        clearProps: "all",
+      });
+      innerCard.style.removeProperty('transform');
+      innerCard.style.removeProperty('-webkit-transform');
+      innerCard.style.removeProperty('transform-origin');
+      console.log('Desktop: Cleared GSAP transforms, using CSS classes');
+    }
+  }, [isMobileLandscape]);
+
+  // Animate pill navbar from top on mount (Desktop only)
+  useEffect(() => {
+    if (pillNavRef.current && window.innerWidth >= 768) {
       gsap.set(pillNavRef.current, {
         y: -100,
         opacity: 0,
@@ -180,13 +422,43 @@ const About = () => {
         ease: "back.out(1.2)",
         delay: 0.3
       });
+    } else if (pillNavRef.current) {
+      // On mobile, ensure it's completely hidden
+      gsap.set(pillNavRef.current, {
+        display: 'none',
+        visibility: 'hidden',
+        opacity: 0
+      });
     }
   }, []);
 
   return (
     <div className="bg-background min-h-screen">
-      {/* PILL NAV - Appears from top */}
-      <div ref={pillNavRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto w-full max-w-fit px-4" style={{ visibility: 'hidden', opacity: 0 }}>
+      {/* Floating Action Menu - Mobile Only */}
+      <div className="fixed top-4 right-4 z-[60] md:hidden">
+        <FloatingActionMenu
+          options={[
+            {
+              label: "Home",
+              onClick: () => navigate("/"),
+              Icon: <User className="w-4 h-4" />,
+            },
+            {
+              label: "Expertise",
+              onClick: () => navigate("/expertise"),
+              Icon: <Briefcase className="w-4 h-4" />,
+            },
+            {
+              label: "Contact",
+              onClick: () => navigate("/contact"),
+              Icon: <Mail className="w-4 h-4" />,
+            },
+          ]}
+        />
+      </div>
+
+      {/* PILL NAV - Appears from top (Desktop Only) */}
+      <div ref={pillNavRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto w-full max-w-fit px-4 hidden md:block" style={{ visibility: 'hidden', opacity: 0, display: 'none' }}>
         <PillNav
           items={[
             { label: 'Home', href: '/' },
@@ -208,13 +480,26 @@ const About = () => {
         {/* Content Section - Full Screen Introduction with Card */}
         <div ref={contentRef} className="content relative w-full h-full z-10 overflow-visible">
           {/* Main Content - Full Width Section with Card */}
-          <div ref={textContentRef} className="relative z-20 w-full h-full flex flex-col justify-center px-8 md:px-20 bg-background/80 backdrop-blur-sm overflow-visible">
-            {/* Profile Card - Positioned on Right Side */}
-            <div ref={profileCardRef} className="absolute right-0 top-0 bottom-0 z-[25] opacity-0 invisible will-change-[transform,opacity] flex items-center justify-center pr-8 md:pr-20 translate-x-[-40px] md:translate-x-[-60px] w-full md:w-1/2 h-full">
+          <div ref={textContentRef} className="relative z-20 w-full h-full flex flex-col justify-center px-8 md:px-20 bg-background/80 backdrop-blur-sm overflow-visible pt-32 md:pt-0">
+            {/* Profile Card - Positioned on Right Side (Desktop & Mobile Landscape) */}
+            <div ref={profileCardRef} className={`absolute right-0 top-0 bottom-0 z-[25] flex items-center justify-center will-change-[transform,opacity] ${isMobilePortrait ? 'hidden' : isMobileLandscape ? 'opacity-100 visible pr-0 translate-x-[20px]' : 'opacity-0 invisible pr-8 md:pr-20 translate-x-[-40px] md:translate-x-[-60px]'} w-full md:w-1/2 h-full`}>
               <Suspense fallback={null}>
-                <div className="scale-150 md:scale-[1.8]">
+                <div 
+                  ref={profileCardInnerRef}
+                  className={isMobileLandscape ? "!scale-[0.2]" : "scale-150 md:scale-[1.8]"}
+                  style={isMobileLandscape ? { 
+                    transform: 'scale(0.2) !important',
+                    WebkitTransform: 'scale(0.2) !important',
+                    MozTransform: 'scale(0.2) !important',
+                    msTransform: 'scale(0.2) !important',
+                    OTransform: 'scale(0.2) !important',
+                    transformOrigin: 'center center !important'
+                  } : undefined}
+                >
                   <DecayCard 
                     image={profileCardSettings?.cardImageUrl || 'https://picsum.photos/300/400?grayscale'}
+                    width={isMobileLandscape ? 200 : 300}
+                    height={isMobileLandscape ? 267 : 400}
                   />
                 </div>
               </Suspense>
@@ -253,6 +538,36 @@ const About = () => {
                       </div>
                     ))}
                   </div>
+
+                  {/* Profile Card - Below Info Cards (Mobile Portrait Only) */}
+                  {isMobilePortrait && maskingComplete && (
+                    <div className="flex justify-end items-center mb-8 w-full pr-6" style={{ transform: 'translateY(-24px) translateX(8px) !important', willChange: 'auto' }}>
+                      <Suspense fallback={null}>
+                        <div className="relative w-full max-w-[380px]" style={{ transform: 'none !important', willChange: 'auto' }}>
+                          <DecayCard 
+                            image={profileCardSettings?.cardImageUrl || 'https://picsum.photos/300/400?grayscale'}
+                            width={380}
+                            height={507}
+                          />
+                          {/* Overlay Text - Click to dismiss */}
+                          {!overlayDismissed && (
+                            <div 
+                              onClick={() => setOverlayDismissed(true)}
+                              className="absolute inset-0 flex items-center justify-center cursor-pointer group transition-all duration-500 z-10 rounded-lg"
+                              style={{ pointerEvents: 'auto' }}
+                            >
+                              <div className="text-center px-6 py-4 transform transition-transform duration-300 group-hover:scale-105">
+                                <p className="text-white text-sm md:text-base font-medium tracking-[0.15em] uppercase letter-spacing-wider opacity-0 animate-[fadeIn_0.8s_ease-out_0.2s_forwards] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                                  Click in the black area
+                                </p>
+                                <div className="w-16 h-px bg-white/70 mx-auto mt-4 opacity-0 animate-[fadeIn_0.8s_ease-out_0.4s_forwards]"></div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </Suspense>
+                    </div>
+                  )}
                 </div>
               </div>
           </div>

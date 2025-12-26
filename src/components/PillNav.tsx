@@ -282,14 +282,34 @@ const PillNav: React.FC<PillNavProps> = ({
 
   const isRouterLink = (href?: string) => href && !isExternalLink(href);
 
+  // Check if mobile landscape
+  const [isMobileLandscape, setIsMobileLandscape] = React.useState(false);
+  
+  React.useEffect(() => {
+    const checkMobileLandscape = () => {
+      const isMobile = window.innerWidth <= 768;
+      const isLandscape = window.innerHeight < window.innerWidth;
+      setIsMobileLandscape(isMobile && isLandscape);
+    };
+    
+    checkMobileLandscape();
+    window.addEventListener('resize', checkMobileLandscape);
+    window.addEventListener('orientationchange', checkMobileLandscape);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobileLandscape);
+      window.removeEventListener('orientationchange', checkMobileLandscape);
+    };
+  }, []);
+
   const cssVars = {
     ['--base']: baseColor,
     ['--pill-bg']: pillColor,
     ['--hover-text']: hoveredPillTextColor,
     ['--pill-text']: resolvedPillTextColor,
-    ['--nav-h']: '42px',
-    ['--logo']: '36px',
-    ['--pill-pad-x']: '18px',
+    ['--nav-h']: isMobileLandscape ? '32px' : '42px',
+    ['--logo']: isMobileLandscape ? '26px' : '36px',
+    ['--pill-pad-x']: isMobileLandscape ? '12px' : '18px',
     ['--pill-gap']: '3px'
   } as React.CSSProperties;
 
@@ -313,7 +333,7 @@ const PillNav: React.FC<PillNavProps> = ({
             style={{
               width: 'var(--nav-h)',
               height: 'var(--nav-h)',
-              background: 'var(--base, #000)'
+              background: 'transparent'
             }}
           >
             <img src={logo} alt={logoAlt} ref={logoImgRef} className="w-full h-full object-cover block" />
@@ -330,7 +350,7 @@ const PillNav: React.FC<PillNavProps> = ({
             style={{
               width: 'var(--nav-h)',
               height: 'var(--nav-h)',
-              background: 'var(--base, #000)'
+              background: 'transparent'
             }}
           >
             <img src={logo} alt={logoAlt} ref={logoImgRef} className="w-full h-full object-cover block" />
@@ -342,7 +362,7 @@ const PillNav: React.FC<PillNavProps> = ({
           className="relative items-center rounded-full hidden md:flex"
           style={{
             height: 'var(--nav-h)',
-            background: 'var(--base, #000)',
+            background: 'transparent',
             marginLeft: logo ? '0.5rem' : '0'
           }}
         >
@@ -406,7 +426,7 @@ const PillNav: React.FC<PillNavProps> = ({
               );
 
               const basePillClasses =
-                'relative overflow-hidden inline-flex items-center justify-center h-full no-underline rounded-full box-border font-semibold text-[16px] leading-[0] uppercase tracking-[0.2px] whitespace-nowrap cursor-pointer px-0';
+                `relative overflow-hidden inline-flex items-center justify-center h-full no-underline rounded-full box-border font-semibold ${isMobileLandscape ? 'text-[11px]' : 'text-[16px]'} leading-[0] uppercase ${isMobileLandscape ? 'tracking-[0.1px]' : 'tracking-[0.2px]'} whitespace-nowrap cursor-pointer px-0`;
 
               return (
                 <li key={item.href} role="none" className="flex h-full">
@@ -455,7 +475,7 @@ const PillNav: React.FC<PillNavProps> = ({
           style={{
             width: 'var(--nav-h)',
             height: 'var(--nav-h)',
-            background: 'var(--base, #000)'
+            background: 'transparent'
           }}
         >
           <span

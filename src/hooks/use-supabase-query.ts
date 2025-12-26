@@ -36,3 +36,4 @@ export function useSupabaseQuery<T>(
   return { data, isLoading, error };
 }
 
+

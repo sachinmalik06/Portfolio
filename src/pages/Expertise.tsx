@@ -6,11 +6,13 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useExpertiseCards } from "@/hooks/use-cms";
 import PillNav from "@/components/PillNav";
+import FloatingActionMenu from "@/components/FloatingActionMenu";
+import { User, Briefcase, Mail } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -22,6 +24,7 @@ const getIcon = (name: string) => {
 
 const Expertise = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLSpanElement>(null);
@@ -33,9 +36,48 @@ const Expertise = () => {
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
+  const [isMobileLandscape, setIsMobileLandscape] = useState(false);
+  const [cardsAnimatedIn, setCardsAnimatedIn] = useState(false);
 
   // Fetch data from Supabase
   const { data: expertiseAreas } = useExpertiseCards();
+
+  // Check for mobile landscape view
+  useEffect(() => {
+    const checkMobileLandscape = () => {
+      const isMobileDevice = window.innerWidth <= 768;
+      const isLandscape = window.innerHeight < window.innerWidth;
+      setIsMobileLandscape(isMobileDevice && isLandscape);
+    };
+
+    checkMobileLandscape();
+    window.addEventListener('resize', checkMobileLandscape);
+    window.addEventListener('orientationchange', checkMobileLandscape);
+
+    return () => {
+      window.removeEventListener('resize', checkMobileLandscape);
+      window.removeEventListener('orientationchange', checkMobileLandscape);
+    };
+  }, []);
+
+  // Reset cardsAnimatedIn when mobile landscape changes
+  useEffect(() => {
+    if (!isMobileLandscape) {
+      setCardsAnimatedIn(false);
+    } else {
+      // In mobile landscape, check if cards section is already visible
+      const checkIfCardsVisible = () => {
+        if (cardsRef.current) {
+          const rect = cardsRef.current.getBoundingClientRect();
+          const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+          if (isVisible) {
+            setTimeout(() => setCardsAnimatedIn(true), 2000);
+          }
+        }
+      };
+      setTimeout(checkIfCardsVisible, 500);
+    }
+  }, [isMobileLandscape]);
 
   // Disable scroll when overlay is open
   useEffect(() => {
@@ -119,6 +161,35 @@ const Expertise = () => {
             end: "top 50%",   // End animation when section is 50% from top
             toggleActions: "play none none reverse",
             once: false, // Allow animation to reverse on scroll up
+            onEnter: () => {
+              // When cards start animating in mobile landscape, show images after animation
+              setTimeout(() => {
+                // Check current mobile landscape state (might have changed)
+                const nowMobileLandscape = window.innerWidth <= 768 && window.innerHeight < window.innerWidth;
+                if (nowMobileLandscape) {
+                  setCardsAnimatedIn(true);
+                  console.log('Mobile landscape: Cards animated in - showing images');
+                }
+              }, 1600); // Wait for stagger + duration
+            },
+            onEnterBack: () => {
+              // When scrolling back up, show images again in mobile landscape
+              setTimeout(() => {
+                const nowMobileLandscape = window.innerWidth <= 768 && window.innerHeight < window.innerWidth;
+                if (nowMobileLandscape) {
+                  setCardsAnimatedIn(true);
+                  console.log('Mobile landscape: Cards entered back - showing images');
+                }
+              }, 1600);
+            },
+            onLeave: () => {
+              // When scrolling past, hide images in mobile landscape
+              const nowMobileLandscape = window.innerWidth <= 768 && window.innerHeight < window.innerWidth;
+              if (nowMobileLandscape) {
+                setCardsAnimatedIn(false);
+                console.log('Mobile landscape: Cards left - hiding images');
+              }
+            }
           },
           y: 0,
           opacity: 1,
@@ -183,11 +254,11 @@ const Expertise = () => {
       }
     });
 
-  }, { scope: containerRef, dependencies: [expertiseAreas] });
+  }, { scope: containerRef, dependencies: [expertiseAreas, isMobileLandscape] });
 
-  // Animate pill navbar from top on mount
+  // Animate pill navbar from top on mount (Desktop only)
   useEffect(() => {
-    if (pillNavRef.current) {
+    if (pillNavRef.current && window.innerWidth >= 768) {
       gsap.set(pillNavRef.current, {
         y: -100,
         opacity: 0,
@@ -202,6 +273,13 @@ const Expertise = () => {
         ease: "back.out(1.2)",
         delay: 0.3
       });
+    } else if (pillNavRef.current) {
+      // On mobile, ensure it's completely hidden
+      gsap.set(pillNavRef.current, {
+        display: 'none',
+        visibility: 'hidden',
+        opacity: 0
+      });
     }
   }, []);
 
@@ -214,8 +292,31 @@ const Expertise = () => {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* PILL NAV - Appears from top */}
-      <div ref={pillNavRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto w-full max-w-fit px-4" style={{ visibility: 'hidden', opacity: 0 }}>
+      {/* Floating Action Menu - Mobile Only */}
+      <div className="fixed top-4 right-4 z-[60] md:hidden">
+        <FloatingActionMenu
+          options={[
+            {
+              label: "Home",
+              onClick: () => navigate("/"),
+              Icon: <User className="w-4 h-4" />,
+            },
+            {
+              label: "About",
+              onClick: () => navigate("/about"),
+              Icon: <User className="w-4 h-4" />,
+            },
+            {
+              label: "Contact",
+              onClick: () => navigate("/contact"),
+              Icon: <Mail className="w-4 h-4" />,
+            },
+          ]}
+        />
+      </div>
+
+      {/* PILL NAV - Appears from top (Desktop Only) */}
+      <div ref={pillNavRef} className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto w-full max-w-fit px-4 hidden md:block" style={{ visibility: 'hidden', opacity: 0, display: 'none' }}>
         <PillNav
           items={[
             { label: 'Home', href: '/' },
@@ -274,26 +375,29 @@ const Expertise = () => {
               return (
                 <div 
                   key={cardId}
+                  data-card-id={cardId}
                   className="expertise-card-wrapper relative group cursor-pointer overflow-visible"
                   style={{
                     opacity: 0,
                     transform: 'translateY(60px) scale(0.9)',
                     zIndex: hoveredCard === cardId ? 9999 : 'auto'
                   }}
-                  onMouseEnter={() => setHoveredCard(cardId)}
-                  onMouseLeave={() => setHoveredCard(null)}
+                  onMouseEnter={() => !isMobileLandscape && setHoveredCard(cardId)}
+                  onMouseLeave={() => !isMobileLandscape && setHoveredCard(null)}
                   onClick={() => setSelectedCard(area)}
                 >
-                  {/* Floating Images on Hover */}
+                  {/* Floating Images on Hover (Desktop) or Auto-show (Mobile Landscape) */}
                   <AnimatePresence>
-                    {hoveredCard === cardId && area.images && area.images.length >= 2 && (
+                    {area.images && area.images.length >= 2 && 
+                     ((isMobileLandscape && cardsAnimatedIn) || 
+                      (!isMobileLandscape && hoveredCard === cardId)) && (
                       <>
                         <motion.div
                           initial={{ opacity: 0, scale: 0.8, x: -20, y: -20, rotate: -5 }}
                           animate={{ opacity: 1, scale: 1, x: -40, y: -40, rotate: -10 }}
                           exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                           transition={{ duration: 0.4, ease: "easeOut" }}
-                          className="absolute -top-10 -left-10 w-32 h-24 rounded-lg overflow-hidden shadow-2xl pointer-events-none hidden md:block"
+                          className={`absolute -top-10 -left-10 w-32 h-24 rounded-lg overflow-hidden shadow-2xl pointer-events-none ${isMobileLandscape ? 'block' : 'hidden md:block'}`}
                           style={{ zIndex: 99999 }}
                         >
                           <img 
@@ -310,7 +414,7 @@ const Expertise = () => {
                           animate={{ opacity: 1, scale: 1, x: 40, y: 40, rotate: 10 }}
                           exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                           transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-                          className="absolute -bottom-10 -right-10 w-28 h-36 rounded-lg overflow-hidden shadow-2xl pointer-events-none hidden md:block"
+                          className={`absolute -bottom-10 -right-10 w-28 h-36 rounded-lg overflow-hidden shadow-2xl pointer-events-none ${isMobileLandscape ? 'block' : 'hidden md:block'}`}
                           style={{ zIndex: 99999 }}
                         >
                           <img 
