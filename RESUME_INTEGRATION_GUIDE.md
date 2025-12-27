@@ -313,3 +313,4 @@ If you need assistance extracting specific data from your PDF resume or have que
 **Last Updated:** 2024
 **Version:** 1.0
 
+

@@ -1,12 +1,14 @@
 import { useEffect } from "react";
-import { useSiteSettings } from "@/hooks/use-cms";
+import { useSiteSettings, useMetaTags } from "@/hooks/use-cms";
 
 export function DocumentHead() {
   const { data: siteSettings } = useSiteSettings();
+  const { data: metaTags } = useMetaTags();
 
   useEffect(() => {
-    // Update document title (takes priority over MetaTags)
-    if (siteSettings?.pageTitle) {
+    // Only update title from siteSettings if metaTags doesn't have a title
+    // MetaTags component should take priority for SEO
+    if (siteSettings?.pageTitle && !metaTags?.title) {
       document.title = siteSettings.pageTitle;
     }
 

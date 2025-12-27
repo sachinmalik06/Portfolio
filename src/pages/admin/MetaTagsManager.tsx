@@ -89,8 +89,10 @@ export default function MetaTagsManager() {
     try {
       await updateMetaTags(formData);
       toast.success("Meta tags updated successfully");
-      // Reload page to apply meta tags
-      window.location.reload();
+      // Small delay to ensure database is updated before reload
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       console.error(error);
       toast.error("Failed to update meta tags");
@@ -389,6 +391,7 @@ export default function MetaTagsManager() {
     </div>
   );
 }
+
 
 
 

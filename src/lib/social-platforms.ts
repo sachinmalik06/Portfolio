@@ -39,3 +39,4 @@ export function getPlatformPlaceholder(platform: string): string {
   return `https://${normalized}.com`;
 }
 
+

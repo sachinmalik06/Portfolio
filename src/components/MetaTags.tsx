@@ -1,6 +1,18 @@
 import { useEffect } from 'react';
 import { useMetaTags } from '@/hooks/use-cms';
 
+/**
+ * MetaTags Component
+ * 
+ * Updates all meta tags dynamically when data is loaded from the database.
+ * 
+ * Note: For social media link previews (Facebook, Twitter, LinkedIn), crawlers
+ * read the initial HTML response. Since this is a SPA, meta tags are added via
+ * JavaScript. For best results:
+ * 1. Clear cache using Facebook Debugger or Twitter Card Validator after updating
+ * 2. Consider using a prerendering service for production
+ * 3. Meta tags will be visible to users and search engines after page load
+ */
 export function MetaTags() {
   const { data: metaTags } = useMetaTags();
 
@@ -8,51 +20,65 @@ export function MetaTags() {
     if (!metaTags) return;
 
     // Helper function to update or create meta tag
+    // Now handles empty content to clear old values
     const updateMetaTag = (name: string, content: string, attribute: 'name' | 'property' = 'name') => {
-      if (!content) return;
-      
+      // Find existing tag by attribute
       let element = document.querySelector(`meta[${attribute}="${name}"]`) as HTMLMetaElement;
-      if (!element) {
-        element = document.createElement('meta');
-        element.setAttribute(attribute, name);
-        document.head.appendChild(element);
+      
+      // Also check for alternative attribute (some tags might use both)
+      if (!element && attribute === 'name') {
+        element = document.querySelector(`meta[property="${name}"]`) as HTMLMetaElement;
+      } else if (!element && attribute === 'property') {
+        element = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
       }
-      element.setAttribute('content', content);
+      
+      if (content) {
+        // Update or create tag with content
+        if (!element) {
+          element = document.createElement('meta');
+          element.setAttribute(attribute, name);
+          document.head.appendChild(element);
+        }
+        element.setAttribute('content', content);
+      } else if (element) {
+        // Remove tag if content is empty
+        element.remove();
+      }
     };
 
     // Helper function to update or create link tag
     const updateLinkTag = (rel: string, href: string) => {
-      if (!href) return;
-      
       let element = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement;
-      if (!element) {
-        element = document.createElement('link');
-        element.setAttribute('rel', rel);
-        document.head.appendChild(element);
+      
+      if (href) {
+        if (!element) {
+          element = document.createElement('link');
+          element.setAttribute('rel', rel);
+          document.head.appendChild(element);
+        }
+        element.setAttribute('href', href);
+      } else if (element) {
+        element.remove();
       }
-      element.setAttribute('href', href);
     };
 
-    // Update title
+    // Update document title and meta name="title"
     if (metaTags.title) {
       document.title = metaTags.title;
+      updateMetaTag('title', metaTags.title, 'name');
     }
 
-    // Basic meta tags
-    updateMetaTag('description', metaTags.description || '');
-    updateMetaTag('keywords', metaTags.keywords || '');
-    updateMetaTag('author', metaTags.author || '');
-    updateMetaTag('robots', metaTags.robots || 'index, follow');
+    // Basic meta tags - always update even if empty to clear old values
+    updateMetaTag('description', metaTags.description || '', 'name');
+    updateMetaTag('keywords', metaTags.keywords || '', 'name');
+    updateMetaTag('author', metaTags.author || '', 'name');
+    updateMetaTag('robots', metaTags.robots || 'index, follow', 'name');
 
     // Canonical URL
-    if (metaTags.canonical) {
-      updateLinkTag('canonical', metaTags.canonical);
-    }
+    updateLinkTag('canonical', metaTags.canonical || '');
 
     // Theme color
-    if (metaTags.themeColor) {
-      updateMetaTag('theme-color', metaTags.themeColor);
-    }
+    updateMetaTag('theme-color', metaTags.themeColor || '', 'name');
 
     // Open Graph tags
     if (metaTags.og) {
@@ -64,18 +90,33 @@ export function MetaTags() {
       updateMetaTag('og:site_name', metaTags.og.siteName || '', 'property');
     }
 
-    // Twitter Card tags
+    // Twitter Card tags - support both name and property attributes for better compatibility
     if (metaTags.twitter) {
-      updateMetaTag('twitter:card', metaTags.twitter.card || '', 'name');
-      updateMetaTag('twitter:url', metaTags.twitter.url || '', 'name');
-      updateMetaTag('twitter:title', metaTags.twitter.title || '', 'name');
-      updateMetaTag('twitter:description', metaTags.twitter.description || '', 'name');
-      updateMetaTag('twitter:image', metaTags.twitter.image || '', 'name');
+      const twitterCard = metaTags.twitter.card || 'summary_large_image';
+      const twitterUrl = metaTags.twitter.url || '';
+      const twitterTitle = metaTags.twitter.title || '';
+      const twitterDescription = metaTags.twitter.description || '';
+      const twitterImage = metaTags.twitter.image || '';
+
+      // Update with name attribute (standard)
+      updateMetaTag('twitter:card', twitterCard, 'name');
+      updateMetaTag('twitter:url', twitterUrl, 'name');
+      updateMetaTag('twitter:title', twitterTitle, 'name');
+      updateMetaTag('twitter:description', twitterDescription, 'name');
+      updateMetaTag('twitter:image', twitterImage, 'name');
+
+      // Also add property attribute for better compatibility with some platforms
+      if (twitterCard) updateMetaTag('twitter:card', twitterCard, 'property');
+      if (twitterUrl) updateMetaTag('twitter:url', twitterUrl, 'property');
+      if (twitterTitle) updateMetaTag('twitter:title', twitterTitle, 'property');
+      if (twitterDescription) updateMetaTag('twitter:description', twitterDescription, 'property');
+      if (twitterImage) updateMetaTag('twitter:image', twitterImage, 'property');
     }
   }, [metaTags]);
 
   return null;
 }
+
 
 
 

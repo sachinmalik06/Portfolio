@@ -258,27 +258,35 @@ export async function getMetaTags() {
 }
 
 export async function updateMetaTags(settings: any) {
-  const { data: existing } = await supabase
+  // Check if record exists using maybeSingle to avoid errors
+  const { data: existing, error: checkError } = await supabase
     .from('site_settings')
     .select('id, value')
     .eq('key', 'meta_tags')
-    .single() as any;
+    .maybeSingle() as any;
+
+  if (checkError && checkError.code !== 'PGRST116') {
+    throw checkError;
+  }
 
   if (existing) {
-    const result = await ((supabase.from('site_settings') as any)
+    // Update existing record
+    const { error: updateError } = await supabase
+      .from('site_settings')
       .update({ value: settings, updated_at: new Date().toISOString() })
-      .eq('key', 'meta_tags'));
+      .eq('key', 'meta_tags');
     
-    if (result.error) throw result.error;
+    if (updateError) throw updateError;
     return settings;
   } else {
-    const { data, error } = await supabase
+    // Insert new record
+    const { data, error: insertError } = await supabase
       .from('site_settings')
       .insert({ key: 'meta_tags', value: settings } as any)
       .select()
       .single();
     
-    if (error) throw error;
+    if (insertError) throw insertError;
     return (data as any)?.value as any;
   }
 }

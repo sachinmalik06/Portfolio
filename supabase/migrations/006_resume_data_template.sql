@@ -168,3 +168,4 @@ SELECT title, description, "order", active FROM public.expertise_cards ORDER BY 
 -- Check timeline entries
 SELECT year, title, "order", active FROM public.timeline_entries ORDER BY "order";
 
+
