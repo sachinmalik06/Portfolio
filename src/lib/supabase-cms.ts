@@ -271,12 +271,11 @@ export async function updateMetaTags(settings: any) {
 
   if (existing) {
     // Update existing record
-    const { error: updateError } = await supabase
-      .from('site_settings')
+    const result = await ((supabase.from('site_settings') as any)
       .update({ value: settings, updated_at: new Date().toISOString() })
-      .eq('key', 'meta_tags');
+      .eq('key', 'meta_tags'));
     
-    if (updateError) throw updateError;
+    if (result.error) throw result.error;
     return settings;
   } else {
     // Insert new record
