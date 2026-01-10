@@ -290,7 +290,17 @@ export async function updateMetaTags(settings: any) {
   }
 }
 
-export async function updateProfileCardSettings(settings: { cardImageUrl?: string }) {
+export async function updateProfileCardSettings(settings: { 
+  cardImageUrl?: string;
+  name?: string;
+  title?: string;
+  description?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  email?: string;
+  stats?: Array<{ value: string; label: string }>;
+}) {
   const { data: existing } = await supabase
     .from('site_settings')
     .select('id, value')

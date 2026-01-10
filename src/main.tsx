@@ -12,6 +12,7 @@ import "./types/global.d.ts";
 
 // Lazy load route components for better code splitting
 const Landing = lazy(() => import("./pages/Landing.tsx"));
+const Home = lazy(() => import("./pages/Home.tsx"));
 const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
 const Expertise = lazy(() => import("./pages/Expertise.tsx"));
@@ -27,6 +28,8 @@ const PagesManager = lazy(() => import("./pages/admin/PagesManager.tsx"));
 const GalleryManager = lazy(() => import("./pages/admin/GalleryManager.tsx"));
 const FooterManager = lazy(() => import("./pages/admin/FooterManager.tsx"));
 const MetaTagsManager = lazy(() => import("./pages/admin/MetaTagsManager.tsx"));
+const ContactManager = lazy(() => import("./pages/admin/ContactManager.tsx"));
+const HomePageManager = lazy(() => import("./pages/admin/HomePageManager.tsx"));
 const Settings = lazy(() => import("./pages/admin/Settings.tsx"));
 
 // Simple loading fallback for route transitions
@@ -156,7 +159,8 @@ createRoot(document.getElementById("root")!).render(
           <ThemeRouteGuard />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-              <Route path="/" element={<Landing />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/landing" element={<Landing />} />
               <Route path="/auth" element={<AuthPage redirectAfterAuth="/admin" />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/expertise" element={<Expertise />} />
@@ -165,13 +169,15 @@ createRoot(document.getElementById("root")!).render(
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
+                <Route path="home" element={<HomePageManager />} />
                 <Route path="expertise" element={<ExpertiseManager />} />
                 <Route path="timeline" element={<TimelineManager />} />
                 <Route path="pages" element={<PagesManager />} />
                 <Route path="gallery" element={<GalleryManager />} />
                 <Route path="footer" element={<FooterManager />} />
-              <Route path="meta-tags" element={<MetaTagsManager />} />
-              <Route path="settings" element={<Settings />} />
+                <Route path="meta-tags" element={<MetaTagsManager />} />
+                <Route path="contact" element={<ContactManager />} />
+                <Route path="settings" element={<Settings />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

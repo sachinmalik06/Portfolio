@@ -169,3 +169,4 @@ SELECT title, description, "order", active FROM public.expertise_cards ORDER BY 
 SELECT year, title, "order", active FROM public.timeline_entries ORDER BY "order";
 
 
+

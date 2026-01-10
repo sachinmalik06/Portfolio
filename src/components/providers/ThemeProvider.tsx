@@ -13,13 +13,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     // Check localStorage first, then system preference
     if (typeof window !== 'undefined') {
+      // Force dark theme by resetting if light was saved
       const savedTheme = localStorage.getItem('theme') as Theme;
+      
+      // If light theme was saved, clear it and use dark
+      if (savedTheme === 'light') {
+        localStorage.setItem('theme', 'dark');
+        return 'dark';
+      }
+      
       if (savedTheme) {
         return savedTheme;
       }
       // Check system preference
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-        return 'light';
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
       }
     }
     return 'dark'; // Default to dark

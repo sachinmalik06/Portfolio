@@ -173,6 +173,9 @@ export interface Database {
           number: string
           image: string
           tags: string[] | null
+          description: string | null
+          detailed_description: string | null
+          link: string | null
           order: number
           active: boolean
           created_at: string
@@ -184,6 +187,9 @@ export interface Database {
           number: string
           image: string
           tags?: string[] | null
+          description?: string | null
+          detailed_description?: string | null
+          link?: string | null
           order?: number
           active?: boolean
           created_at?: string
@@ -195,8 +201,43 @@ export interface Database {
           number?: string
           image?: string
           tags?: string[] | null
+          description?: string | null
+          detailed_description?: string | null
+          link?: string | null
           order?: number
           active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      contact_submissions: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          subject: string | null
+          message: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          subject?: string | null
+          message: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          subject?: string | null
+          message?: string
+          status?: string
           created_at?: string
           updated_at?: string
         }

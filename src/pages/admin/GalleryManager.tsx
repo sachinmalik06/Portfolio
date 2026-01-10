@@ -104,6 +104,7 @@ export default function GalleryManager() {
   const [endTextFirst, setEndTextFirst] = useState("");
   const [endTextSecond, setEndTextSecond] = useState("");
   const [itemsList, setItemsList] = useState<any[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Initialize items when gallery items load
   useEffect(() => {
@@ -111,7 +112,7 @@ export default function GalleryManager() {
       const sortedItems = [...(items as any[])].sort((a, b) => (a.order || 0) - (b.order || 0));
       setItemsList(sortedItems);
     }
-  }, [items]);
+  }, [items, refreshKey]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -186,8 +187,11 @@ export default function GalleryManager() {
     const formData = new FormData(e.currentTarget);
     
     const data = {
-      title: formData.get("title") as string, // This will be displayed where tags are
+      title: formData.get("title") as string,
       number: formData.get("number") as string,
+      description: formData.get("description") as string || null,
+      detailed_description: formData.get("detailed_description") as string || null,
+      link: formData.get("link") as string || null,
       image: formData.get("image") as string,
       tags: null, // Tags are no longer used
       order: parseInt(formData.get("order") as string) || 0,
@@ -204,6 +208,12 @@ export default function GalleryManager() {
       }
       setIsDialogOpen(false);
       setEditingItem(null);
+      // Trigger refetch by incrementing key
+      setRefreshKey(prev => prev + 1);
+      // Force reload after a short delay to ensure database is updated
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       console.error("Save error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to save gallery item");
@@ -236,7 +246,7 @@ export default function GalleryManager() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-display font-bold">Horizontal Gallery</h1>
-          <p className="text-muted-foreground">Manage the gallery items displayed on the home page.</p>
+          <p className="text-muted-foreground">Manage the gallery items displayed on the portfolio.</p>
         </div>
         <Button onClick={openCreate}>
           <Plus className="w-4 h-4 mr-2" />
@@ -304,7 +314,7 @@ export default function GalleryManager() {
           setEditingItem(null);
         }
       }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" key={editingItem?.id || 'new'}>
           <DialogHeader>
             <DialogTitle>{editingItem ? "Edit Gallery Item" : "Create New Gallery Item"}</DialogTitle>
             <DialogDescription>
@@ -315,19 +325,43 @@ export default function GalleryManager() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Number</label>
-                <Input name="number" defaultValue={editingItem?.number} placeholder="01, 02, 03..." required />
+                <Input name="number" defaultValue={editingItem?.number || ""} placeholder="01, 02, 03..." required />
                 <p className="text-xs text-muted-foreground">Will be displayed as &quot;Project [number]&quot;</p>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Title (Subtitle)</label>
-                <Input name="title" defaultValue={editingItem?.title} placeholder="This text appears below the project number" />
-                <p className="text-xs text-muted-foreground">This text appears where tags used to be displayed</p>
+                <label className="text-sm font-medium">Title</label>
+                <Input name="title" defaultValue={editingItem?.title || ""} placeholder="Project title" required />
+                <p className="text-xs text-muted-foreground">Main project title</p>
               </div>
             </div>
             
             <div className="space-y-2">
+              <label className="text-sm font-medium">Short Description</label>
+              <Input name="description" defaultValue={editingItem?.description || ""} placeholder="Brief description visible on card" />
+              <p className="text-xs text-muted-foreground">Short description displayed by default on the project card</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Detailed Description</label>
+              <textarea
+                name="detailed_description"
+                defaultValue={editingItem?.detailed_description || ""}
+                placeholder="Full project description shown when expanded"
+                rows={4}
+                className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <p className="text-xs text-muted-foreground">Detailed description shown when user clicks to expand the project card</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Project Link (URL)</label>
+              <Input name="link" defaultValue={editingItem?.link || ""} placeholder="https://example.com/project" />
+              <p className="text-xs text-muted-foreground">External link to the project. Leave empty if no link.</p>
+            </div>
+            
+            <div className="space-y-2">
               <label className="text-sm font-medium">Image URL</label>
-              <Input name="image" defaultValue={editingItem?.image} placeholder="https://example.com/image.jpg" required />
+              <Input name="image" defaultValue={editingItem?.image || ""} placeholder="https://example.com/image.jpg" required />
               {editingItem?.image && (
                 <div className="mt-2 w-full max-w-xs rounded-lg overflow-hidden border border-white/10 bg-white/5">
                   <img 
@@ -346,13 +380,14 @@ export default function GalleryManager() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Order</label>
-                <Input type="number" name="order" defaultValue={editingItem?.order || 0} />
+                <Input type="number" name="order" defaultValue={editingItem?.order?.toString() || "0"} />
               </div>
               <div className="space-y-2 flex items-end">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input 
                     type="checkbox" 
                     name="active" 
+                    key={editingItem?.id || 'new-active'}
                     defaultChecked={editingItem?.active !== false}
                     className="w-4 h-4 rounded border-white/20"
                   />

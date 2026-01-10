@@ -529,7 +529,7 @@ export default function Settings() {
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                 <p className="text-sm text-blue-200">
                   <ImageIcon className="w-4 h-4 inline mr-2" />
-                  <strong>Where logos appear:</strong> Footer (landing page), Admin Panel header, Auth/Login page, Logo Dropdown menu. If no logo URL is provided, the logo text will be displayed in a colored box.
+                  <strong>Where logos appear:</strong> Footer, Navigation, Admin Panel header, Auth/Login page, Logo Dropdown menu. If no logo URL is provided, the logo text will be displayed in a colored box.
                 </p>
               </div>
 

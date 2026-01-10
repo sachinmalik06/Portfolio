@@ -15,7 +15,8 @@ import {
   Image as ImageIcon,
   User,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Mail
 } from "lucide-react";
 import { useAuth } from "@/components/providers/SupabaseAuthProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
@@ -114,7 +115,7 @@ export default function AdminLayout() {
       label: "Home Page",
       icon: Home,
       items: [
-        { icon: FileText, label: "Home Content", to: "/admin/pages?tab=home", description: "Hero, videos, text" },
+        { icon: Home, label: "Home Settings", to: "/admin/home", description: "Hero, About, Contact sections" },
         { icon: ImageIcon, label: "Gallery", to: "/admin/gallery", description: "Portfolio gallery items" },
         { icon: FileText, label: "Footer", to: "/admin/footer", description: "Footer links & social" },
       ]
@@ -127,6 +128,7 @@ export default function AdminLayout() {
         { icon: User, label: "About Page", to: "/admin/pages?tab=about", description: "About content & timeline" },
         { icon: Layers, label: "Expertise Page", to: "/admin/pages?tab=expertise", description: "Expertise cards" },
         { icon: FileText, label: "Contact Page", to: "/admin/pages?tab=contact", description: "Contact info" },
+        { icon: Mail, label: "Contact Submissions", to: "/admin/contact", description: "Form submissions" },
       ]
     },
     {

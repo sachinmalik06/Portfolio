@@ -35,7 +35,7 @@ export default function PagesManager() {
   const location = useLocation();
   const getTabFromUrl = () => {
     const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'home';
+    return params.get('tab') || 'about';
   };
   const [activeTab, setActiveTab] = useState(getTabFromUrl());
 
@@ -45,7 +45,6 @@ export default function PagesManager() {
     setActiveTab(tab);
   }, [location.search]);
   
-  const { data: homePage } = usePage("home");
   const { data: aboutPage } = usePage("about");
   const { data: contactPage } = usePage("contact");
   const { data: siteSettings } = useSiteSettings();
@@ -76,7 +75,6 @@ export default function PagesManager() {
 
   // Get page titles for headers
   const pageTitles: Record<string, string> = {
-    home: "Home / Landing Page",
     about: "About Page",
     expertise: "Expertise Page",
     contact: "Contact Page",
@@ -84,7 +82,6 @@ export default function PagesManager() {
   };
 
   const pageDescriptions: Record<string, string> = {
-    home: "Manage the landing page hero section, videos, and text content.",
     about: "Manage about page content, footer text, and timeline entries.",
     expertise: "Manage expertise cards displayed on the expertise page.",
     contact: "Manage contact page information and social links.",
@@ -100,13 +97,6 @@ export default function PagesManager() {
 
       {/* Show content directly based on active tab - no tabs list when coming from sidebar */}
       <div className="space-y-6">
-        {activeTab === "home" && (
-          <HomeEditor 
-            initialData={(homePage as any)?.content} 
-            onSave={(data) => handleSave("home", data)} 
-          />
-        )}
-
         {activeTab === "about" && (
           <div className="space-y-6">
             <AboutEditor 
@@ -134,90 +124,6 @@ export default function PagesManager() {
         )}
       </div>
     </div>
-  );
-}
-
-function HomeEditor({ initialData, onSave }: { initialData: any, onSave: (data: any) => void }) {
-  const [formData, setFormData] = useState({
-    heroTitle1: "PORT",
-    heroTitle2: "FOLIO",
-    videoUrl: "https://videos.pexels.com/video-files/5377684/5377684-uhd_2560_1440_25fps.mp4",
-    finalVideoUrl: "https://videos.pexels.com/video-files/3222356/3222356-hd_1920_1080_25fps.mp4",
-    bottomTextLeftTitle: "CINEMATIC",
-    bottomTextLeftSubtitle: "Showreel 2024",
-    bottomTextRightTitle: "STRATEGY",
-    bottomTextRightSubtitle: "Creative Direction",
-    ...initialData
-  });
-
-  useEffect(() => {
-    if (initialData) setFormData({ ...formData, ...initialData });
-  }, [initialData]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  return (
-    <Card className="bg-card/50 border-white/5">
-      <CardHeader>
-        <CardTitle>Landing Page</CardTitle>
-        <CardDescription>Customize the main hero section.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Hero Title Part 1</Label>
-            <Input name="heroTitle1" value={formData.heroTitle1} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>Hero Title Part 2</Label>
-            <Input name="heroTitle2" value={formData.heroTitle2} onChange={handleChange} />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Main Video URL</Label>
-          <Input name="videoUrl" value={formData.videoUrl} onChange={handleChange} />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Second Video URL (After GSAP Text Animation)</Label>
-          <Input name="finalVideoUrl" value={formData.finalVideoUrl} onChange={handleChange} />
-          <p className="text-xs text-muted-foreground">This video appears after the horizontal scrolling text animation section.</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-4 border border-white/5 p-4 rounded-lg">
-            <h4 className="font-medium text-sm text-muted-foreground">Bottom Left Text</h4>
-            <div className="space-y-2">
-              <Label>Title</Label>
-              <Input name="bottomTextLeftTitle" value={formData.bottomTextLeftTitle} onChange={handleChange} />
-            </div>
-            <div className="space-y-2">
-              <Label>Subtitle</Label>
-              <Input name="bottomTextLeftSubtitle" value={formData.bottomTextLeftSubtitle} onChange={handleChange} />
-            </div>
-          </div>
-
-          <div className="space-y-4 border border-white/5 p-4 rounded-lg">
-            <h4 className="font-medium text-sm text-muted-foreground">Bottom Right Text</h4>
-            <div className="space-y-2">
-              <Label>Title</Label>
-              <Input name="bottomTextRightTitle" value={formData.bottomTextRightTitle} onChange={handleChange} />
-            </div>
-            <div className="space-y-2">
-              <Label>Subtitle</Label>
-              <Input name="bottomTextRightSubtitle" value={formData.bottomTextRightSubtitle} onChange={handleChange} />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <Button onClick={() => onSave(formData)}>Save Changes</Button>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 

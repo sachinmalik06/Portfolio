@@ -314,3 +314,4 @@ If you need assistance extracting specific data from your PDF resume or have que
 **Version:** 1.0
 
 
+

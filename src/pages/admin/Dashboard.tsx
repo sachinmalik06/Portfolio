@@ -1,14 +1,41 @@
 import { useExpertiseCards, useTimeline } from "@/hooks/use-cms";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Layers, Clock, FileText, ArrowRight, TrendingUp, Users } from "lucide-react";
+import { Layers, Clock, FileText, ArrowRight, Mail } from "lucide-react";
 import { Link } from "react-router";
-import { Area, AreaChart, CartesianGrid, XAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react";
 
 export default function Dashboard() {
   const { data: expertiseCards, isLoading: cardsLoading } = useExpertiseCards();
   const { data: timeline, isLoading: timelineLoading } = useTimeline();
+  const [contactSubmissions, setContactSubmissions] = useState({ total: 0, unread: 0 });
+  const [contactLoading, setContactLoading] = useState(true);
+
+  useEffect(() => {
+    fetchContactStats();
+  }, []);
+
+  const fetchContactStats = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('contact_submissions')
+        .select('status');
+
+      if (error) throw error;
+
+      const total = data?.length || 0;
+      const unread = data?.filter((sub: any) => sub.status === 'unread').length || 0;
+      
+      setContactSubmissions({ total, unread });
+    } catch (error) {
+      console.error('Error fetching contact stats:', error);
+    } finally {
+      setContactLoading(false);
+    }
+  };
 
   // Mock data for the chart
   const chartData = [
@@ -49,7 +76,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-card/50 border-white/5 backdrop-blur-sm hover:bg-card/80 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Expertise Cards</CardTitle>
@@ -74,7 +101,28 @@ export default function Dashboard() {
 
         <Card className="bg-card/50 border-white/5 backdrop-blur-sm hover:bg-card/80 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Pages</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Contact Messages</CardTitle>
+            <Mail className="w-4 h-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">
+              {contactLoading ? "..." : contactSubmissions.total}
+              {!contactLoading && contactSubmissions.unread > 0 && (
+                <span className="text-sm text-primary ml-2">+{contactSubmissions.unread}</span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {contactLoading ? "Loading..." : 
+                contactSubmissions.unread > 0 
+                  ? `${contactSubmissions.unread} unread messages`
+                  : "All messages read"}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/50 border-white/5 backdrop-blur-sm hover:bg-card/80 transition-colors">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Content Pages</CardTitle>
             <FileText className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -143,6 +191,24 @@ export default function Dashboard() {
             <CardDescription>Common management tasks</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
+            <Link to="/admin/contact">
+              <Button variant="outline" className="w-full justify-start h-auto py-4 border-white/10 hover:bg-white/5 group">
+                <div className="bg-primary/10 p-2 rounded mr-4 group-hover:bg-primary/20 transition-colors">
+                  <Mail className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <div className="font-bold flex items-center gap-2">
+                    Contact Messages
+                    {!contactLoading && contactSubmissions.unread > 0 && (
+                      <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+                        {contactSubmissions.unread}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground">View and reply to messages</div>
+                </div>
+              </Button>
+            </Link>
             <Link to="/admin/expertise">
               <Button variant="outline" className="w-full justify-start h-auto py-4 border-white/10 hover:bg-white/5 group">
                 <div className="bg-primary/10 p-2 rounded mr-4 group-hover:bg-primary/20 transition-colors">

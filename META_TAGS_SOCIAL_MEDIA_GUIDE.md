@@ -167,3 +167,4 @@ Here's an example of what your meta tags should look like:
 3. Supabase dashboard to verify data is saved
 4. Network tab to verify meta tags are in the HTML response
 
+

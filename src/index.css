@@ -342,24 +342,34 @@ html.has-scroll-dragging {
 }
 
 .light {
-  /* Light mode theme */
-  --background: #AF3E3E;
-  --foreground: #ffffff;
-  --card: #AF3E3E;
-  --card-foreground: #ffffff;
-  --primary: hsl(35 42% 46%);
-  --primary-foreground: #ffffff;
-  --secondary: hsl(341 54% 24%);
-  --secondary-foreground: #ffffff;
-  --muted: rgba(175, 62, 62, 0.8);
-  --muted-foreground: rgba(255, 255, 255, 0.8);
-  --accent: hsl(102 9% 54%);
-  --accent-foreground: #ffffff;
+  /* Light mode theme - Warm Beige Palette */
+  --background: #F9F8F6;
+  --foreground: #3D3A35;
+  --card: #FFFFFF;
+  --card-foreground: #3D3A35;
+  --primary: #C9B59C;
+  --primary-foreground: #3D3A35;
+  --secondary: #D9CFC7;
+  --secondary-foreground: #3D3A35;
+  --muted: #EFE9E3;
+  --muted-foreground: #6B6760;
+  --accent: #C9B59C;
+  --accent-foreground: #3D3A35;
   --destructive: hsl(0 62% 50%);
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.2);
-  --input: rgba(255, 255, 255, 0.2);
-  --ring: hsl(35 42% 46%);
+  --destructive-foreground: #FFFFFF;
+  --border: #E5DED6;
+  --input: #EFE9E3;
+  --ring: #C9B59C;
+  
+  /* Update sidebar for light mode */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #3D3A35;
+  --sidebar-primary: #C9B59C;
+  --sidebar-primary-foreground: #3D3A35;
+  --sidebar-accent: #D9CFC7;
+  --sidebar-accent-foreground: #3D3A35;
+  --sidebar-border: #E5DED6;
+  --sidebar-ring: #C9B59C;
 }
 
 .dark {
@@ -578,4 +588,12 @@ html.has-scroll-dragging {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Hero title styles for new home page */
+.hero-title {
+  font-size: clamp(3rem, 10vw, 9rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-weight: 700;
 }
