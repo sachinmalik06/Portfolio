@@ -540,12 +540,12 @@ export async function updateCertification(
   id: string,
   updates: Database['public']['Tables']['certifications']['Update']
 ) {
-  const { data, error } = await supabase
-    .from('certifications')
-    .update(updates as any)
+  const { data, error } = await ((supabase
+    .from('certifications') as any)
+    .update(updates)
     .eq('id', id)
     .select()
-    .single();
+    .single());
   if (error) throw error;
   return data;
 }
