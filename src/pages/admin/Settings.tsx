@@ -403,10 +403,10 @@ export default function Settings() {
                   type="url"
                   value={cardImageUrl}
                   onChange={(e) => setCardImageUrl(e.target.value)}
-                  placeholder="https://example.com/card-image.jpg"
+                  placeholder="https://example.com/card-image.jpg or Google Drive link"
                 />
                 <p className="text-xs text-muted-foreground">
-                  URL to the image that will be displayed on the 3D card. Leave empty to use default.
+                  Supports Google Drive links. Share → Copy link → Paste here. Leave empty to use default.
                 </p>
                 {cardImageUrl && (
                   <div className="mt-2 p-2 border border-white/10 rounded-lg">

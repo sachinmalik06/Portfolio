@@ -193,10 +193,10 @@ export default function CertificationsManager() {
                   type="url"
                   value={formData.credential_url}
                   onChange={(e) => setFormData({ ...formData, credential_url: e.target.value })}
-                  placeholder="https://..."
+                  placeholder="https://... or Google Drive link"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Link to certificate verification or credential page
+                  Link to certificate verification or credential page. Supports Google Drive links.
                 </p>
               </div>
 

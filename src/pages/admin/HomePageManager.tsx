@@ -309,7 +309,7 @@ export default function HomePageManager() {
                   placeholder="https://example.com/image.jpg or Google Drive URL"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Google Drive URLs will be automatically converted to direct image links
+                  Supports Google Drive links. Share → Copy link → Paste here.
                 </p>
               </div>
 
