@@ -163,117 +163,55 @@ const About = () => {
   useGSAP(() => {
     if (!wrapperRef.current || !imageRef.current || !textContentRef.current || !scrollSpacerRef.current || !timelineRef.current) return;
 
-    // For mobile portrait, create a simple masking animation and track completion
+    // For mobile portrait, skip masking animation and show content immediately
     if (isMobilePortrait) {
-      // Kill any existing ScrollTriggers for this trigger
-      ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === scrollSpacerRef.current || st.vars?.trigger === scrollSpacerRef.current) {
-          st.kill();
-        }
-      });
-
-      // Create a simple timeline for masking animation
-      // Pin the wrapper to keep introduction section fixed during scroll
-      // For mobile portrait, we need to pin the wrapper so it stays fixed during scroll
-      const maskTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: scrollSpacerRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 2, // Smooth scrubbing - works bidirectionally
-          pin: wrapperRef.current, // Pin the wrapper to keep introduction section fixed
-          pinSpacing: false, // Disable pin spacing to remove extra space after fade out
-          invalidateOnRefresh: true,
-          anticipatePin: 1,
-          // Ensure animations work in both directions
-          refreshPriority: 1,
-        }
-      });
-
-      // Masking Animation (Image Zoom & Fade Out)
-      maskTl.to(imageRef.current, {
-        scale: 3,
-        z: 500,
-        opacity: 0,
-        transformOrigin: "center center",
-        ease: "power2.inOut",
-        duration: 1,
-        willChange: "transform, opacity",
-        onUpdate: function() {
-          // Track progress continuously for bidirectional animation
-          const progress = this.progress();
-          if (progress >= 0.5) {
-            // Masking is mostly complete
-            setMaskingComplete(true);
-            setIntroVisible(true);
-          } else {
-            // Masking is not complete
-            setMaskingComplete(false);
-            setIntroVisible(false);
-            setStartEncryption(false);
-          }
-        },
-        onComplete: () => {
-          // Ensure states are set when animation completes
-          setMaskingComplete(true);
-          setStartEncryption(true);
-          setIntroVisible(true);
-        },
-        onReverseComplete: () => {
-          // Reset when scrolling back to start
-          setMaskingComplete(false);
-          setStartEncryption(false);
-          setIntroVisible(false);
-        },
-        onReverseStart: () => {
-          // Start hiding encryption when reverse animation begins
-          setStartEncryption(false);
-        }
-      });
-
-      // Animate text elements to slide up smoothly (mobile portrait)
+      // Kill ALL existing ScrollTriggers to prevent any scroll-based animations
+      ScrollTrigger.getAll().forEach(st => st.kill());
+      
+      // Hide the image immediately
+      if (imageRef.current) {
+        gsap.set(imageRef.current, { opacity: 0, display: 'none' });
+      }
+      
+      // Set all states to show content immediately
+      setMaskingComplete(true);
+      setIntroVisible(true);
+      setStartEncryption(true);
+      
+      // Make text elements visible immediately with NO animations
       const textElements = gsap.utils.toArray<HTMLElement>(".animate-text");
       if (textElements.length > 0) {
-        // Calculate when the last element finishes animating
-        const totalStaggerTime = (textElements.length - 1) * 0.15;
-        const totalAnimationTime = 1.2 + totalStaggerTime;
-        
-        maskTl.fromTo(
-          textElements,
-          { y: 80, opacity: 0, autoAlpha: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            autoAlpha: 1,
-            duration: 1.2,
-            stagger: 0.15,
-            ease: "power3.out",
-            willChange: "transform, opacity",
-            onUpdate: function() {
-              // Track text animation progress for bidirectional control
-              const progress = this.progress();
-              // Text animation should work smoothly in both directions
-              // States are controlled by masking animation progress
-            },
-            onReverseStart: () => {
-              // Start hiding when text animation reverses
-              setStartEncryption(false);
-            },
-            onReverseComplete: () => {
-              // Hide intro and encryption when scrolling back completely
-              setIntroVisible(false);
-              setStartEncryption(false);
-            }
-          },
-          "-=0.5" // Start slightly before masking completes
-        );
-        
-        // Profile card visibility is handled in masking animation's onComplete callback
-        // No need for separate callback here since onComplete already sets introVisible
-      } else {
-        // Profile card visibility is handled in masking animation's onComplete callback
-        // No need for separate callback here since onComplete already sets introVisible
+        // Kill any existing animations on these elements
+        textElements.forEach(el => gsap.killTweensOf(el));
+        // Set to visible state immediately
+        gsap.set(textElements, { 
+          y: 0, 
+          opacity: 1, 
+          autoAlpha: 1,
+          clearProps: "all" // Clear all GSAP properties
+        });
       }
+      
+      // Make wrapper static (no pinning, no scroll effects)
+      if (wrapperRef.current) {
+        gsap.set(wrapperRef.current, {
+          position: 'relative',
+          opacity: 1,
+          clearProps: "transform"
+        });
+      }
+      
+      // Show timeline immediately below the intro
+      if (timelineRef.current) {
+        gsap.set(timelineRef.current, {
+          opacity: 1,
+          y: 0,
+          clearProps: "transform"
+        });
+      }
+      
+      // No scroll animations for mobile - content is immediately visible and static
+      return;
 
       // Track scroll progress for additional state management
       // This handles profile card visibility in both directions (scroll up and down)
@@ -768,16 +706,16 @@ const About = () => {
         />
       </div>
 
-      {/* Fixed Intro Section - Full Screen */}
-      <div ref={wrapperRef} className="fixed inset-0 z-50 w-full h-screen overflow-visible bg-background will-change-opacity">
+      {/* Fixed Intro Section - Full Screen (Fixed on Desktop, Relative on Mobile) */}
+      <div ref={wrapperRef} className={`z-50 w-full overflow-visible bg-background will-change-opacity ${isMobilePortrait ? 'relative min-h-screen' : 'fixed inset-0 h-screen'}`}>
         {/* Content Section - Full Screen Introduction with Card */}
         <div ref={contentRef} className="content relative w-full h-full z-10 overflow-visible">
           {/* Main Content - Full Width Section with Card */}
           <div 
             ref={textContentRef} 
-            className="relative z-30 w-full h-full flex flex-col justify-center px-8 md:px-20 bg-background/80 backdrop-blur-sm overflow-visible"
+            className={`relative z-30 w-full h-full flex flex-col justify-center bg-background/80 backdrop-blur-sm overflow-visible ${isMobilePortrait ? 'px-4 py-6' : 'px-8 md:px-20'}`}
             style={{
-              paddingTop: isMobilePortrait ? '4rem' : undefined, // Reduced padding to minimize space
+              paddingTop: isMobilePortrait ? '2rem' : undefined,
             }}
           >
             {/* Profile Card - Positioned on Right Side (Desktop & Mobile Landscape) */}
@@ -803,22 +741,22 @@ const About = () => {
                 </div>
               </Suspense>
             </div>
-              <div className="flex flex-col gap-12">
-                <div className="flex flex-col gap-8 text-left">
-                  <div className="space-y-2 animate-text opacity-0 invisible will-change-[transform,opacity]">
-                    <span className="text-sm font-body tracking-widest uppercase text-muted-foreground">{content.introSubtitle}</span>
-                    <h1 className="text-6xl md:text-8xl font-display font-bold text-primary tracking-tight whitespace-nowrap">
+              <div className={`flex flex-col ${isMobilePortrait ? 'gap-4' : 'gap-12'}`}>
+                <div className={`flex flex-col text-left ${isMobilePortrait ? 'gap-3' : 'gap-8'}`}>
+                  <div className={`animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-2'}`}>
+                    <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-xs' : 'text-sm'}`}>{content.introSubtitle}</span>
+                    <h1 className={`font-display font-bold text-primary tracking-tight ${isMobilePortrait ? 'text-4xl whitespace-normal leading-tight' : 'text-6xl md:text-8xl whitespace-nowrap'}`}>
                       {content.introTitle}
                     </h1>
                   </div>
                   
-                  <div className="space-y-6 max-w-2xl animate-text opacity-0 invisible will-change-[transform,opacity]">
-                    <p className="text-2xl md:text-3xl font-light text-foreground/80">
+                  <div className={`max-w-2xl animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-6'}`}>
+                    <p className={`font-light text-foreground/80 ${isMobilePortrait ? 'text-base leading-relaxed' : 'text-2xl md:text-3xl'}`}>
                       {content.introText}
                     </p>
                     
                     <div 
-                      className={`text-lg md:text-xl leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'min-h-[3rem]' : ''}`}
+                      className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-sm min-h-[2.5rem]' : 'text-lg md:text-xl min-h-[3rem]'}`}
                     >
                       <EncryptedText 
                         text={content.encryptedText}
@@ -831,26 +769,14 @@ const About = () => {
 
                     {/* Profile Card - Inside Introduction Area (Mobile Portrait Only) */}
                     {isMobilePortrait && (
-                      <div className="flex justify-end items-center mt-2 w-full pr-6">
+                      <div className="flex justify-center items-center mt-3 w-full">
                         <Suspense fallback={null}>
-                          <div className="relative w-full max-w-[380px]">
+                          <div className="relative w-full max-w-[280px]">
                             <DecayCard 
                               image={profileCardSettings?.cardImageUrl ? convertDriveUrlToDirectImageUrl(profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
-                              width={380}
-                              height={507}
+                              width={280}
+                              height={373}
                             />
-                            {/* Overlay Text - Click to dismiss */}
-                            {!overlayDismissed && (
-                              <div 
-                                onClick={() => setOverlayDismissed(true)}
-                                className="absolute inset-0 flex items-center justify-center cursor-pointer group transition-all duration-500 z-10 rounded-lg"
-                              >
-                                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] rounded-lg group-hover:bg-black/50 transition-colors" />
-                                <p className="relative z-10 text-white text-sm font-medium px-4 py-2 rounded-md bg-white/10 backdrop-blur-sm border border-white/20 group-hover:bg-white/20 transition-colors">
-                                  Click to view
-                                </p>
-                              </div>
-                            )}
                           </div>
                         </Suspense>
                       </div>
@@ -858,11 +784,11 @@ const About = () => {
                   </div>
 
                   {/* Info Cards - Horizontal Layout */}
-                  <div className={`flex flex-nowrap overflow-x-auto md:overflow-visible no-scrollbar animate-text opacity-0 invisible will-change-[transform,opacity] ${isMobilePortrait ? 'justify-end pr-6 mt-0.5 gap-2 pb-8' : 'mt-4 gap-4 pb-2'}`}>
+                  <div className={`flex flex-nowrap overflow-x-auto md:overflow-visible no-scrollbar animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center gap-2 mt-2 pb-4' : 'mt-4 gap-4 pb-2'}`}>
                     {infoCards.map((card, index) => (
-                      <div key={index} className={`group border border-white/10 bg-white/5 backdrop-blur-sm rounded-lg hover:bg-white/10 transition-colors duration-300 shrink-0 ${isMobilePortrait ? 'p-2 min-w-[85px] max-w-[105px]' : 'p-4 min-w-[140px]'}`}>
-                        <h3 className={`font-bold uppercase tracking-widest text-muted-foreground mb-0.5 ${isMobilePortrait ? 'text-[7px] leading-tight' : 'text-[10px] mb-1'}`}>{card.label}</h3>
-                        <p className={`font-display text-foreground group-hover:text-primary transition-colors whitespace-nowrap ${isMobilePortrait ? 'text-[11px] leading-tight' : 'text-lg'}`}>{card.value}</p>
+                      <div key={index} className={`group border border-white/10 bg-white/5 backdrop-blur-sm rounded-lg hover:bg-white/10 transition-colors duration-300 shrink-0 ${isMobilePortrait ? 'p-2.5 min-w-[90px] flex-1 max-w-[120px]' : 'p-4 min-w-[140px]'}`}>
+                        <h3 className={`font-bold uppercase tracking-widest text-muted-foreground ${isMobilePortrait ? 'text-[8px] leading-tight mb-1' : 'text-[10px] mb-1'}`}>{card.label}</h3>
+                        <p className={`font-display text-foreground group-hover:text-primary transition-colors ${isMobilePortrait ? 'text-xs leading-tight' : 'text-lg whitespace-nowrap'}`}>{card.value}</p>
                       </div>
                     ))}
                   </div>
@@ -883,8 +809,8 @@ const About = () => {
         </div>
       </div>
 
-      {/* Scroll Spacer to drive the fixed animation */}
-      <div ref={scrollSpacerRef} className="w-full h-[250vh]" />
+      {/* Scroll Spacer to drive the fixed animation (Hidden on Mobile Portrait) */}
+      <div ref={scrollSpacerRef} className={`w-full ${isMobilePortrait ? 'h-0' : 'h-[250vh]'}`} />
 
       {/* Timeline Section */}
       <div ref={timelineRef} className="relative z-10 bg-background opacity-0 will-change-[transform,opacity]">

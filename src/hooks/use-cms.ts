@@ -416,3 +416,72 @@ export function useUpdateGalleryTextSettings() {
   return { mutate, isLoading, error };
 }
 
+// Certifications
+export function useCertifications() {
+  return useSupabaseQuery(
+    () => cms.getCertifications(),
+    []
+  );
+}
+
+export function useCreateCertification() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (certification: Parameters<typeof cms.createCertification>[0]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createCertification(certification);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateCertification() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, certification: Parameters<typeof cms.updateCertification>[1]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateCertification(id, certification);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteCertification() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteCertification(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}

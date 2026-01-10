@@ -16,7 +16,8 @@ import {
   User,
   ChevronDown,
   ChevronUp,
-  Mail
+  Mail,
+  Award
 } from "lucide-react";
 import { useAuth } from "@/components/providers/SupabaseAuthProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
@@ -126,7 +127,8 @@ export default function AdminLayout() {
       icon: FileText,
       items: [
         { icon: User, label: "About Page", to: "/admin/pages?tab=about", description: "About content & timeline" },
-        { icon: Layers, label: "Expertise Page", to: "/admin/pages?tab=expertise", description: "Expertise cards" },
+        { icon: Layers, label: "Expertise", to: "/admin/expertise", description: "Expertise cards" },
+        { icon: Award, label: "Certifications", to: "/admin/certifications", description: "Certifications & achievements" },
         { icon: FileText, label: "Contact Page", to: "/admin/pages?tab=contact", description: "Contact info" },
         { icon: Mail, label: "Contact Submissions", to: "/admin/contact", description: "Form submissions" },
       ]

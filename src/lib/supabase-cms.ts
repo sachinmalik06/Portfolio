@@ -146,11 +146,15 @@ export async function getProfileCardSettings() {
     // If not found, return defaults
     return {
       cardImageUrl: '',
+      imageUrl: '',
     };
   }
   
-  return ((data as any)?.value as any) || {
-    cardImageUrl: ''
+  const value = (data as any)?.value;
+  return {
+    cardImageUrl: value?.imageUrl || value?.cardImageUrl || '',
+    imageUrl: value?.imageUrl || value?.cardImageUrl || '',
+    stats: value?.stats || []
   };
 }
 
@@ -506,4 +510,51 @@ export async function updateGalleryTextSettings(settings: any) {
   }
 }
 
+// --- CERTIFICATIONS ---
+export async function getCertifications(includeInactive = false) {
+  let query = supabase
+    .from('certifications')
+    .select('*')
+    .order('order_index', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('is_active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createCertification(certification: Database['public']['Tables']['certifications']['Insert']) {
+  const { data, error } = await supabase
+    .from('certifications')
+    .insert(certification as any)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateCertification(
+  id: string,
+  updates: Database['public']['Tables']['certifications']['Update']
+) {
+  const { data, error } = await supabase
+    .from('certifications')
+    .update(updates as any)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteCertification(id: string) {
+  const { error } = await supabase
+    .from('certifications')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
 

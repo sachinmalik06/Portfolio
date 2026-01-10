@@ -114,7 +114,7 @@ const Contact = () => {
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.4 }}
           >
             <div>
               <span className="text-primary text-sm font-medium uppercase tracking-widest">
@@ -198,7 +198,7 @@ const Contact = () => {
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
           >
             <h3 className="text-xl md:text-2xl font-bold text-foreground mb-4 md:mb-6">Send a Message</h3>
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">

@@ -23,6 +23,7 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard.tsx"));
 const ExpertiseManager = lazy(() => import("./pages/admin/ExpertiseManager.tsx"));
+const CertificationsManager = lazy(() => import("./pages/admin/CertificationsManager.tsx"));
 const TimelineManager = lazy(() => import("./pages/admin/TimelineManager.tsx"));
 const PagesManager = lazy(() => import("./pages/admin/PagesManager.tsx"));
 const GalleryManager = lazy(() => import("./pages/admin/GalleryManager.tsx"));
@@ -171,6 +172,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route index element={<Dashboard />} />
                 <Route path="home" element={<HomePageManager />} />
                 <Route path="expertise" element={<ExpertiseManager />} />
+                <Route path="certifications" element={<CertificationsManager />} />
                 <Route path="timeline" element={<TimelineManager />} />
                 <Route path="pages" element={<PagesManager />} />
                 <Route path="gallery" element={<GalleryManager />} />

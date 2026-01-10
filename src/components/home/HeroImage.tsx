@@ -7,8 +7,8 @@ const HeroImage = () => {
   const { data: profileData } = useProfileCardSettings();
   
   // Get image from CMS or use default
-  const heroImageUrl = profileData?.cardImageUrl 
-    ? convertDriveUrlToDirectImageUrl(profileData.cardImageUrl)
+  const heroImageUrl = profileData?.imageUrl || profileData?.cardImageUrl
+    ? convertDriveUrlToDirectImageUrl(profileData.imageUrl || profileData.cardImageUrl)
     : null;
 
   return (
@@ -16,7 +16,7 @@ const HeroImage = () => {
       className="relative w-full h-full max-h-[70vh] lg:max-h-[80vh]"
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
     >
       {/* Main image container */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl h-full bg-card">

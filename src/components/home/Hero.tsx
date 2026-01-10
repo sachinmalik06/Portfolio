@@ -41,7 +41,7 @@ const Hero = () => {
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.4 }}
             >
               <h1 className="hero-title text-foreground">
                 {name.split(' ').map((word: string, index: number) => (
@@ -58,7 +58,7 @@ const Hero = () => {
               className="text-muted-foreground text-base md:text-lg max-w-md mx-auto lg:mx-0 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
             >
               {description}
             </motion.p>
@@ -68,7 +68,7 @@ const Hero = () => {
               className="flex gap-3 justify-center lg:justify-start"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.3, delay: 0.15 }}
             >
               {socialLinks.map((link: any, index: number) => (
                 <SocialButton key={index} label={link.label} href={link.href} />

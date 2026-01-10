@@ -342,34 +342,34 @@ html.has-scroll-dragging {
 }
 
 .light {
-  /* Light mode theme - Warm Beige Palette */
-  --background: #F9F8F6;
-  --foreground: #3D3A35;
+  /* Light mode theme - Modern Dark Palette with Cyan Accent */
+  --background: #EEEEEE;
+  --foreground: #222831;
   --card: #FFFFFF;
-  --card-foreground: #3D3A35;
-  --primary: #C9B59C;
-  --primary-foreground: #3D3A35;
-  --secondary: #D9CFC7;
-  --secondary-foreground: #3D3A35;
-  --muted: #EFE9E3;
-  --muted-foreground: #6B6760;
-  --accent: #C9B59C;
-  --accent-foreground: #3D3A35;
+  --card-foreground: #222831;
+  --primary: #00ADB5;
+  --primary-foreground: #EEEEEE;
+  --secondary: #393E46;
+  --secondary-foreground: #EEEEEE;
+  --muted: #EEEEEE;
+  --muted-foreground: #393E46;
+  --accent: #00ADB5;
+  --accent-foreground: #222831;
   --destructive: hsl(0 62% 50%);
-  --destructive-foreground: #FFFFFF;
-  --border: #E5DED6;
-  --input: #EFE9E3;
-  --ring: #C9B59C;
+  --destructive-foreground: #EEEEEE;
+  --border: #393E46;
+  --input: #EEEEEE;
+  --ring: #00ADB5;
   
   /* Update sidebar for light mode */
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #3D3A35;
-  --sidebar-primary: #C9B59C;
-  --sidebar-primary-foreground: #3D3A35;
-  --sidebar-accent: #D9CFC7;
-  --sidebar-accent-foreground: #3D3A35;
-  --sidebar-border: #E5DED6;
-  --sidebar-ring: #C9B59C;
+  --sidebar: #222831;
+  --sidebar-foreground: #EEEEEE;
+  --sidebar-primary: #00ADB5;
+  --sidebar-primary-foreground: #EEEEEE;
+  --sidebar-accent: #393E46;
+  --sidebar-accent-foreground: #EEEEEE;
+  --sidebar-border: #393E46;
+  --sidebar-ring: #00ADB5;
 }
 
 .dark {

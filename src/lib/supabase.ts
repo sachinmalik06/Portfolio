@@ -22,11 +22,5 @@ export const supabase = createClient<Database>(
     db: {
       schema: 'public',
     },
-    global: {
-      headers: {
-        'Accept': 'application/json',
-        'apikey': supabaseAnonKey || 'dummy-key',
-      },
-    },
   }
 );

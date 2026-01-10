@@ -68,7 +68,7 @@ const About = () => {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.4 }}
           className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start"
         >
           <div className="space-y-6 md:space-y-8">
@@ -132,7 +132,7 @@ const About = () => {
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
           >
             {/* Work Experience */}
             <div className="bg-card rounded-2xl p-5 md:p-6 border border-border">

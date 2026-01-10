@@ -27,7 +27,7 @@ const Projects = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.5, margin: "0px 0px -100px 0px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.3 }}
         >
           <span className="text-primary text-sm font-medium uppercase tracking-widest">
             Portfolio
@@ -48,7 +48,7 @@ const Projects = () => {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, amount: 0.4, margin: "0px 0px -150px 0px" }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
                 layout="position"
               >
                 {/* Project Card */}
