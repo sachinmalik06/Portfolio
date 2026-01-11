@@ -237,6 +237,10 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                   height: '100%',
                   position: 'relative',
                   willChange: 'transform',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(0,0,0,0.05)',
                 }}
               >
                 <div
@@ -254,19 +258,18 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                   className="gallery__item-imginner"
                   style={{
                     backgroundImage: item.image && !imagesErrored[item.id] && imagesLoaded[item.id] ? `url(${convertDriveUrlToDirectImageUrl(item.image)})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: '50% 0',
+                    backgroundSize: 'contain',
+                    backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     width: '100%',
-                    height: 'calc(100% + 14vh)',
-                    marginTop: '-7vh',
+                    height: '100%',
                     willChange: 'transform',
                     filter: 'saturate(0) brightness(0)', // Initial filter state
                     opacity: item.image && imagesLoaded[item.id] && !imagesErrored[item.id] ? 1 : 0,
                     transition: 'opacity 0.3s ease-in-out',
-                    minHeight: '200px', // Ensure minimum height on mobile
-                    display: 'block', // Ensure it's displayed
-                    position: 'relative', // Ensure positioning works
+                    minHeight: '200px',
+                    display: 'block',
+                    position: 'relative',
                   }}
                 >
                   {/* Preload image using img tag for better browser handling */}
@@ -291,8 +294,8 @@ const HorizontalGallery = forwardRef<HorizontalGalleryRef, HorizontalGalleryProp
                           const div = imageInnerRefs.current[index];
                           if (div && img.src) {
                             div.style.backgroundImage = `url(${img.src})`;
-                            div.style.backgroundSize = 'cover';
-                            div.style.backgroundPosition = '50% 0';
+                            div.style.backgroundSize = 'contain';
+                            div.style.backgroundPosition = 'center';
                             div.style.backgroundRepeat = 'no-repeat';
                             div.style.opacity = '1';
                             div.style.display = 'block';
