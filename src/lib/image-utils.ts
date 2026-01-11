@@ -4,9 +4,11 @@
  * Examples:
  * - https://drive.google.com/file/d/FILE_ID/view?usp=sharing
  * - https://drive.google.com/open?id=FILE_ID
- * - https://drive.google.com/uc?id=FILE_ID (already direct)
+ * - https://drive.google.com/uc?id=FILE_ID
  * 
- * Returns: https://drive.google.com/uc?export=view&id=FILE_ID
+ * Returns: https://drive.google.com/thumbnail?id=FILE_ID&sz=w2000
+ * 
+ * Note: File must be set to "Anyone with the link can view" in Google Drive sharing settings
  */
 export function convertDriveUrlToDirectImageUrl(url: string | null | undefined): string {
   if (!url || !url.trim()) {
@@ -15,8 +17,8 @@ export function convertDriveUrlToDirectImageUrl(url: string | null | undefined):
 
   const trimmedUrl = url.trim();
 
-  // If it's already a direct Google Drive image URL, return as is
-  if (trimmedUrl.includes('drive.google.com/uc?') && trimmedUrl.includes('export=view')) {
+  // If it's already a direct Google Drive thumbnail URL, return as is
+  if (trimmedUrl.includes('drive.google.com/thumbnail?')) {
     return trimmedUrl;
   }
 
@@ -47,7 +49,9 @@ export function convertDriveUrlToDirectImageUrl(url: string | null | undefined):
 
   // If we found a file ID, convert to direct image URL
   if (fileId) {
-    return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    // Use thumbnail endpoint which is more reliable for embedding
+    // sz=w2000 gives us a high-quality image (2000px width)
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`;
   }
 
   // If no file ID found, return original URL (might be a regular image URL)

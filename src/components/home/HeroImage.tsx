@@ -7,9 +7,15 @@ const HeroImage = () => {
   const { data: profileData } = useProfileCardSettings();
   
   // Get image from CMS or use default
-  const heroImageUrl = profileData?.imageUrl || profileData?.cardImageUrl
-    ? convertDriveUrlToDirectImageUrl(profileData.imageUrl || profileData.cardImageUrl)
+  const rawImageUrl = profileData?.imageUrl || profileData?.cardImageUrl;
+  const heroImageUrl = rawImageUrl
+    ? convertDriveUrlToDirectImageUrl(rawImageUrl)
     : null;
+  
+  // Debug logging
+  console.log('Profile Data:', profileData);
+  console.log('Raw Image URL:', rawImageUrl);
+  console.log('Converted Image URL:', heroImageUrl);
 
   return (
     <motion.div
@@ -25,6 +31,10 @@ const HeroImage = () => {
             src={heroImageUrl}
             alt="Profile Portrait"
             className="w-full h-full object-cover object-top max-h-[70vh] lg:max-h-[80vh]"
+            onError={(e) => {
+              console.error('Failed to load image:', heroImageUrl);
+              console.error('Image load error event:', e);
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
