@@ -11,11 +11,6 @@ const HeroImage = () => {
   const heroImageUrl = rawImageUrl
     ? convertDriveUrlToDirectImageUrl(rawImageUrl)
     : null;
-  
-  // Debug logging
-  console.log('Profile Data:', profileData);
-  console.log('Raw Image URL:', rawImageUrl);
-  console.log('Converted Image URL:', heroImageUrl);
 
   return (
     <motion.div
@@ -31,10 +26,6 @@ const HeroImage = () => {
             src={heroImageUrl}
             alt="Profile Portrait"
             className="w-full h-full object-cover object-top max-h-[50vh] md:max-h-[60vh] lg:max-h-[80vh]"
-            onError={(e) => {
-              console.error('Failed to load image:', heroImageUrl);
-              console.error('Image load error event:', e);
-            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">

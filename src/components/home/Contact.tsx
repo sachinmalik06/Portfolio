@@ -4,6 +4,9 @@ import { useSiteSettings } from "@/hooks/use-cms";
 import { useState, FormEvent, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import type { Database } from "@/lib/database.types";
+
+type ContactSubmissionInsert = Database['public']['Tables']['contact_submissions']['Insert'];
 
 const Contact = () => {
   const { data: siteData } = useSiteSettings();
@@ -21,13 +24,21 @@ const Contact = () => {
   }, []);
 
   const fetchContactSettings = async () => {
-    const { data } = await supabase
-      .from('site_settings')
-      .select('*')
-      .eq('key', 'home_contact')
-      .single();
-    
-    if (data) setContactSettings((data as any).value);
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('key', 'home_contact')
+        .maybeSingle();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching contact settings:', error);
+      }
+      
+      if (data) setContactSettings((data as any).value);
+    } catch (error) {
+      console.error('Error fetching contact settings:', error);
+    }
   };
 
   // Default contact info
@@ -52,19 +63,31 @@ const Contact = () => {
       return;
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       // Submit to Supabase
-      const { data, error } = await ((supabase.from('contact_submissions') as any)
-        .insert({
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject || 'No subject',
-          message: formData.message,
-        })
+      const submissionData: ContactSubmissionInsert = {
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject || 'No subject',
+        message: formData.message,
+        status: 'unread'
+      };
+
+      const result = await (supabase.from('contact_submissions') as any)
+        .insert([submissionData])
         .select()
-        .single());
+        .single();
+      
+      const { data, error } = result;
 
       if (error) {
         console.error('Supabase error:', error);
@@ -89,9 +112,10 @@ const Contact = () => {
         subject: "",
         message: ""
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting contact form:', error);
-      toast.error("Failed to send message. Please try again or contact us directly via email.");
+      const errorMessage = error?.message || "Failed to send message. Please try again or contact us directly via email.";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -273,7 +297,7 @@ const Contact = () => {
               <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 md:py-4 bg-primary text-primary-foreground rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 md:py-4 bg-primary text-primary-foreground rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                 whileHover={!isSubmitting ? { scale: 1.02 } : {}}
                 whileTap={!isSubmitting ? { scale: 0.98 } : {}}
               >

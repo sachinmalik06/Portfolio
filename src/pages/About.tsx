@@ -138,10 +138,21 @@ const About = () => {
   // Transform timeline entries for the component
   const timelineData = (timelineEntries || []).map((entry: any) => ({
     title: entry.year || '',
+    yearStyles: entry.year_styles,
+    titleStyles: entry.title_styles,
+    contentStyles: entry.content_styles,
     content: (
       <div>
-        <h4 className="text-primary font-bold mb-2 text-lg">{entry.title || ''}</h4>
-        <div className="text-muted-foreground text-sm md:text-base whitespace-pre-wrap mb-4">
+        <h4 
+          className={`mb-2 text-${entry.title_styles?.fontSize || 'lg'} font-${entry.title_styles?.fontWeight || 'bold'}`}
+          style={{ color: entry.title_styles?.color || 'hsl(var(--primary))' }}
+        >
+          {entry.title || ''}
+        </h4>
+        <div 
+          className={`whitespace-pre-wrap mb-4 text-${entry.content_styles?.fontSize || 'base'} font-${entry.content_styles?.fontWeight || 'normal'}`}
+          style={{ color: entry.content_styles?.color || undefined }}
+        >
           {typeof entry.content === 'string' ? entry.content : JSON.stringify(entry.content || '')}
         </div>
         {entry.images && Array.isArray(entry.images) && entry.images.length > 0 && (

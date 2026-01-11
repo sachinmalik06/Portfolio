@@ -138,6 +138,9 @@ export interface Database {
           title: string
           content: Json | null
           images: string[]
+          year_styles: Json | null
+          title_styles: Json | null
+          content_styles: Json | null
           order: number
           active: boolean
           created_at: string
@@ -149,6 +152,9 @@ export interface Database {
           title: string
           content?: Json | null
           images?: string[]
+          year_styles?: Json | null
+          title_styles?: Json | null
+          content_styles?: Json | null
           order?: number
           active?: boolean
           created_at?: string
@@ -160,6 +166,9 @@ export interface Database {
           title?: string
           content?: Json | null
           images?: string[]
+          year_styles?: Json | null
+          title_styles?: Json | null
+          content_styles?: Json | null
           order?: number
           active?: boolean
           created_at?: string
@@ -176,6 +185,9 @@ export interface Database {
           description: string | null
           detailed_description: string | null
           link: string | null
+          title_styles: Json | null
+          description_styles: Json | null
+          detailed_description_styles: Json | null
           order: number
           active: boolean
           created_at: string
@@ -190,6 +202,9 @@ export interface Database {
           description?: string | null
           detailed_description?: string | null
           link?: string | null
+          title_styles?: Json | null
+          description_styles?: Json | null
+          detailed_description_styles?: Json | null
           order?: number
           active?: boolean
           created_at?: string
@@ -204,6 +219,9 @@ export interface Database {
           description?: string | null
           detailed_description?: string | null
           link?: string | null
+          title_styles?: Json | null
+          description_styles?: Json | null
+          detailed_description_styles?: Json | null
           order?: number
           active?: boolean
           created_at?: string

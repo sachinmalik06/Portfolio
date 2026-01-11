@@ -249,6 +249,21 @@ html.has-scroll-dragging {
   --font-body: "Inter", sans-serif;
   --font-variable: "Roboto Flex", sans-serif;
   
+  /* Text Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  
+  /* Line Heights */
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+  
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -596,4 +611,56 @@ html.has-scroll-dragging {
   line-height: 0.9;
   letter-spacing: -0.03em;
   font-weight: 700;
+}
+
+/* React Quill Editor Styles */
+.ql-toolbar {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border)) !important;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.ql-container {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border)) !important;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  font-family: inherit;
+  min-height: 200px;
+}
+
+.ql-editor {
+  min-height: 200px;
+  color: hsl(var(--foreground));
+}
+
+.ql-editor.ql-blank::before {
+  color: hsl(var(--muted-foreground));
+}
+
+.ql-toolbar button:hover,
+.ql-toolbar button.ql-active {
+  color: hsl(var(--primary)) !important;
+}
+
+.ql-toolbar button svg {
+  stroke: currentColor;
+}
+
+.ql-stroke {
+  stroke: hsl(var(--foreground)) !important;
+}
+
+.ql-fill {
+  fill: hsl(var(--foreground)) !important;
+}
+
+.ql-picker-label {
+  color: hsl(var(--foreground)) !important;
+}
+
+.ql-picker-options {
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
 }
