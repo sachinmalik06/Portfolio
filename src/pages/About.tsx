@@ -615,19 +615,19 @@ const About = () => {
               <div className={`flex flex-col ${isMobilePortrait ? 'gap-4' : 'gap-12'}`}>
                 <div className={`flex flex-col text-left ${isMobilePortrait ? 'gap-3' : 'gap-8'}`}>
                   <div className={`animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-2'}`}>
-                    <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-xs' : 'text-sm'}`}>{content.introSubtitle}</span>
+                    <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-sm' : 'text-sm'}`}>{content.introSubtitle}</span>
                     <h1 className={`font-display font-bold text-primary tracking-tight ${isMobilePortrait ? 'text-4xl whitespace-normal leading-tight' : 'text-6xl md:text-8xl whitespace-nowrap'}`}>
                       {content.introTitle}
                     </h1>
                   </div>
                   
                   <div className={`max-w-2xl animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-6'}`}>
-                    <p className={`font-light text-foreground/80 ${isMobilePortrait ? 'text-base leading-relaxed' : 'text-2xl md:text-3xl'}`}>
+                    <p className={`font-light text-foreground/80 ${isMobilePortrait ? 'text-lg leading-relaxed' : 'text-2xl md:text-3xl'}`}>
                       {content.introText}
                     </p>
                     
                     <div 
-                      className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-sm min-h-[2.5rem]' : 'text-lg md:text-xl min-h-[3rem]'}`}
+                      className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-base min-h-[2.5rem]' : 'text-lg md:text-xl min-h-[3rem]'}`}
                     >
                       <EncryptedText 
                         text={content.encryptedText}
@@ -658,8 +658,8 @@ const About = () => {
                   <div className={`flex flex-nowrap overflow-x-auto md:overflow-visible no-scrollbar animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center gap-2 mt-2 pb-4' : 'mt-4 gap-4 pb-2'}`}>
                     {infoCards.map((card, index) => (
                       <div key={index} className={`group border border-white/10 bg-white/5 backdrop-blur-sm rounded-lg hover:bg-white/10 transition-colors duration-300 shrink-0 ${isMobilePortrait ? 'p-2.5 min-w-[90px] flex-1 max-w-[120px]' : 'p-4 min-w-[140px]'}`}>
-                        <h3 className={`font-bold uppercase tracking-widest text-muted-foreground ${isMobilePortrait ? 'text-[8px] leading-tight mb-1' : 'text-[10px] mb-1'}`}>{card.label}</h3>
-                        <p className={`font-display text-foreground group-hover:text-primary transition-colors ${isMobilePortrait ? 'text-xs leading-tight' : 'text-lg whitespace-nowrap'}`}>{card.value}</p>
+                        <h3 className={`font-bold uppercase tracking-widest text-muted-foreground ${isMobilePortrait ? 'text-[10px] leading-tight mb-1' : 'text-[10px] mb-1'}`}>{card.label}</h3>
+                        <p className={`font-display text-foreground group-hover:text-primary transition-colors ${isMobilePortrait ? 'text-sm leading-tight' : 'text-lg whitespace-nowrap'}`}>{card.value}</p>
                       </div>
                     ))}
                   </div>
@@ -692,7 +692,7 @@ const About = () => {
             {/* Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
             
-            <p className="text-muted-foreground text-xs md:text-sm uppercase tracking-[0.3em] mb-12 animate-pulse">The Journey Continues</p>
+            <p className="text-muted-foreground text-sm md:text-sm uppercase tracking-[0.3em] mb-12 animate-pulse">The Journey Continues</p>
             
             <Link to="/contact" className="relative z-10 group flex flex-col items-center">
               <VariableProximity

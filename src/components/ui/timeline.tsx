@@ -122,7 +122,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
             <div className="relative pl-20 pr-4 md:pl-4 w-full">
               <h3 
-                className={`md:hidden block text-2xl mb-4 text-left font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '2xl'} font-${item.yearStyles?.fontWeight || 'bold'}`}
+                className={`md:hidden block text-3xl mb-4 text-left font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '3xl'} font-${item.yearStyles?.fontWeight || 'bold'}`}
                 style={item.yearStyles?.color ? { color: item.yearStyles.color } : {}}
               >
                 {item.title}
