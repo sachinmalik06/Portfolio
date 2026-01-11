@@ -16,19 +16,12 @@ export const supabase = createClient<Database>(
   supabaseAnonKey || 'dummy-key',
   {
     auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'supabase-auth',
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
     },
     db: {
       schema: 'public',
-    },
-    global: {
-      headers: {
-        'x-client-info': 'portfolio-web',
-      },
     },
   }
 );
