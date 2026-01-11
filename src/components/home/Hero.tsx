@@ -32,11 +32,11 @@ const Hero = () => {
   const description = siteData?.siteDescription || "Internationally oriented business professional passionate about strategic decision-making, data-driven growth, and digital transformation in multicultural environments.";
 
   return (
-    <section id="home" className="h-screen bg-background px-4 md:px-12 lg:px-20 pt-16 pb-4 flex items-center overflow-hidden">
+    <section id="home" className="min-h-screen bg-background px-4 md:px-12 lg:px-20 pt-16 md:pt-20 lg:pt-16 pb-4 md:pb-8 flex items-center overflow-hidden">
       <div className="max-w-7xl mx-auto w-full h-full flex items-center">
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center w-full">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 items-center w-full py-4">
           {/* Left Content */}
-          <div className="space-y-4 md:space-y-6 text-center lg:text-left">
+          <div className="space-y-3 md:space-y-5 lg:space-y-6 text-center lg:text-left order-last lg:order-first">
             {/* Main Title */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -89,7 +89,7 @@ const Hero = () => {
           </div>
 
           {/* Right Content - Hero Image */}
-          <div className="lg:pl-8 order-first lg:order-last h-full flex items-center">
+          <div className="lg:pl-8 order-first lg:order-last flex items-center">
             <HeroImage />
           </div>
         </div>

@@ -594,7 +594,7 @@ const About = () => {
                   } : undefined}
                 >
                   <DecayCard 
-                    image={profileCardSettings?.cardImageUrl ? convertDriveUrlToDirectImageUrl(profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
+                    image={(profileCardSettings?.imageUrl || profileCardSettings?.cardImageUrl) ? convertDriveUrlToDirectImageUrl(profileCardSettings.imageUrl || profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
                     width={isMobileLandscape ? 200 : 300}
                     height={isMobileLandscape ? 267 : 400}
                   />
@@ -633,7 +633,7 @@ const About = () => {
                         <Suspense fallback={null}>
                           <div className="relative w-full max-w-[280px]">
                             <DecayCard 
-                              image={profileCardSettings?.cardImageUrl ? convertDriveUrlToDirectImageUrl(profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
+                              image={(profileCardSettings?.imageUrl || profileCardSettings?.cardImageUrl) ? convertDriveUrlToDirectImageUrl(profileCardSettings.imageUrl || profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
                               width={280}
                               height={373}
                             />

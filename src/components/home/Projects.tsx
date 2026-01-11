@@ -24,10 +24,10 @@ const Projects = () => {
         {/* Section Header */}
         <motion.div
           className="text-center mb-12 md:mb-16"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.5, margin: "0px 0px -100px 0px" }}
-          transition={{ duration: 0.3 }}
+          viewport={{ once: true, amount: 0.3, margin: "0px 0px -50px 0px" }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
         >
           <span className="text-primary text-sm font-medium uppercase tracking-widest">
             Portfolio
@@ -45,10 +45,14 @@ const Projects = () => {
             return (
               <motion.div
                 key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.4, margin: "0px 0px -150px 0px" }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.2, margin: "0px 0px -100px 0px" }}
+                transition={{ 
+                  duration: 0.25, 
+                  delay: index * 0.03,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
                 layout="position"
               >
                 {/* Project Card */}
@@ -58,18 +62,18 @@ const Projects = () => {
                   animate={{
                     scale: isExpanded ? 1.02 : 1,
                   }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
                 >
                   {/* Image - Clickable */}
                   <motion.div
                     layout
-                    className="relative overflow-hidden bg-muted group cursor-pointer aspect-[4/3]"
+                    className="relative overflow-hidden bg-muted group cursor-pointer h-[280px] flex items-center justify-center"
                     onClick={() => toggleExpand(project.id)}
                   >
                     <motion.img
                       src={project.image}
                       alt={project.title || `Project ${project.number}`}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = 'https://via.placeholder.com/600x400?text=Project+Image';

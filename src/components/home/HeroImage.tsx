@@ -19,18 +19,18 @@ const HeroImage = () => {
 
   return (
     <motion.div
-      className="relative w-full h-full max-h-[70vh] lg:max-h-[80vh]"
+      className="relative w-full h-full max-h-[50vh] md:max-h-[60vh] lg:max-h-[80vh]"
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
     >
       {/* Main image container */}
-      <div className="relative rounded-3xl overflow-hidden shadow-2xl h-full bg-card">
+      <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl h-full bg-card">
         {heroImageUrl ? (
           <img
             src={heroImageUrl}
             alt="Profile Portrait"
-            className="w-full h-full object-cover object-top max-h-[70vh] lg:max-h-[80vh]"
+            className="w-full h-full object-cover object-top max-h-[50vh] md:max-h-[60vh] lg:max-h-[80vh]"
             onError={(e) => {
               console.error('Failed to load image:', heroImageUrl);
               console.error('Image load error event:', e);
