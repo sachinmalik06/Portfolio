@@ -82,7 +82,8 @@ const Contact = () => {
         status: 'unread'
       };
 
-      const result = await (supabase.from('contact_submissions') as any)
+      const result = await (supabase
+        .from('contact_submissions') as any)
         .insert([submissionData])
         .select()
         .single();

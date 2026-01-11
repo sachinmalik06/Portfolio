@@ -18,9 +18,17 @@ export const supabase = createClient<Database>(
     auth: {
       persistSession: true,
       autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      storageKey: 'supabase-auth',
     },
     db: {
       schema: 'public',
+    },
+    global: {
+      headers: {
+        'x-client-info': 'portfolio-web',
+      },
     },
   }
 );
