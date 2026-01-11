@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useMetaTags, useUpdateMetaTags } from "@/hooks/use-cms";
 import { Globe, Image as ImageIcon, Search, Share2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function MetaTagsManager() {
   const { data: metaTags, isLoading } = useMetaTags();
@@ -96,6 +97,34 @@ export default function MetaTagsManager() {
     } catch (error) {
       console.error(error);
       toast.error("Failed to update meta tags");
+    }
+  };
+
+  const useProfileImage = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'profile_card')
+        .single();
+      
+      if (error) throw error;
+      
+      const imageUrl = (data as any)?.value?.imageUrl || (data as any)?.value?.cardImageUrl;
+      
+      if (imageUrl) {
+        setFormData(prev => ({
+          ...prev,
+          og: { ...prev.og, image: imageUrl },
+          twitter: { ...prev.twitter, image: imageUrl }
+        }));
+        toast.success("Profile image loaded for social media previews");
+      } else {
+        toast.error("No profile image found in settings");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load profile image");
     }
   };
 
@@ -239,12 +268,24 @@ export default function MetaTagsManager() {
 
               <div className="space-y-2">
                 <Label htmlFor="og.image">Image URL</Label>
-                <Input
-                  id="og.image"
-                  value={formData.og.image}
-                  onChange={(e) => handleChange('og.image', e.target.value)}
-                  placeholder="https://cinematicstrategy.com/og-image.png"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="og.image"
+                    value={formData.og.image}
+                    onChange={(e) => handleChange('og.image', e.target.value)}
+                    placeholder="https://cinematicstrategy.com/og-image.png"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={useProfileImage}
+                    className="whitespace-nowrap"
+                  >
+                    <ImageIcon className="w-4 h-4 mr-2" />
+                    Use Profile Image
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">Full URL to an image (1200x630px recommended for best results).</p>
                 {formData.og.image && (
                   <div className="mt-2">
@@ -319,12 +360,24 @@ export default function MetaTagsManager() {
 
               <div className="space-y-2">
                 <Label htmlFor="twitter.image">Image URL</Label>
-                <Input
-                  id="twitter.image"
-                  value={formData.twitter.image}
-                  onChange={(e) => handleChange('twitter.image', e.target.value)}
-                  placeholder="https://cinematicstrategy.com/twitter-image.png"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="twitter.image"
+                    value={formData.twitter.image}
+                    onChange={(e) => handleChange('twitter.image', e.target.value)}
+                    placeholder="https://cinematicstrategy.com/twitter-image.png"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={useProfileImage}
+                    className="whitespace-nowrap"
+                  >
+                    <ImageIcon className="w-4 h-4 mr-2" />
+                    Use Profile Image
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">Full URL to an image (1200x675px recommended).</p>
                 {formData.twitter.image && (
                   <div className="mt-2">

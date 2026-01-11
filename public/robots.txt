@@ -1,0 +1,10 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://sachinmalik.co.in/sitemap.xml
+
+# Disallow admin routes from being indexed
+Disallow: /admin
+Disallow: /api
