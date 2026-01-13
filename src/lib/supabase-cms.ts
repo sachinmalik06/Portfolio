@@ -296,6 +296,7 @@ export async function updateMetaTags(settings: any) {
 
 export async function updateProfileCardSettings(settings: { 
   cardImageUrl?: string;
+  imageUrl?: string;
   name?: string;
   title?: string;
   description?: string;
