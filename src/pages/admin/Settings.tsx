@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { useProfileCardSettings, useUpdateProfileCardSettings, useLogoSettings, useUpdateLogoSettings } from "@/hooks/use-cms";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { convertDriveUrlToDirectImageUrl } from "@/lib/image-utils";
-import ImageUpload from "@/components/admin/ImageUpload";
+import ImageUploadWithCrop from "@/components/admin/ImageUploadWithCrop";
 
 export default function Settings() {
   const { user, profile, signOut } = useAuth();
@@ -397,7 +397,7 @@ export default function Settings() {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              <ImageUpload
+              <ImageUploadWithCrop
                 currentImageUrl={cardImageUrl}
                 onImageUploaded={async (url) => {
                   setCardImageUrl(url);
@@ -413,6 +413,8 @@ export default function Settings() {
                 folder="hero"
                 label="Hero Profile Image"
                 description="PNG, JPG, WEBP up to 5MB. Optimized for instant loading."
+                aspectRatio={3 / 4}
+                cropShape="rect"
               />
 
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">

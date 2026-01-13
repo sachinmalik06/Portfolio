@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Trash2, Image as ImageIcon } from "lucide-react";
-import ImageUpload from "@/components/admin/ImageUpload";
+import ImageUploadWithCrop from "@/components/admin/ImageUploadWithCrop";
 
 interface SocialLink {
   label: string;
@@ -304,7 +304,7 @@ export default function HomePageManager() {
 
               <div className="space-y-2">
                 <Label>Profile Image</Label>
-                <ImageUpload
+                <ImageUploadWithCrop
                   currentImageUrl={heroData.profileImageUrl}
                   onImageUploaded={async (url) => {
                     setHeroData({ ...heroData, profileImageUrl: url });
@@ -326,6 +326,8 @@ export default function HomePageManager() {
                   folder="hero"
                   label="Hero Profile Image"
                   description="PNG, JPG, WEBP up to 5MB. This image appears in the hero section."
+                  aspectRatio={3 / 4}
+                  cropShape="rect"
                 />
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-2">
                   <p className="text-sm text-blue-200">
