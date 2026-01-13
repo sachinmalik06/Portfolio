@@ -104,10 +104,10 @@ const Expertise = () => {
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="text-center mb-12 md:mb-16"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.5, margin: "0px 0px -100px 0px" }}
-          transition={{ duration: 0.3 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.25 }}
         >
           <span className="text-primary text-sm font-medium uppercase tracking-widest">
             What I Do
@@ -125,16 +125,16 @@ const Expertise = () => {
               <motion.div
                 key={item.title}
                 className="group p-5 md:p-8 bg-background rounded-2xl border border-border hover:border-primary transition-all duration-300 cursor-pointer"
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.4, margin: "0px 0px -150px 0px" }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.25, delay: index * 0.03 }}
                 whileHover={{ y: -8, scale: 1.02 }}
               >
                 <motion.div
                   className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300"
                   whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: 0.5 }}
                 >
                   <IconComponent className="w-5 h-5 md:w-6 md:h-6" />
                 </motion.div>
@@ -156,7 +156,7 @@ const Expertise = () => {
           className="my-12 md:my-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
+          viewport={{ once: true, amount: 0.3, margin: "0px 0px -100px 0px" }}
           transition={{ duration: 0.3, delay: 0.15 }}
         >
           <h3 className="text-lg md:text-xl font-bold text-foreground mb-6 md:mb-8 text-center">
@@ -170,7 +170,7 @@ const Expertise = () => {
                 className={`bg-background rounded-2xl p-5 md:p-6 border border-border hover:border-primary transition-all duration-300 ${cert.credential_url ? 'cursor-pointer hover:shadow-lg hover:shadow-primary/10' : ''}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.4, margin: "0px 0px -150px 0px" }}
+                viewport={{ once: true, amount: 0.4, margin: "0px 0px -150px 0px" }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 whileHover={{ y: -5 }}
                 onClick={() => {
@@ -216,7 +216,7 @@ const Expertise = () => {
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.5, margin: "0px 0px -100px 0px" }}
+          viewport={{ once: true, amount: 0.5, margin: "0px 0px -100px 0px" }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <h3 className="text-lg md:text-xl font-bold text-foreground mb-4 md:mb-6">Technical Skills</h3>
@@ -227,7 +227,7 @@ const Expertise = () => {
                 className="px-3 py-1.5 md:px-4 md:py-2 bg-background border border-border rounded-full text-xs md:text-sm text-muted-foreground hover:border-primary hover:text-foreground transition-colors"
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: false, amount: 0.5, margin: "0px 0px -100px 0px" }}
+                viewport={{ once: true, amount: 0.5, margin: "0px 0px -100px 0px" }}
                 transition={{ delay: 0.5 + index * 0.05 }}
                 whileHover={{ scale: 1.05 }}
               >
@@ -242,7 +242,7 @@ const Expertise = () => {
           className="mt-12 md:mt-16 grid grid-cols-3 gap-3 md:gap-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.5, margin: "0px 0px -100px 0px" }}
+          viewport={{ once: true, amount: 0.5, margin: "0px 0px -100px 0px" }}
           transition={{ duration: 0.3, delay: 0.25 }}
         >
           <div className="bg-background rounded-2xl p-4 md:p-6 border border-border text-center">

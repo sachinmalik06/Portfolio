@@ -8,16 +8,20 @@ const HeroImage = () => {
   
   // Get image from CMS or use default
   const rawImageUrl = profileData?.imageUrl || profileData?.cardImageUrl;
+  
+  // Check if it's already a Supabase URL (no conversion needed)
+  const isSupabaseUrl = rawImageUrl?.includes('/storage/v1/object/public/');
+  
   const heroImageUrl = rawImageUrl
-    ? convertDriveUrlToDirectImageUrl(rawImageUrl)
+    ? (isSupabaseUrl ? rawImageUrl : convertDriveUrlToDirectImageUrl(rawImageUrl))
     : null;
 
   return (
     <motion.div
       className="relative w-full h-full max-h-[50vh] md:max-h-[60vh] lg:max-h-[80vh]"
-      initial={{ opacity: 0, x: 40 }}
+      initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
+      transition={{ duration: 0.3, delay: 0.05 }}
     >
       {/* Main image container */}
       <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl h-full bg-card">
@@ -26,6 +30,9 @@ const HeroImage = () => {
             src={heroImageUrl}
             alt="Profile Portrait"
             className="w-full h-full object-cover object-top max-h-[50vh] md:max-h-[60vh] lg:max-h-[80vh]"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
@@ -49,7 +56,7 @@ const HeroImage = () => {
         rel="noopener noreferrer"
         className="absolute -top-2 -right-2 md:-top-4 md:-right-4 w-10 h-10 md:w-14 md:h-14 bg-foreground rounded-full flex items-center justify-center text-background shadow-lg"
         whileHover={{ scale: 1.1, rotate: 180 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.3 }}
       >
         <Globe className="w-4 h-4 md:w-6 md:h-6" />
       </motion.a>
@@ -63,7 +70,7 @@ const HeroImage = () => {
           animate={{ opacity: 1, scale: 1 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.3, duration: 0.2 }}
           title="View Expertise"
         >
           <BarChart3 className="w-4 h-4 md:w-5 md:h-5" />
@@ -76,7 +83,7 @@ const HeroImage = () => {
           animate={{ opacity: 1, scale: 1 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.35, duration: 0.2 }}
           title="View Education"
         >
           <GraduationCap className="w-4 h-4 md:w-5 md:h-5" />
@@ -89,7 +96,7 @@ const HeroImage = () => {
           whileTap={{ scale: 0.95 }}
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.4, duration: 0.2 }}
           title="Send Email"
         >
           <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5" />

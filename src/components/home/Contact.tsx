@@ -136,10 +136,10 @@ const Contact = () => {
           {/* Left - Info */}
           <motion.div
             className="space-y-6 md:space-y-8"
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-            transition={{ duration: 0.4 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.3 }}
           >
             <div>
               <span className="text-primary text-sm font-medium uppercase tracking-widest">
@@ -220,10 +220,10 @@ const Contact = () => {
           {/* Right - Form */}
           <motion.div
             className="bg-card rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-10 border border-border"
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
           >
             <h3 className="text-xl md:text-2xl font-bold text-foreground mb-4 md:mb-6">Send a Message</h3>
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">

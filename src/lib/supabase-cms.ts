@@ -312,14 +312,21 @@ export async function updateProfileCardSettings(settings: {
     .single() as any;
 
   const currentValue = (existing?.value as any) || {};
+  
+  // If cardImageUrl is provided, also set imageUrl for backward compatibility
+  const updatedSettings = { ...settings };
+  if (settings.cardImageUrl !== undefined) {
+    updatedSettings.imageUrl = settings.cardImageUrl;
+  }
+  
   const newValue = {
     ...currentValue,
-    ...settings
+    ...updatedSettings
   };
 
   if (existing) {
     const result = await ((supabase.from('site_settings') as any)
-      .update({ value: newValue })
+      .update({ value: newValue, updated_at: new Date().toISOString() })
       .eq('id', (existing as any).id)
       .select()
       .single());

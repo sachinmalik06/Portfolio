@@ -10,9 +10,9 @@ const StatCard = ({ value, description, delay = 0 }: StatCardProps) => {
   return (
     <motion.div
       className="space-y-1 text-center lg:text-left"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay }}
+      transition={{ duration: 0.3, delay }}
     >
       <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-primary">
         {value}

@@ -1,19 +1,24 @@
+import { lazy, Suspense } from "react";
 import Navigation from "@/components/home/Navigation";
 import Hero from "@/components/home/Hero";
-import About from "@/components/home/About";
-import Expertise from "@/components/home/Expertise";
-import Projects from "@/components/home/Projects";
-import Contact from "@/components/home/Contact";
+
+// Lazy load sections below the fold for faster initial load
+const About = lazy(() => import("@/components/home/About"));
+const Expertise = lazy(() => import("@/components/home/Expertise"));
+const Projects = lazy(() => import("@/components/home/Projects"));
+const Contact = lazy(() => import("@/components/home/Contact"));
 
 const Home = () => {
   return (
     <main className="min-h-screen bg-background">
       <Navigation />
       <Hero />
-      <About />
-      <Expertise />
-      <Projects />
-      <Contact />
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <About />
+        <Expertise />
+        <Projects />
+        <Contact />
+      </Suspense>
     </main>
   );
 };

@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon } from "lucide-react";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface SocialLink {
   label: string;
@@ -302,15 +303,36 @@ export default function HomePageManager() {
               </div>
 
               <div className="space-y-2">
-                <Label>Profile Image URL</Label>
-                <Input
-                  value={heroData.profileImageUrl}
-                  onChange={(e) => setHeroData({ ...heroData, profileImageUrl: e.target.value })}
-                  placeholder="https://example.com/image.jpg or Google Drive URL"
+                <Label>Profile Image</Label>
+                <ImageUpload
+                  currentImageUrl={heroData.profileImageUrl}
+                  onImageUploaded={async (url) => {
+                    setHeroData({ ...heroData, profileImageUrl: url });
+                    try {
+                      await ((supabase.from('site_settings') as any)
+                        .upsert({
+                          key: 'profile_card',
+                          value: {
+                            imageUrl: url,
+                            stats: heroData.stats
+                          }
+                        }, { onConflict: 'key' }));
+                      toast.success("Hero profile image updated!");
+                    } catch (error: any) {
+                      toast.error(error?.message || "Failed to update image");
+                    }
+                  }}
+                  bucket="images"
+                  folder="hero"
+                  label="Hero Profile Image"
+                  description="PNG, JPG, WEBP up to 5MB. This image appears in the hero section."
                 />
-                <p className="text-xs text-muted-foreground">
-                  Supports Google Drive links. Share → Copy link → Paste here.
-                </p>
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-2">
+                  <p className="text-sm text-blue-200">
+                    <ImageIcon className="w-4 h-4 inline mr-2" />
+                    Images are uploaded to Supabase Storage for instant loading.
+                  </p>
+                </div>
               </div>
 
               {/* Social Links */}

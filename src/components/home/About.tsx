@@ -65,10 +65,10 @@ const About = () => {
     <section id="about" className="min-h-screen bg-background px-4 md:px-12 lg:px-20 py-16 md:py-24">
       <div className="max-w-7xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-          transition={{ duration: 0.4 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.3 }}
           className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start"
         >
           <div className="space-y-6 md:space-y-8">
@@ -76,8 +76,8 @@ const About = () => {
               className="text-primary text-sm font-medium uppercase tracking-widest"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: false, amount: 0.5, margin: "0px 0px -100px 0px" }}
-              transition={{ delay: 0.2 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ delay: 0.1 }}
             >
               {aboutSettings?.subtitle || "About Me"}
             </motion.span>
@@ -129,10 +129,10 @@ const About = () => {
           {/* Work Experience & Education */}
           <motion.div
             className="space-y-6 md:space-y-8"
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.3, margin: "0px 0px -100px 0px" }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
           >
             {/* Work Experience */}
             <div className="bg-card rounded-2xl p-5 md:p-6 border border-border">

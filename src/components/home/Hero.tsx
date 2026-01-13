@@ -39,9 +39,9 @@ const Hero = () => {
           <div className="space-y-3 md:space-y-5 lg:space-y-6 text-center lg:text-left order-last lg:order-first">
             {/* Main Title */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.3 }}
             >
               <h1 className="hero-title text-foreground">
                 {name.split(' ').map((word: string, index: number) => (
@@ -56,9 +56,9 @@ const Hero = () => {
             {/* Description */}
             <motion.p
               className="text-muted-foreground text-base md:text-lg max-w-md mx-auto lg:mx-0 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
+              transition={{ duration: 0.2, delay: 0.05 }}
             >
               {description}
             </motion.p>
@@ -66,9 +66,9 @@ const Hero = () => {
             {/* Social Links */}
             <motion.div
               className="flex gap-3 justify-center lg:justify-start"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.15 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
             >
               {socialLinks.map((link: any, index: number) => (
                 <SocialButton key={index} label={link.label} href={link.href} />
@@ -82,7 +82,7 @@ const Hero = () => {
                   key={stat.value}
                   value={stat.value}
                   description={stat.description}
-                  delay={0.4 + index * 0.1}
+                  delay={0.15 + index * 0.05}
                 />
               ))}
             </div>

@@ -40,7 +40,7 @@ const Navigation = () => {
         }`}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <nav className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}

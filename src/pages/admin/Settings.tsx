@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { useProfileCardSettings, useUpdateProfileCardSettings, useLogoSettings, useUpdateLogoSettings } from "@/hooks/use-cms";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { convertDriveUrlToDirectImageUrl } from "@/lib/image-utils";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 export default function Settings() {
   const { user, profile, signOut } = useAuth();
@@ -388,52 +389,39 @@ export default function Settings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImageIcon className="w-5 h-5" />
-              Profile Card Image
+              Hero Section Image
             </CardTitle>
             <CardDescription>
-              Update the profile card image displayed on the About page. You can use image URLs or upload to Supabase Storage.
+              Upload the image that appears in the hero section of your home page.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleUpdateCard} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="cardImageUrl">Card Image URL</Label>
-                <Input 
-                  id="cardImageUrl"
-                  type="url"
-                  value={cardImageUrl}
-                  onChange={(e) => setCardImageUrl(e.target.value)}
-                  placeholder="https://example.com/card-image.jpg or Google Drive link"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Supports Google Drive links. Share → Copy link → Paste here. Leave empty to use default.
-                </p>
-                {cardImageUrl && (
-                  <div className="mt-2 p-2 border border-white/10 rounded-lg">
-                    <img 
-                      src={convertDriveUrlToDirectImageUrl(cardImageUrl)} 
-                      alt="Card preview" 
-                      className="max-w-full h-32 object-contain rounded"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-
+            <div className="space-y-6">
+              <ImageUpload
+                currentImageUrl={cardImageUrl}
+                onImageUploaded={async (url) => {
+                  setCardImageUrl(url);
+                  try {
+                    await updateProfileCard({ cardImageUrl: url });
+                    toast.success("Hero image updated! Refreshing page...");
+                    setTimeout(() => window.location.reload(), 1500);
+                  } catch (error: any) {
+                    toast.error(error?.message || "Failed to update image");
+                  }
+                }}
+                bucket="images"
+                folder="hero"
+                label="Hero Profile Image"
+                description="PNG, JPG, WEBP up to 5MB. Optimized for instant loading."
+              />
 
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                 <p className="text-sm text-blue-200">
                   <ImageIcon className="w-4 h-4 inline mr-2" />
-                  Tip: You can upload images to Supabase Storage and use the public URL here, or use any publicly accessible image URL.
+                  Images are uploaded to Supabase Storage for instant loading. No more delays!
                 </p>
               </div>
-
-              <Button type="submit" className="w-full" disabled={isUpdatingCard}>
-                {isUpdatingCard ? "Updating..." : "Update Profile Card Images"}
-              </Button>
-            </form>
+            </div>
           </CardContent>
         </Card>
         </TabsContent>
