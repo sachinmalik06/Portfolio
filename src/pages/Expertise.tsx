@@ -560,7 +560,7 @@ const Expertise = () => {
                         <Icon className="w-8 h-8 text-primary group-hover:text-primary-foreground transition-colors duration-500" />
                       </div>
                       
-                      <h3 className="text-2xl font-display mb-4 text-foreground group-hover:text-primary transition-colors duration-300">
+                      <h3 className="text-2xl font-display mb-4 group-hover:text-primary transition-colors duration-300" style={{ color: '#00ADB5' }}>
                         {area.title}
                       </h3>
                       

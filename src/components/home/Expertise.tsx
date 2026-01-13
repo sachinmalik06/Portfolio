@@ -139,7 +139,7 @@ const Expertise = () => {
                   <IconComponent className="w-5 h-5 md:w-6 md:h-6" />
                 </motion.div>
                 
-                <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 md:mb-3">
+                <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3" style={{ color: '#00ADB5' }}>
                   {item.title}
                 </h3>
                 
