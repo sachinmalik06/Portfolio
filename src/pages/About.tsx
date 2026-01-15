@@ -144,7 +144,7 @@ const About = () => {
     content: (
       <div>
         <h4 
-          className={`mb-2 text-${entry.title_styles?.fontSize || 'lg'} font-${entry.title_styles?.fontWeight || 'bold'}`}
+          className={`mb-2 text-${entry.title_styles?.fontSize || 'lg'} font-bold`}
           style={{ 
             color: entry.title_styles?.color || 'hsl(var(--primary))',
             textAlign: (entry.title_styles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
@@ -153,7 +153,7 @@ const About = () => {
           {entry.title || ''}
         </h4>
         <div 
-          className={`whitespace-pre-wrap mb-4 text-${entry.content_styles?.fontSize || 'base'} font-${entry.content_styles?.fontWeight || 'normal'}`}
+          className={`whitespace-pre-wrap mb-4 text-${entry.content_styles?.fontSize || 'base'} font-normal`}
           style={{ 
             color: entry.content_styles?.color || undefined,
             textAlign: (entry.content_styles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'

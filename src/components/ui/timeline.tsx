@@ -116,7 +116,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                 <div className="h-4 w-4 rounded-full bg-muted border border-border p-2" />
               </div>
               <h3 
-                className={`hidden md:block text-xl md:pl-20 md:text-5xl font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '5xl'} font-${item.yearStyles?.fontWeight || 'bold'}`}
+                className={`hidden md:block text-xl md:pl-20 md:text-5xl font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '5xl'}`}
                 style={{ 
                   color: item.yearStyles?.color || undefined,
                   textAlign: (item.yearStyles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
@@ -128,7 +128,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
             <div className="relative pl-20 pr-4 md:pl-4 w-full">
               <h3 
-                className={`md:hidden block text-3xl mb-4 text-left font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '3xl'} font-${item.yearStyles?.fontWeight || 'bold'}`}
+                className={`md:hidden block text-3xl mb-4 text-left font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '3xl'}`}
                 style={{ 
                   color: item.yearStyles?.color || undefined,
                   textAlign: (item.yearStyles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
