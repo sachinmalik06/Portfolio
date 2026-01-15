@@ -612,22 +612,23 @@ const About = () => {
                 </div>
               </Suspense>
             </div>
-              <div className={`flex flex-col ${isMobilePortrait ? 'gap-4' : 'gap-12'}`}>
+              {/* Left Content Area - Constrained to not overlap with profile card */}
+              <div className={`flex flex-col ${isMobilePortrait ? 'gap-4 w-full' : 'gap-12 w-full md:w-1/2 md:max-w-[55%]'}`}>
                 <div className={`flex flex-col text-left ${isMobilePortrait ? 'gap-3' : 'gap-8'}`}>
-                  <div className={`animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-2'}`}>
-                    <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-sm' : 'text-sm'}`}>{content.introSubtitle}</span>
-                    <h1 className={`font-display font-bold text-primary tracking-tight ${isMobilePortrait ? 'text-4xl whitespace-normal leading-tight' : 'text-6xl md:text-8xl whitespace-nowrap'}`}>
+                  <div className={`animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-3'}`}>
+                    <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-sm' : 'text-xs md:text-sm'}`}>{content.introSubtitle}</span>
+                    <h1 className={`font-display font-bold text-primary tracking-tight ${isMobilePortrait ? 'text-4xl whitespace-normal leading-tight' : 'text-4xl md:text-5xl lg:text-6xl whitespace-nowrap'}`}>
                       {content.introTitle}
                     </h1>
                   </div>
                   
-                  <div className={`max-w-2xl animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-6'}`}>
-                    <p className={`font-light text-foreground/80 ${isMobilePortrait ? 'text-lg leading-relaxed' : 'text-2xl md:text-3xl'}`}>
+                  <div className={`max-w-2xl animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-4'}`}>
+                    <p className={`font-light text-foreground/80 leading-relaxed ${isMobilePortrait ? 'text-lg leading-relaxed' : 'text-base md:text-lg'}`}>
                       {content.introText}
                     </p>
                     
                     <div 
-                      className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-base min-h-[2.5rem]' : 'text-lg md:text-xl min-h-[3rem]'}`}
+                      className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-base min-h-[2.5rem]' : 'text-sm md:text-base min-h-[2rem]'}`}
                     >
                       <EncryptedText 
                         text={content.encryptedText}
@@ -654,12 +655,28 @@ const About = () => {
                     )}
                   </div>
 
-                  {/* Info Cards - Horizontal Layout */}
-                  <div className={`flex flex-nowrap overflow-x-auto md:overflow-visible no-scrollbar animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center gap-2 mt-2 pb-4' : 'mt-4 gap-4 pb-2'}`}>
+                  {/* Info Cards - Modern Production Layout (Left Side Only) */}
+                  <div className={`flex flex-wrap gap-3 md:gap-4 animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center mt-4 pb-4' : 'mt-8 pb-2'}`}>
                     {infoCards.map((card, index) => (
-                      <div key={index} className={`group border border-white/10 bg-white/5 backdrop-blur-sm rounded-lg hover:bg-white/10 transition-colors duration-300 shrink-0 ${isMobilePortrait ? 'p-2.5 min-w-[90px] flex-1 max-w-[120px]' : 'p-4 min-w-[140px]'}`}>
-                        <h3 className={`font-bold uppercase tracking-widest text-muted-foreground ${isMobilePortrait ? 'text-[10px] leading-tight mb-1' : 'text-[10px] mb-1'}`}>{card.label}</h3>
-                        <p className={`font-display text-foreground group-hover:text-primary transition-colors ${isMobilePortrait ? 'text-sm leading-tight' : 'text-lg whitespace-nowrap'}`}>{card.value}</p>
+                      <div 
+                        key={index} 
+                        className={`group relative overflow-hidden border border-border/40 bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-md rounded-xl hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-500 ${isMobilePortrait ? 'p-4 flex-1 min-w-[calc(50%-0.375rem)]' : 'p-4 md:p-5 flex-[0_1_calc(50%-0.5rem)]'}`}
+                      >
+                        {/* Subtle gradient overlay on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/[0.03] group-hover:to-transparent transition-all duration-500" />
+                        
+                        {/* Content */}
+                        <div className="relative z-10">
+                          <h3 className={`font-body font-semibold uppercase tracking-[0.2em] text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-300 ${isMobilePortrait ? 'text-[9px] mb-2' : 'text-[10px] mb-3'}`}>
+                            {card.label}
+                          </h3>
+                          <p className={`font-display font-medium text-foreground/90 group-hover:text-primary leading-tight transition-all duration-300 ${isMobilePortrait ? 'text-sm' : 'text-base md:text-lg'}`}>
+                            {card.value}
+                          </p>
+                        </div>
+                        
+                        {/* Bottom accent line */}
+                        <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-primary to-primary/0 group-hover:w-full transition-all duration-500" />
                       </div>
                     ))}
                   </div>

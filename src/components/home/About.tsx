@@ -144,7 +144,7 @@ const About = () => {
                 {!isLoading && workExperience.length > 0 ? (
                   workExperience.map((item: any) => (
                     <div key={item.id} className="border-l-2 border-primary/30 pl-4">
-                      <h4 className="font-semibold text-foreground text-sm md:text-base">{item.title}</h4>
+                      <h4 className="font-semibold text-foreground text-base md:text-lg">{item.title}</h4>
                       <p className="text-primary text-xs md:text-sm">{item.subtitle || item.company}</p>
                       <p className="text-muted-foreground text-xs md:text-sm">{item.date_range || item.period}</p>
                       {item.description && (
@@ -158,7 +158,7 @@ const About = () => {
                   ))
                 ) : (
                   <div className="border-l-2 border-primary/30 pl-4">
-                    <h4 className="font-semibold text-foreground text-sm md:text-base">{defaultExperience.title}</h4>
+                    <h4 className="font-semibold text-foreground text-base md:text-lg">{defaultExperience.title}</h4>
                     <p className="text-primary text-xs md:text-sm">{defaultExperience.company}</p>
                     <p className="text-muted-foreground text-xs md:text-sm">{defaultExperience.period}</p>
                     <ul className="mt-2 text-xs md:text-sm text-muted-foreground space-y-1">
@@ -181,7 +181,7 @@ const About = () => {
                 {!isLoading && education.length > 0 ? (
                   education.map((entry: any) => (
                     <div key={entry.id} className="border-l-2 border-primary/30 pl-4">
-                      <h4 className="font-semibold text-foreground text-sm md:text-base">{entry.title}</h4>
+                      <h4 className="font-semibold text-foreground text-base md:text-lg">{entry.title}</h4>
                       <p className="text-primary text-xs md:text-sm">{entry.subtitle || entry.institution}</p>
                       <p className="text-muted-foreground text-xs md:text-sm">{entry.date_range || entry.period}</p>
                     </div>
@@ -189,7 +189,7 @@ const About = () => {
                 ) : (
                   defaultEducation.map((entry, index) => (
                     <div key={index} className="border-l-2 border-primary/30 pl-4">
-                      <h4 className="font-semibold text-foreground text-sm md:text-base">{entry.degree}</h4>
+                      <h4 className="font-semibold text-foreground text-base md:text-lg">{entry.degree}</h4>
                       <p className="text-primary text-xs md:text-sm">{entry.institution}</p>
                       <p className="text-muted-foreground text-xs md:text-sm">{entry.period}</p>
                     </div>
