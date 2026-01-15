@@ -143,21 +143,21 @@ export default function TimelineManager() {
     // Get text styling options for each element
     const yearStyles = {
       fontSize: formData.get("yearFontSize") as string || 'base',
-      fontWeight: formData.get("yearFontWeight") as string || 'normal',
+      fontWeight: 'bold',
       color: formData.get("yearColor") as string || '',
       textAlign: formData.get("yearTextAlign") as string || 'left',
     };
     
     const titleStyles = {
       fontSize: formData.get("titleFontSize") as string || 'lg',
-      fontWeight: formData.get("titleFontWeight") as string || 'bold',
+      fontWeight: 'bold',
       color: formData.get("titleColor") as string || '',
       textAlign: formData.get("titleTextAlign") as string || 'left',
     };
     
     const contentStyles = {
       fontSize: formData.get("contentFontSize") as string || 'base',
-      fontWeight: formData.get("contentFontWeight") as string || 'normal',
+      fontWeight: 'normal',
       color: formData.get("contentColor") as string || '',
       textAlign: formData.get("contentTextAlign") as string || 'left',
     };
@@ -270,14 +270,14 @@ export default function TimelineManager() {
       </DndContext>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-full max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-[98vw] w-full max-h-[90vh] overflow-y-scroll">
           <DialogHeader>
             <DialogTitle>{editingEntry ? "Edit Entry" : "New Entry"}</DialogTitle>
             <DialogDescription>
-              {editingEntry ? "Update the timeline entry details below." : "Fill in the details to create a new timeline entry."}
+              {editingEntry ? "Update the timeline entry details below. Scroll down to see all styling options including text alignment." : "Fill in the details to create a new timeline entry. Scroll down to see all styling options including text alignment."}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <form onSubmit={handleSubmit} className="space-y-6 mt-4 pb-8">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Year</label>
@@ -298,9 +298,9 @@ export default function TimelineManager() {
             </div>
             
             {/* Year Styling */}
-            <div className="space-y-3 border-t pt-4">
+            <div className="space-y-3 border-t pt-4 mt-4 bg-muted/20 p-4 rounded-lg">
               <h4 className="text-sm font-semibold text-primary">Year Styling</h4>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
                   <select 
@@ -339,6 +339,8 @@ export default function TimelineManager() {
                     placeholder="#00ADB5 or leave empty"
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 mt-2">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Text Align</label>
                   <select 
@@ -356,9 +358,9 @@ export default function TimelineManager() {
             </div>
             
             {/* Title Styling */}
-            <div className="space-y-3 border-t pt-4">
-              <h4 className="text-sm font-semibold text-primary">Title Styling</h4>
-              <div className="grid grid-cols-4 gap-4">
+            <div className="space-y-3 border-t pt-4 mt-4 bg-muted/20 p-4 rounded-lg">
+              <h4 className="text-sm font-semibold text-primary">Title Styling (Font Size, Text Align, Text Color)</h4>
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
                   <select 
@@ -382,29 +384,6 @@ export default function TimelineManager() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="titleFontWeight" 
-                    defaultValue={editingEntry?.title_styles?.fontWeight || 'bold'} 
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="light">Light</option>
-                    <option value="normal">Normal</option>
-                    <option value="medium">Medium</option>
-                    <option value="semibold">Semi Bold</option>
-                    <option value="bold">Bold</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="titleColor" 
-                    defaultValue={editingEntry?.title_styles?.color || ''} 
-                    placeholder="#00ADB5 or leave empty"
-                  />
-                </div>
-                <div className="space-y-2">
                   <label className="text-sm font-medium">Text Align</label>
                   <select 
                     name="titleTextAlign" 
@@ -417,13 +396,22 @@ export default function TimelineManager() {
                     <option value="justify">Justify</option>
                   </select>
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Text Color</label>
+                  <Input 
+                    type="text" 
+                    name="titleColor" 
+                    defaultValue={editingEntry?.title_styles?.color || ''} 
+                    placeholder="#00ADB5 or leave empty"
+                  />
+                </div>
               </div>
             </div>
             
             {/* Content Styling */}
-            <div className="space-y-3 border-t pt-4">
-              <h4 className="text-sm font-semibold text-primary">Content Styling</h4>
-              <div className="grid grid-cols-4 gap-4">
+            <div className="space-y-3 border-t pt-4 mt-4 bg-muted/20 p-4 rounded-lg">
+              <h4 className="text-sm font-semibold text-primary">Content Styling (Font Size, Text Align, Text Color)</h4>
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
                   <select 
@@ -447,29 +435,6 @@ export default function TimelineManager() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="contentFontWeight" 
-                    defaultValue={editingEntry?.content_styles?.fontWeight || 'normal'} 
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="light">Light</option>
-                    <option value="normal">Normal</option>
-                    <option value="medium">Medium</option>
-                    <option value="semibold">Semi Bold</option>
-                    <option value="bold">Bold</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="contentColor" 
-                    defaultValue={editingEntry?.content_styles?.color || ''} 
-                    placeholder="#00ADB5 or leave empty"
-                  />
-                </div>
-                <div className="space-y-2">
                   <label className="text-sm font-medium">Text Align</label>
                   <select 
                     name="contentTextAlign" 
@@ -481,6 +446,16 @@ export default function TimelineManager() {
                     <option value="right">Right</option>
                     <option value="justify">Justify</option>
                   </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Text Color</label>
+                  <input
+                    type="text" 
+                    name="contentColor" 
+                    defaultValue={editingEntry?.content_styles?.color || ''} 
+                    placeholder="#00ADB5 or leave empty"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
                 </div>
               </div>
             </div>
