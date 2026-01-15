@@ -14,16 +14,19 @@ interface TimelineEntry {
     fontSize?: string;
     fontWeight?: string;
     color?: string;
+    textAlign?: string;
   };
   titleStyles?: {
     fontSize?: string;
     fontWeight?: string;
     color?: string;
+    textAlign?: string;
   };
   contentStyles?: {
     fontSize?: string;
     fontWeight?: string;
     color?: string;
+    textAlign?: string;
   };
 }
 
@@ -114,7 +117,10 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
               </div>
               <h3 
                 className={`hidden md:block text-xl md:pl-20 md:text-5xl font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '5xl'} font-${item.yearStyles?.fontWeight || 'bold'}`}
-                style={item.yearStyles?.color ? { color: item.yearStyles.color } : {}}
+                style={{ 
+                  color: item.yearStyles?.color || undefined,
+                  textAlign: (item.yearStyles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
+                }}
               >
                 {item.title}
               </h3>
@@ -123,7 +129,10 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
             <div className="relative pl-20 pr-4 md:pl-4 w-full">
               <h3 
                 className={`md:hidden block text-3xl mb-4 text-left font-bold text-muted-foreground text-${item.yearStyles?.fontSize || '3xl'} font-${item.yearStyles?.fontWeight || 'bold'}`}
-                style={item.yearStyles?.color ? { color: item.yearStyles.color } : {}}
+                style={{ 
+                  color: item.yearStyles?.color || undefined,
+                  textAlign: (item.yearStyles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
+                }}
               >
                 {item.title}
               </h3>

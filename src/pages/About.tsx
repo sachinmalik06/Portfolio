@@ -145,13 +145,19 @@ const About = () => {
       <div>
         <h4 
           className={`mb-2 text-${entry.title_styles?.fontSize || 'lg'} font-${entry.title_styles?.fontWeight || 'bold'}`}
-          style={{ color: entry.title_styles?.color || 'hsl(var(--primary))' }}
+          style={{ 
+            color: entry.title_styles?.color || 'hsl(var(--primary))',
+            textAlign: (entry.title_styles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
+          }}
         >
           {entry.title || ''}
         </h4>
         <div 
           className={`whitespace-pre-wrap mb-4 text-${entry.content_styles?.fontSize || 'base'} font-${entry.content_styles?.fontWeight || 'normal'}`}
-          style={{ color: entry.content_styles?.color || undefined }}
+          style={{ 
+            color: entry.content_styles?.color || undefined,
+            textAlign: (entry.content_styles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
+          }}
         >
           {typeof entry.content === 'string' ? entry.content : JSON.stringify(entry.content || '')}
         </div>
@@ -655,12 +661,12 @@ const About = () => {
                     )}
                   </div>
 
-                  {/* Info Cards - Modern Production Layout (Left Side Only) */}
-                  <div className={`flex flex-wrap gap-3 md:gap-4 animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center mt-4 pb-4' : 'mt-8 pb-2'}`}>
+                  {/* Info Cards - Modern Production Layout (Left Side Only - Single Line) */}
+                  <div className={`flex flex-nowrap gap-2 md:gap-3 animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center mt-4 pb-4 overflow-x-auto' : 'mt-8 pb-2'}`}>
                     {infoCards.map((card, index) => (
                       <div 
                         key={index} 
-                        className={`group relative overflow-hidden border border-border/40 bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-md rounded-xl hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-500 ${isMobilePortrait ? 'p-4 flex-1 min-w-[calc(50%-0.375rem)]' : 'p-4 md:p-5 flex-[0_1_calc(50%-0.5rem)]'}`}
+                        className={`group relative overflow-hidden border border-border/40 bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-md rounded-xl hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-500 ${isMobilePortrait ? 'p-4 flex-1 min-w-[calc(33.333%-0.5rem)]' : 'p-4 md:p-5 flex-1 min-w-0'}`}
                       >
                         {/* Subtle gradient overlay on hover */}
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/[0.03] group-hover:to-transparent transition-all duration-500" />
