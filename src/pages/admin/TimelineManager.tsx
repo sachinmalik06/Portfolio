@@ -317,31 +317,6 @@ export default function TimelineManager() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="yearFontWeight" 
-                    defaultValue={editingEntry?.year_styles?.fontWeight || 'normal'} 
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="light">Light</option>
-                    <option value="normal">Normal</option>
-                    <option value="medium">Medium</option>
-                    <option value="semibold">Semi Bold</option>
-                    <option value="bold">Bold</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="yearColor" 
-                    defaultValue={editingEntry?.year_styles?.color || ''} 
-                    placeholder="#00ADB5 or leave empty"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 gap-4 mt-2">
-                <div className="space-y-2">
                   <label className="text-sm font-medium">Text Align</label>
                   <select 
                     name="yearTextAlign" 
@@ -353,6 +328,15 @@ export default function TimelineManager() {
                     <option value="right">Right</option>
                     <option value="justify">Justify</option>
                   </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Text Color</label>
+                  <Input 
+                    type="text" 
+                    name="yearColor" 
+                    defaultValue={editingEntry?.year_styles?.color || ''} 
+                    placeholder="#00ADB5 or leave empty"
+                  />
                 </div>
               </div>
             </div>
