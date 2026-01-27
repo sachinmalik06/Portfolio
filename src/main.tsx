@@ -17,13 +17,16 @@ const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
 const Expertise = lazy(() => import("./pages/Expertise.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
+const Resume = lazy(() => import("./pages/Resume.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+
 
 // Admin Components
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard.tsx"));
 const ExpertiseManager = lazy(() => import("./pages/admin/ExpertiseManager.tsx"));
 const CertificationsManager = lazy(() => import("./pages/admin/CertificationsManager.tsx"));
+const ResumeManager = lazy(() => import("./pages/admin/ResumeManager.tsx"));
 const TimelineManager = lazy(() => import("./pages/admin/TimelineManager.tsx"));
 const PagesManager = lazy(() => import("./pages/admin/PagesManager.tsx"));
 const GalleryManager = lazy(() => import("./pages/admin/GalleryManager.tsx"));
@@ -67,7 +70,7 @@ function RouteSyncer() {
 
 function ScrollToTop() {
   const location = useLocation();
-  
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [location.pathname]);
@@ -86,11 +89,11 @@ function ThemeRouteGuard() {
     const landingThemeKey = 'landingTheme';
     const currentPath = location.pathname;
     const prevPath = prevPathRef.current;
-    
+
     // Pages that should always be in dark mode
-    const darkModePages = ['/about', '/expertise', '/contact'];
+    const darkModePages = ['/about', '/expertise', '/contact', '/resume'];
     const isDarkModePage = darkModePages.includes(currentPath);
-    
+
     // Always check and enforce theme for dark mode pages, even if path hasn't changed
     // This ensures theme is set correctly on initial load or when navigating to these pages
     if (isDarkModePage) {
@@ -105,16 +108,16 @@ function ThemeRouteGuard() {
       prevPathRef.current = currentPath;
       return;
     }
-    
+
     // Only run when route actually changes (not on initial mount if already on Landing)
     if (prevPath === currentPath) {
       return;
     }
-    
+
     // Update prev path after checking
     const wasOnLanding = prevPath === '/';
     prevPathRef.current = currentPath;
-    
+
     if (currentPath === '/') {
       // Just navigated TO Landing page: restore saved landing theme
       const savedLandingTheme = localStorage.getItem(landingThemeKey) as 'light' | 'dark' | null;
@@ -153,38 +156,39 @@ createRoot(document.getElementById("root")!).render(
       <InstrumentationProvider>
         <SupabaseAuthProvider>
           <BrowserRouter>
-          <MetaTags />
-          <DocumentHead />
-          <RouteSyncer />
-          <ScrollToTop />
-          <ThemeRouteGuard />
-          <Suspense fallback={<RouteLoading />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/auth" element={<AuthPage redirectAfterAuth="/admin" />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/expertise" element={<Expertise />} />
-              <Route path="/about" element={<About />} />
-              
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="home" element={<HomePageManager />} />
-                <Route path="expertise" element={<ExpertiseManager />} />
-                <Route path="certifications" element={<CertificationsManager />} />
-                <Route path="timeline" element={<TimelineManager />} />
-                <Route path="pages" element={<PagesManager />} />
-                <Route path="gallery" element={<GalleryManager />} />
-                <Route path="footer" element={<FooterManager />} />
-                <Route path="meta-tags" element={<MetaTagsManager />} />
-                <Route path="contact" element={<ContactManager />} />
-                <Route path="settings" element={<Settings />} />
-              </Route>
+            <MetaTags />
+            <DocumentHead />
+            <RouteSyncer />
+            <ScrollToTop />
+            <ThemeRouteGuard />
+            <Suspense fallback={<RouteLoading />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/landing" element={<Landing />} />
+                <Route path="/auth" element={<AuthPage redirectAfterAuth="/admin" />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/expertise" element={<Expertise />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/resume" element={<Resume />} />
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="home" element={<HomePageManager />} />
+                  <Route path="expertise" element={<ExpertiseManager />} />
+                  <Route path="certifications" element={<CertificationsManager />} />
+                  <Route path="resume" element={<ResumeManager />} />
+                  <Route path="timeline" element={<TimelineManager />} />
+                  <Route path="pages" element={<PagesManager />} />
+                  <Route path="gallery" element={<GalleryManager />} />
+                  <Route path="footer" element={<FooterManager />} />
+                  <Route path="meta-tags" element={<MetaTagsManager />} />
+                  <Route path="contact" element={<ContactManager />} />
+                  <Route path="settings" element={<Settings />} />
+                </Route>
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
           <Toaster />
         </SupabaseAuthProvider>

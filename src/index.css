@@ -539,6 +539,12 @@ html.has-scroll-dragging {
   .scrollbar-track-transparent::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  /* Dot background pattern for resume page */
+  .dot-background {
+    background-image: radial-gradient(rgba(238, 238, 238, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
 }
 
 /* Parallax Slider Styles */

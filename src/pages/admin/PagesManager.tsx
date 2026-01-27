@@ -44,7 +44,7 @@ export default function PagesManager() {
     const tab = getTabFromUrl();
     setActiveTab(tab);
   }, [location.search]);
-  
+
   const { data: aboutPage } = usePage("about");
   const { data: contactPage } = usePage("contact");
   const { data: siteSettings } = useSiteSettings();
@@ -99,9 +99,9 @@ export default function PagesManager() {
       <div className="space-y-6">
         {activeTab === "about" && (
           <div className="space-y-6">
-            <AboutEditor 
-              initialData={(aboutPage as any)?.content} 
-              onSave={(data) => handleSave("about", data)} 
+            <AboutEditor
+              initialData={(aboutPage as any)?.content}
+              onSave={(data) => handleSave("about", data)}
             />
             <AboutFooterTextEditor />
             <TimelineSection />
@@ -111,11 +111,11 @@ export default function PagesManager() {
         {activeTab === "expertise" && (
           <ExpertiseSection />
         )}
-        
+
         {activeTab === "contact" && (
-          <ContactEditor 
-            initialData={(contactPage as any)?.content} 
-            onSave={(data) => handleSave("contact", data)} 
+          <ContactEditor
+            initialData={(contactPage as any)?.content}
+            onSave={(data) => handleSave("contact", data)}
           />
         )}
 
@@ -129,7 +129,7 @@ export default function PagesManager() {
 
 function AboutEditor({ initialData, onSave }: { initialData: any, onSave: (data: any) => void }) {
   const [formData, setFormData] = useState({
-    introTitle: "Harsh Jeswani",
+    introTitle: "Sachin Malik",
     introSubtitle: "About",
     introText: "Strategic thinker and creative problem solver.",
     encryptedText: "Building the future through innovation, leadership, and relentless pursuit of excellence.",
@@ -200,7 +200,7 @@ function AboutEditor({ initialData, onSave }: { initialData: any, onSave: (data:
 
 function ContactEditor({ initialData, onSave }: { initialData: any, onSave: (data: any) => void }) {
   const [formData, setFormData] = useState({
-    tagline: "Harsh Jeswani",
+    tagline: "Sachin Malik",
     title: "Let's Connect",
     description: "Available for strategic consulting, creative collaborations, and meaningful conversations about design and innovation.",
     socialLinks: [] as SocialLink[],
@@ -210,7 +210,7 @@ function ContactEditor({ initialData, onSave }: { initialData: any, onSave: (dat
   useEffect(() => {
     if (initialData) {
       let socialLinks = Array.isArray(initialData.socialLinks) ? initialData.socialLinks : [];
-      
+
       // Handle backward compatibility: convert old 'email' or 'emails' fields to social links
       if (initialData.email && !socialLinks.some((link: any) => link.platform === "gmail" || link.href?.startsWith("mailto:"))) {
         socialLinks.push({
@@ -228,9 +228,9 @@ function ContactEditor({ initialData, onSave }: { initialData: any, onSave: (dat
           }
         });
       }
-      
-      setFormData({ 
-        tagline: "Harsh Jeswani",
+
+      setFormData({
+        tagline: "Sachin Malik",
         title: "Let's Connect",
         description: "Available for strategic consulting, creative collaborations, and meaningful conversations about design and innovation.",
         ...initialData,
@@ -314,9 +314,9 @@ function SiteSettingsEditor({ initialData, onSave }: { initialData: any, onSave:
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <Label>Header Title</Label>
-          <Input 
-            value={headerTitle} 
-            onChange={(e) => setHeaderTitle(e.target.value)} 
+          <Input
+            value={headerTitle}
+            onChange={(e) => setHeaderTitle(e.target.value)}
             placeholder="CINEMATIC STRATEGY"
           />
           <p className="text-xs text-muted-foreground">This appears in the top-left corner of the landing page.</p>
@@ -324,9 +324,9 @@ function SiteSettingsEditor({ initialData, onSave }: { initialData: any, onSave:
 
         <div className="space-y-2">
           <Label>Page Title (Browser Tab)</Label>
-          <Input 
-            value={pageTitle} 
-            onChange={(e) => setPageTitle(e.target.value)} 
+          <Input
+            value={pageTitle}
+            onChange={(e) => setPageTitle(e.target.value)}
             placeholder="Cinematic Strategy - Strategic Consulting & Creative Direction"
           />
           <p className="text-xs text-muted-foreground">This appears in the browser tab title.</p>
@@ -334,9 +334,9 @@ function SiteSettingsEditor({ initialData, onSave }: { initialData: any, onSave:
 
         <div className="space-y-2">
           <Label>Favicon URL</Label>
-          <Input 
-            value={faviconUrl} 
-            onChange={(e) => setFaviconUrl(e.target.value)} 
+          <Input
+            value={faviconUrl}
+            onChange={(e) => setFaviconUrl(e.target.value)}
             placeholder="https://example.com/favicon.svg or data:image/svg+xml,..."
           />
           <p className="text-xs text-muted-foreground">URL or data URI for the favicon. Leave empty to use default.</p>
@@ -468,29 +468,29 @@ function TimelineSection() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const imagesInput = formData.get("images") as string;
-    const images = imagesInput 
+    const images = imagesInput
       ? imagesInput.split(',').map(url => url.trim()).filter(url => url.length > 0)
       : [];
-    
+
     // Get text styling options for each element
     const yearStyles = {
       fontSize: formData.get("yearFontSize") as string || 'base',
       fontWeight: formData.get("yearFontWeight") as string || 'normal',
       color: formData.get("yearColor") as string || '',
     };
-    
+
     const titleStyles = {
       fontSize: formData.get("titleFontSize") as string || 'lg',
       fontWeight: formData.get("titleFontWeight") as string || 'bold',
       color: formData.get("titleColor") as string || '',
     };
-    
+
     const contentStyles = {
       fontSize: formData.get("contentFontSize") as string || 'base',
       fontWeight: formData.get("contentFontWeight") as string || 'normal',
       color: formData.get("contentColor") as string || '',
     };
-    
+
     const data = {
       year: formData.get("year") as string,
       title: formData.get("title") as string,
@@ -659,16 +659,16 @@ function TimelineSection() {
               <label className="text-sm font-medium">Content</label>
               <Textarea name="content" defaultValue={editingEntry?.content} className="h-32" required />
             </div>
-            
+
             {/* Year Styling */}
             <div className="space-y-3 border-t pt-4">
               <h4 className="text-sm font-semibold text-primary">Year Styling</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
-                  <select 
-                    name="yearFontSize" 
-                    defaultValue={editingEntry?.year_styles?.fontSize || 'base'} 
+                  <select
+                    name="yearFontSize"
+                    defaultValue={editingEntry?.year_styles?.fontSize || 'base'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="xs">Extra Small</option>
@@ -681,9 +681,9 @@ function TimelineSection() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="yearFontWeight" 
-                    defaultValue={editingEntry?.year_styles?.fontWeight || 'normal'} 
+                  <select
+                    name="yearFontWeight"
+                    defaultValue={editingEntry?.year_styles?.fontWeight || 'normal'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="light">Light</option>
@@ -695,25 +695,25 @@ function TimelineSection() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="yearColor" 
-                    defaultValue={editingEntry?.year_styles?.color || ''} 
+                  <Input
+                    type="text"
+                    name="yearColor"
+                    defaultValue={editingEntry?.year_styles?.color || ''}
                     placeholder="#00ADB5 or leave empty"
                   />
                 </div>
               </div>
             </div>
-            
+
             {/* Title Styling */}
             <div className="space-y-3 border-t pt-4">
               <h4 className="text-sm font-semibold text-primary">Title Styling</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
-                  <select 
-                    name="titleFontSize" 
-                    defaultValue={editingEntry?.title_styles?.fontSize || 'lg'} 
+                  <select
+                    name="titleFontSize"
+                    defaultValue={editingEntry?.title_styles?.fontSize || 'lg'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="xs">Extra Small</option>
@@ -733,9 +733,9 @@ function TimelineSection() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="titleFontWeight" 
-                    defaultValue={editingEntry?.title_styles?.fontWeight || 'bold'} 
+                  <select
+                    name="titleFontWeight"
+                    defaultValue={editingEntry?.title_styles?.fontWeight || 'bold'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="light">Light</option>
@@ -747,25 +747,25 @@ function TimelineSection() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="titleColor" 
-                    defaultValue={editingEntry?.title_styles?.color || ''} 
+                  <Input
+                    type="text"
+                    name="titleColor"
+                    defaultValue={editingEntry?.title_styles?.color || ''}
                     placeholder="#00ADB5 or leave empty"
                   />
                 </div>
               </div>
             </div>
-            
+
             {/* Content Styling */}
             <div className="space-y-3 border-t pt-4">
               <h4 className="text-sm font-semibold text-primary">Content Styling</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
-                  <select 
-                    name="contentFontSize" 
-                    defaultValue={editingEntry?.content_styles?.fontSize || 'base'} 
+                  <select
+                    name="contentFontSize"
+                    defaultValue={editingEntry?.content_styles?.fontSize || 'base'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="xs">Extra Small</option>
@@ -785,9 +785,9 @@ function TimelineSection() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="contentFontWeight" 
-                    defaultValue={editingEntry?.content_styles?.fontWeight || 'normal'} 
+                  <select
+                    name="contentFontWeight"
+                    defaultValue={editingEntry?.content_styles?.fontWeight || 'normal'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="light">Light</option>
@@ -799,10 +799,10 @@ function TimelineSection() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="contentColor" 
-                    defaultValue={editingEntry?.content_styles?.color || ''} 
+                  <Input
+                    type="text"
+                    name="contentColor"
+                    defaultValue={editingEntry?.content_styles?.color || ''}
                     placeholder="#00ADB5 or leave empty"
                   />
                 </div>
@@ -810,10 +810,10 @@ function TimelineSection() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Images (comma-separated URLs)</label>
-              <Textarea 
-                name="images" 
-                defaultValue={editingEntry?.images?.join(', ') || ''} 
-                className="h-20" 
+              <Textarea
+                name="images"
+                defaultValue={editingEntry?.images?.join(', ') || ''}
+                className="h-20"
                 placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
               />
               <p className="text-xs text-muted-foreground">Enter image URLs separated by commas</p>
@@ -886,7 +886,7 @@ function ExpertiseSection() {
     const formData = new FormData(e.currentTarget);
     const imagesString = imagesInput || (formData.get("images") as string) || "";
     const imagesArray = imagesString.split(",").map(s => s.trim()).filter(Boolean);
-    
+
     const data = {
       title: formData.get("title") as string,
       description: formData.get("description") as string,
@@ -1071,12 +1071,12 @@ function ExpertiseSection() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Long Description (Modal)</label>
-              <Textarea 
-                name="longDescription" 
-                defaultValue={editingCard?.long_description || editingCard?.longDescription} 
-                className="h-32" 
+              <Textarea
+                name="longDescription"
+                defaultValue={editingCard?.long_description || editingCard?.longDescription}
+                className="h-32"
                 placeholder="This detailed description appears in the modal when users click on the card..."
-                required 
+                required
               />
             </div>
             <div className="space-y-2">
@@ -1085,11 +1085,11 @@ function ExpertiseSection() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Image URLs (comma separated)</label>
-              <Input 
-                name="images" 
+              <Input
+                name="images"
                 value={imagesInput}
                 onChange={(e) => setImagesInput(e.target.value)}
-                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg" 
+                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
               />
               <p className="text-xs text-muted-foreground">
                 First image appears in the modal when clicking the card. First 2 images appear as floating previews on hover (desktop only).

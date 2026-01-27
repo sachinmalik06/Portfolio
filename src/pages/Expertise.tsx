@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { useExpertiseCards } from "@/hooks/use-cms";
 import PillNav from "@/components/PillNav";
 import FloatingActionMenu from "@/components/FloatingActionMenu";
-import { User, Briefcase, Mail } from "lucide-react";
+import { User, Briefcase, Mail, GraduationCap } from "lucide-react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -58,7 +58,7 @@ const Expertise = () => {
   useEffect(() => {
     const checkMobileView = () => {
       if (typeof window === 'undefined') return;
-      
+
       const isMobileDevice = window.innerWidth <= 768;
       const isLandscape = window.innerHeight < window.innerWidth;
       const isPortrait = window.innerHeight >= window.innerWidth;
@@ -69,7 +69,7 @@ const Expertise = () => {
     checkMobileView();
     // Add delay to ensure window dimensions are ready
     const timeoutId = setTimeout(checkMobileView, 100);
-    
+
     window.addEventListener('resize', checkMobileView);
     window.addEventListener('orientationchange', checkMobileView);
 
@@ -125,11 +125,11 @@ const Expertise = () => {
         duration: 1,
         ease: "power3.out"
       })
-      .to(subtitleRef.current, {
-        letterSpacing: "0.3em",
-        duration: 1.5,
-        ease: "power2.out"
-      }, "<");
+        .to(subtitleRef.current, {
+          letterSpacing: "0.3em",
+          duration: 1.5,
+          ease: "power2.out"
+        }, "<");
     }
 
     // Description animation
@@ -172,7 +172,7 @@ const Expertise = () => {
             scale: 0.9
           });
         });
-        
+
         // Animate cards in when scrolling down
         gsap.to(cards, {
           scrollTrigger: {
@@ -223,7 +223,7 @@ const Expertise = () => {
         });
       }
     };
-    
+
     // Try multiple times to ensure cards are rendered (in case data loads slowly)
     setTimeout(animateCards, 100);
     setTimeout(animateCards, 300);
@@ -285,7 +285,7 @@ const Expertise = () => {
         visibility: 'visible',
         display: 'block'
       });
-      
+
       gsap.to(pillNavRef.current, {
         y: 0,
         opacity: 1,
@@ -327,6 +327,11 @@ const Expertise = () => {
               Icon: <User className="w-4 h-4" />,
             },
             {
+              label: "Resume",
+              onClick: () => navigate("/resume"),
+              Icon: <GraduationCap className="w-4 h-4" />,
+            },
+            {
               label: "Contact",
               onClick: () => navigate("/contact"),
               Icon: <Mail className="w-4 h-4" />,
@@ -342,6 +347,7 @@ const Expertise = () => {
             { label: 'Home', href: '/' },
             { label: 'About', href: '/about' },
             { label: 'Expertise', href: '/expertise' },
+            { label: 'Resume', href: '/resume' },
             { label: 'Contact', href: '/contact' }
           ]}
           activeHref={location.pathname}
@@ -359,16 +365,16 @@ const Expertise = () => {
           <span ref={subtitleRef} className="inline-block text-primary font-body tracking-[0.3em] uppercase text-sm mb-6">
             Our Expertise
           </span>
-          
+
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-light mb-8 leading-[0.9]">
-            <Shuffle 
-              text="Strategic Mastery" 
+            <Shuffle
+              text="Strategic Mastery"
               className="text-primary cursor-default block font-display"
               tag="span"
             />
           </h1>
 
-          <VariableProximity 
+          <VariableProximity
             ref={descriptionRef}
             label="We combine analytical rigor with creative vision to solve complex challenges and drive meaningful growth for forward-thinking organizations."
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl font-light leading-relaxed flex-wrap"
@@ -393,7 +399,7 @@ const Expertise = () => {
               const Icon = getIcon(area.icon);
               const cardId = area.id || area._id || `card-${area.title}`;
               return (
-                <div 
+                <div
                   key={cardId}
                   data-card-id={cardId}
                   className="expertise-card-wrapper relative group cursor-pointer overflow-visible"
@@ -442,12 +448,12 @@ const Expertise = () => {
                       e.stopPropagation();
                       return;
                     }
-                    
+
                     // Only handle click on desktop (not mobile)
                     if (isMobileLandscape || isMobilePortrait) {
                       return;
                     }
-                    
+
                     e.stopPropagation();
                     e.preventDefault();
                     isOpeningRef.current = true;
@@ -458,34 +464,34 @@ const Expertise = () => {
                   }}
                   onTouchEnd={(e) => {
                     e.stopPropagation();
-                    
+
                     // Only open if not already opening or open (prevent double opening)
                     if (isOpeningRef.current || selectedCard) {
                       touchStartPosRef.current = null;
                       touchMovedRef.current = false;
                       return;
                     }
-                    
+
                     // Check if this was a scroll or a tap
                     if (touchMovedRef.current || !touchStartPosRef.current) {
                       touchStartPosRef.current = null;
                       touchMovedRef.current = false;
                       return;
                     }
-                    
+
                     // Calculate final touch position
                     const touch = e.changedTouches[0];
                     const deltaX = Math.abs(touch.clientX - touchStartPosRef.current.x);
                     const deltaY = Math.abs(touch.clientY - touchStartPosRef.current.y);
                     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    
+
                     // Only open if movement was minimal (less than 15px) - indicating a tap, not a scroll
                     if (distance > 15) {
                       touchStartPosRef.current = null;
                       touchMovedRef.current = false;
                       return;
                     }
-                    
+
                     // Also check time - taps should be quick (less than 300ms)
                     const touchDuration = Date.now() - touchStartRef.current;
                     if (touchDuration > 300) {
@@ -493,7 +499,7 @@ const Expertise = () => {
                       touchMovedRef.current = false;
                       return;
                     }
-                    
+
                     // This was a tap, open the card
                     e.preventDefault();
                     isOpeningRef.current = true;
@@ -501,77 +507,77 @@ const Expertise = () => {
                     setTimeout(() => {
                       isOpeningRef.current = false;
                     }, 300);
-                    
+
                     touchStartPosRef.current = null;
                     touchMovedRef.current = false;
                   }}
                 >
                   {/* Floating Images on Hover (Desktop only - not mobile) */}
                   <AnimatePresence>
-                    {area.images && area.images.length >= 2 && 
-                     // Only show on desktop hover, NOT on mobile (portrait or landscape)
-                     (!isMobileLandscape && !isMobilePortrait && hoveredCard === cardId) && (
-                      <>
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8, x: -20, y: -20, rotate: -5 }}
-                          animate={{ opacity: 1, scale: 1, x: -40, y: -40, rotate: -10 }}
-                          exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-                          transition={{ duration: 0.4, ease: "easeOut" }}
-                          className="absolute -top-10 -left-10 w-32 h-24 rounded-lg overflow-hidden shadow-2xl pointer-events-none hidden md:block"
-                          style={{ zIndex: 99999 }}
-                        >
-                          <img 
-                            src={area.images[0]} 
-                            alt="" 
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8, x: 20, y: 20, rotate: 5 }}
-                          animate={{ opacity: 1, scale: 1, x: 40, y: 40, rotate: 10 }}
-                          exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-                          transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-                          className="absolute -bottom-10 -right-10 w-28 h-36 rounded-lg overflow-hidden shadow-2xl pointer-events-none hidden md:block"
-                          style={{ zIndex: 99999 }}
-                        >
-                          <img 
-                            src={area.images[1]} 
-                            alt="" 
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        </motion.div>
-                      </>
-                    )}
+                    {area.images && area.images.length >= 2 &&
+                      // Only show on desktop hover, NOT on mobile (portrait or landscape)
+                      (!isMobileLandscape && !isMobilePortrait && hoveredCard === cardId) && (
+                        <>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8, x: -20, y: -20, rotate: -5 }}
+                            animate={{ opacity: 1, scale: 1, x: -40, y: -40, rotate: -10 }}
+                            exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            className="absolute -top-10 -left-10 w-32 h-24 rounded-lg overflow-hidden shadow-2xl pointer-events-none hidden md:block"
+                            style={{ zIndex: 99999 }}
+                          >
+                            <img
+                              src={area.images[0]}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </motion.div>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8, x: 20, y: 20, rotate: 5 }}
+                            animate={{ opacity: 1, scale: 1, x: 40, y: 40, rotate: 10 }}
+                            exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+                            className="absolute -bottom-10 -right-10 w-28 h-36 rounded-lg overflow-hidden shadow-2xl pointer-events-none hidden md:block"
+                            style={{ zIndex: 99999 }}
+                          >
+                            <img
+                              src={area.images[1]}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </motion.div>
+                        </>
+                      )}
                   </AnimatePresence>
 
                   {/* Card Content */}
                   <div className="relative z-10 h-full p-8 rounded-xl border border-white/5 bg-white/5 backdrop-blur-sm transition-all duration-500 group-hover:border-primary/30 group-hover:bg-white/10 overflow-hidden">
                     {/* Hover Gradient Background */}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
+
                     <div className="relative z-10">
                       <div className="card-icon-container mb-6 p-4 bg-white/5 rounded-lg w-fit group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 group-hover:scale-110 group-hover:rotate-3">
                         <Icon className="w-8 h-8 text-primary group-hover:text-primary-foreground transition-colors duration-500" />
                       </div>
-                      
+
                       <h3 className="text-2xl font-display mb-4 group-hover:text-primary transition-colors duration-300" style={{ color: '#a77d44' }}>
                         {area.title}
                       </h3>
-                      
+
                       <p className="text-muted-foreground mb-8 leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
                         {area.description}
                       </p>
 
                       <div className="flex flex-wrap gap-2">
                         {area.skills.map((skill: string, idx: number) => (
-                          <span 
-                            key={idx} 
+                          <span
+                            key={idx}
                             className="skill-tag text-xs font-body tracking-wider uppercase px-3 py-1 rounded-full border border-white/10 bg-white/5 text-muted-foreground/60 group-hover:border-primary/30 group-hover:text-primary/80 transition-all duration-300"
                           >
                             {skill}
@@ -592,7 +598,7 @@ const Expertise = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-border/30 pt-20">
           {stats.map((stat, index) => (
             <div key={index} className="stat-item text-center md:text-left">
-              <div 
+              <div
                 id={`stat-val-${index}`}
                 className="text-4xl md:text-6xl font-display text-primary mb-2"
               >
@@ -637,7 +643,7 @@ const Expertise = () => {
               className="fixed inset-0 z-[9999] bg-background/80 backdrop-blur-md"
               style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
             />
-            
+
             {/* Modal */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -648,14 +654,14 @@ const Expertise = () => {
               onClick={(e) => e.stopPropagation()}
               onTouchEnd={(e) => e.stopPropagation()}
             >
-              <div 
+              <div
                 className="bg-card border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl pointer-events-auto relative flex flex-col md:flex-row"
                 onClick={(e) => e.stopPropagation()}
                 onTouchEnd={(e) => e.stopPropagation()}
               >
-                
+
                 {/* Close Button */}
-                <button 
+                <button
                   onTouchStart={(e) => {
                     e.stopPropagation();
                     touchStartRef.current = Date.now();
@@ -677,7 +683,7 @@ const Expertise = () => {
                     setSelectedCard(null);
                   }}
                   className="absolute top-4 right-4 z-[10001] p-2 rounded-full bg-black/20 hover:bg-black/40 active:bg-black/60 text-white transition-colors cursor-pointer"
-                  style={{ 
+                  style={{
                     touchAction: 'manipulation',
                     pointerEvents: 'auto',
                     zIndex: 10001,
@@ -693,9 +699,9 @@ const Expertise = () => {
                 <div className="w-full md:w-2/5 h-64 md:h-auto relative overflow-hidden bg-gradient-to-br from-primary/10 to-background">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 md:hidden" />
                   {selectedCard.images && selectedCard.images.length > 0 && selectedCard.images[0] ? (
-                    <img 
-                      src={selectedCard.images[0]} 
-                      alt={selectedCard.title} 
+                    <img
+                      src={selectedCard.images[0]}
+                      alt={selectedCard.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
@@ -740,8 +746,8 @@ const Expertise = () => {
                     <div className="flex flex-wrap gap-3 mb-8">
                       {selectedCard.skills && selectedCard.skills.length > 0 ? (
                         selectedCard.skills.map((skill: string, idx: number) => (
-                          <span 
-                            key={idx} 
+                          <span
+                            key={idx}
                             className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-foreground/80"
                           >
                             {skill}
@@ -752,7 +758,7 @@ const Expertise = () => {
                       )}
                     </div>
 
-                    <Button 
+                    <Button
                       onTouchStart={(e) => {
                         e.stopPropagation();
                         touchStartRef.current = Date.now();

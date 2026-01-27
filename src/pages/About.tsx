@@ -12,7 +12,7 @@ import VariableProximity from "@/components/VariableProximity";
 import { usePage, useTimeline, useProfileCardSettings, useAboutFooterText } from "@/hooks/use-cms";
 import PillNav from "@/components/PillNav";
 import FloatingActionMenu from "@/components/FloatingActionMenu";
-import { User, Briefcase, Mail } from "lucide-react";
+import { User, Briefcase, Mail, GraduationCap } from "lucide-react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -46,7 +46,7 @@ const About = () => {
   useEffect(() => {
     const checkMobileView = () => {
       if (typeof window === 'undefined') return;
-      
+
       const isMobileDevice = window.innerWidth <= 768;
       const isLandscape = window.innerHeight < window.innerWidth;
       const isPortrait = window.innerHeight >= window.innerWidth;
@@ -56,10 +56,10 @@ const About = () => {
 
     // Check immediately
     checkMobileView();
-    
+
     // Check after a small delay to ensure window is ready
     const timeoutId = setTimeout(checkMobileView, 100);
-    
+
     window.addEventListener('resize', checkMobileView);
     window.addEventListener('orientationchange', checkMobileView);
 
@@ -71,12 +71,12 @@ const About = () => {
   }, []);
 
   const navigate = useNavigate();
-  
+
   // Fetch Page Content
   const { data: pageData } = usePage("about");
   const pageContent = pageData ? ((pageData as any).content) : null;
   const content = (pageContent || {
-    introTitle: "Harsh Jeswani",
+    introTitle: "Sachin Malik",
     introSubtitle: "About",
     introText: "Strategic thinker and creative problem solver.",
     encryptedText: "Building the future through innovation, leadership, and relentless pursuit of excellence.",
@@ -95,14 +95,14 @@ const About = () => {
 
   // Fetch Timeline Data
   const { data: timelineEntries } = useTimeline();
-  
+
   // Fetch Profile Card Settings
   const { data: profileCardSettings } = useProfileCardSettings();
-  
+
   // Fetch About Footer Text
   const { data: aboutFooterText } = useAboutFooterText();
   const footerText = aboutFooterText || { createText: "LET'S CREATE", togetherText: "TOGETHER" };
-  
+
   // Debug logging
   useEffect(() => {
     if (profileCardSettings) {
@@ -128,7 +128,7 @@ const About = () => {
       }
     }
   }, [maskingComplete, startEncryption]);
-  
+
   const infoCards = [
     { label: "Role", value: content.role },
     { label: "Focus", value: content.focus },
@@ -143,18 +143,18 @@ const About = () => {
     contentStyles: entry.content_styles,
     content: (
       <div>
-        <h4 
+        <h4
           className={`mb-2 text-${entry.title_styles?.fontSize || 'lg'} font-bold`}
-          style={{ 
+          style={{
             color: entry.title_styles?.color || 'hsl(var(--primary))',
             textAlign: (entry.title_styles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
           }}
         >
           {entry.title || ''}
         </h4>
-        <div 
+        <div
           className={`whitespace-pre-wrap mb-4 text-${entry.content_styles?.fontSize || 'base'} font-normal`}
-          style={{ 
+          style={{
             color: entry.content_styles?.color || undefined,
             textAlign: (entry.content_styles?.textAlign || 'left') as 'left' | 'center' | 'right' | 'justify'
           }}
@@ -184,31 +184,31 @@ const About = () => {
     if (isMobilePortrait) {
       // Kill ALL existing ScrollTriggers to prevent any scroll-based animations
       ScrollTrigger.getAll().forEach(st => st.kill());
-      
+
       // Hide the image immediately
       if (imageRef.current) {
         gsap.set(imageRef.current, { opacity: 0, display: 'none' });
       }
-      
+
       // Set all states to show content immediately
       setMaskingComplete(true);
       setIntroVisible(true);
       setStartEncryption(true);
-      
+
       // Make text elements visible immediately with NO animations
       const textElements = gsap.utils.toArray<HTMLElement>(".animate-text");
       if (textElements.length > 0) {
         // Kill any existing animations on these elements
         textElements.forEach(el => gsap.killTweensOf(el));
         // Set to visible state immediately
-        gsap.set(textElements, { 
-          y: 0, 
-          opacity: 1, 
+        gsap.set(textElements, {
+          y: 0,
+          opacity: 1,
           autoAlpha: 1,
           clearProps: "all" // Clear all GSAP properties
         });
       }
-      
+
       // Make wrapper static (no pinning, no scroll effects)
       if (wrapperRef.current) {
         gsap.set(wrapperRef.current, {
@@ -217,7 +217,7 @@ const About = () => {
           clearProps: "transform"
         });
       }
-      
+
       // Show timeline immediately below the intro
       if (timelineRef.current) {
         gsap.set(timelineRef.current, {
@@ -226,7 +226,7 @@ const About = () => {
           clearProps: "transform"
         });
       }
-      
+
       // No scroll animations for mobile - content is immediately visible and static
       return;
     }
@@ -292,7 +292,7 @@ const About = () => {
       ease: "power2.inOut",
       duration: 1,
       willChange: "transform, opacity",
-      onUpdate: function() {
+      onUpdate: function () {
         // Track progress - when animation is 50% complete, masking is done
         if (this.progress() >= 0.5) {
           setMaskingComplete(true);
@@ -314,15 +314,15 @@ const About = () => {
     // 2. Reveal Content & Profile Card (After image is cleared)
     // Text Reveal (Staggered) - Start first
     const textElements = gsap.utils.toArray(".animate-text");
-    tl.fromTo(textElements, 
+    tl.fromTo(textElements,
       { y: 30, opacity: 0, autoAlpha: 0 },
-      { 
-        y: 0, 
-        opacity: 1, 
-        autoAlpha: 1, 
-        duration: 0.8, 
-        stagger: 0.1, 
-        ease: "power2.out", 
+      {
+        y: 0,
+        opacity: 1,
+        autoAlpha: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power2.out",
         willChange: "transform, opacity",
         onReverseComplete: () => {
           // Hide encryption when text reverses
@@ -342,17 +342,17 @@ const About = () => {
           clearProps: "all",
         });
       }
-      
+
       // Profile card appears at the same time as text (synced)
       // Profile card stays visible until fade out phase
-      tl.fromTo(profileCardRef.current, 
+      tl.fromTo(profileCardRef.current,
         { x: 200, opacity: 0, autoAlpha: 0, visibility: 'hidden' },
-        { 
-          x: 0, 
-          opacity: 1, 
-          autoAlpha: 1, 
+        {
+          x: 0,
+          opacity: 1,
+          autoAlpha: 1,
           visibility: 'visible',
-          duration: 0.8, 
+          duration: 0.8,
           ease: "power2.out",
           willChange: "transform, opacity",
           onReverseComplete: () => {
@@ -373,7 +373,7 @@ const About = () => {
         },
         "<" // Start at the same time as text reveal
       );
-      
+
       // Keep profile card visible during hold phase - it will fade out with wrapper
       // No need to hide it separately, it stays visible until fade out
     }
@@ -407,12 +407,12 @@ const About = () => {
         }
       }
     });
-    
+
     // Fade In Timeline (Cross-fade)
     // We animate the timeline container to fade in and slide up slightly
-    tl.fromTo(timelineRef.current, 
-      { opacity: 0, y: 100 }, 
-      { opacity: 1, y: 0, duration: 1, ease: "power2.out", willChange: "transform, opacity" }, 
+    tl.fromTo(timelineRef.current,
+      { opacity: 0, y: 100 },
+      { opacity: 1, y: 0, duration: 1, ease: "power2.out", willChange: "transform, opacity" },
       "<" // Start at the same time as wrapper fade out
     );
 
@@ -427,7 +427,7 @@ const About = () => {
       if (profileCardInnerRef.current) {
         const currentTransform = window.getComputedStyle(profileCardInnerRef.current).transform;
         const currentScale = parseFloat(currentTransform.match(/matrix.*\(([^)]+)\)/)?.[1]?.split(',')[0] || '1');
-        
+
         // If scale is not 0.2, re-apply it
         if (Math.abs(currentScale - 0.2) > 0.1) {
           gsap.set(profileCardInnerRef.current, {
@@ -447,13 +447,13 @@ const About = () => {
   // Update profile card scale when mobile landscape changes
   useEffect(() => {
     console.log('Profile card scale useEffect triggered', { isMobileLandscape, hasRef: !!profileCardInnerRef.current });
-    
+
     if (!profileCardInnerRef.current) {
       // Retry after a short delay if ref is not ready
       const timer = setTimeout(() => {
         if (profileCardInnerRef.current) {
           const innerCard = profileCardInnerRef.current;
-          
+
           if (isMobileLandscape) {
             console.log('Applying scale 0.2 (delayed)');
             gsap.killTweensOf(innerCard);
@@ -465,7 +465,7 @@ const About = () => {
             innerCard.style.setProperty('transform', 'scale(0.2) !important');
             innerCard.style.setProperty('-webkit-transform', 'scale(0.2) !important');
             innerCard.style.setProperty('transform-origin', 'center center');
-            
+
             // Force a reflow
             innerCard.offsetHeight;
           }
@@ -473,12 +473,12 @@ const About = () => {
       }, 100);
       return () => clearTimeout(timer);
     }
-    
+
     const innerCard = profileCardInnerRef.current;
-    
+
     // Kill any existing animations first
     gsap.killTweensOf(innerCard);
-    
+
     if (isMobileLandscape) {
       // Mobile landscape: apply small scale via GSAP AND inline style
       gsap.set(innerCard, {
@@ -490,10 +490,10 @@ const About = () => {
       innerCard.style.setProperty('transform', 'scale(0.2) !important');
       innerCard.style.setProperty('-webkit-transform', 'scale(0.2) !important');
       innerCard.style.setProperty('transform-origin', 'center center');
-      
+
       // Force a reflow to ensure styles are applied
       innerCard.offsetHeight;
-      
+
       // Log computed style to verify
       const computed = window.getComputedStyle(innerCard);
       console.log('Mobile landscape: Applied scale 0.2 to profile card', {
@@ -522,7 +522,7 @@ const About = () => {
         visibility: 'visible',
         display: 'block'
       });
-      
+
       gsap.to(pillNavRef.current, {
         y: 0,
         opacity: 1,
@@ -557,6 +557,11 @@ const About = () => {
               Icon: <Briefcase className="w-4 h-4" />,
             },
             {
+              label: "Resume",
+              onClick: () => navigate("/resume"),
+              Icon: <GraduationCap className="w-4 h-4" />,
+            },
+            {
               label: "Contact",
               onClick: () => navigate("/contact"),
               Icon: <Mail className="w-4 h-4" />,
@@ -572,6 +577,7 @@ const About = () => {
             { label: 'Home', href: '/' },
             { label: 'About', href: '/about' },
             { label: 'Expertise', href: '/expertise' },
+            { label: 'Resume', href: '/resume' },
             { label: 'Contact', href: '/contact' }
           ]}
           activeHref={location.pathname}
@@ -588,8 +594,8 @@ const About = () => {
         {/* Content Section - Full Screen Introduction with Card */}
         <div ref={contentRef} className="content relative w-full h-full z-10 overflow-visible">
           {/* Main Content - Full Width Section with Card */}
-          <div 
-            ref={textContentRef} 
+          <div
+            ref={textContentRef}
             className={`relative z-30 w-full h-full flex flex-col justify-center bg-background/80 backdrop-blur-sm overflow-visible ${isMobilePortrait ? 'px-4 py-6' : 'px-8 md:px-20'}`}
             style={{
               paddingTop: isMobilePortrait ? '2rem' : undefined,
@@ -598,10 +604,10 @@ const About = () => {
             {/* Profile Card - Positioned on Right Side (Desktop & Mobile Landscape) */}
             <div ref={profileCardRef} className={`absolute right-0 top-0 bottom-0 z-10 flex items-center justify-center will-change-[transform,opacity] ${isMobilePortrait ? 'hidden' : isMobileLandscape ? 'opacity-100 visible pr-0 translate-x-[20px]' : 'opacity-0 invisible pr-8 md:pr-20 translate-x-[-40px] md:translate-x-[-60px]'} w-full md:w-1/2 h-full`}>
               <Suspense fallback={null}>
-                <div 
+                <div
                   ref={profileCardInnerRef}
                   className={isMobileLandscape ? "!scale-[0.2]" : "scale-150 md:scale-[1.8]"}
-                  style={isMobileLandscape ? { 
+                  style={isMobileLandscape ? {
                     transform: 'scale(0.2) !important',
                     WebkitTransform: 'scale(0.2) !important',
                     MozTransform: 'scale(0.2) !important',
@@ -610,7 +616,7 @@ const About = () => {
                     transformOrigin: 'center center !important'
                   } : undefined}
                 >
-                  <DecayCard 
+                  <DecayCard
                     image={(profileCardSettings?.imageUrl || profileCardSettings?.cardImageUrl) ? convertDriveUrlToDirectImageUrl(profileCardSettings.imageUrl || profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
                     width={isMobileLandscape ? 200 : 300}
                     height={isMobileLandscape ? 267 : 400}
@@ -618,86 +624,86 @@ const About = () => {
                 </div>
               </Suspense>
             </div>
-              {/* Left Content Area - Constrained to not overlap with profile card */}
-              <div className={`flex flex-col ${isMobilePortrait ? 'gap-4 w-full' : 'gap-12 w-full md:w-1/2 md:max-w-[55%]'}`}>
-                <div className={`flex flex-col text-left ${isMobilePortrait ? 'gap-3' : 'gap-8'}`}>
-                  <div className={`animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-3'}`}>
-                    <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-sm' : 'text-xs md:text-sm'}`}>{content.introSubtitle}</span>
-                    <h1 className={`font-display font-bold text-primary tracking-tight ${isMobilePortrait ? 'text-4xl whitespace-normal leading-tight' : 'text-4xl md:text-5xl lg:text-6xl whitespace-nowrap'}`}>
-                      {content.introTitle}
-                    </h1>
-                  </div>
-                  
-                  <div className={`max-w-2xl animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-4'}`}>
-                    <p className={`font-light text-foreground/80 leading-relaxed ${isMobilePortrait ? 'text-lg leading-relaxed' : 'text-base md:text-lg'}`}>
-                      {content.introText}
-                    </p>
-                    
-                    <div 
-                      className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-base min-h-[2.5rem]' : 'text-sm md:text-base min-h-[2rem]'}`}
-                    >
-                      <EncryptedText 
-                        text={content.encryptedText}
-                        encryptedClassName="text-muted-foreground/30"
-                        revealedClassName="text-foreground"
-                        revealDelayMs={isMobilePortrait ? 40 : 30}
-                        animate={startEncryption}
-                      />
-                    </div>
-
-                    {/* Profile Card - Inside Introduction Area (Mobile Portrait Only) */}
-                    {isMobilePortrait && (
-                      <div className="flex justify-center items-center mt-3 w-full">
-                        <Suspense fallback={null}>
-                          <div className="relative w-full max-w-[280px]">
-                            <DecayCard 
-                              image={(profileCardSettings?.imageUrl || profileCardSettings?.cardImageUrl) ? convertDriveUrlToDirectImageUrl(profileCardSettings.imageUrl || profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
-                              width={280}
-                              height={373}
-                            />
-                          </div>
-                        </Suspense>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info Cards - Modern Production Layout (Left Side Only - Single Line) */}
-                  <div className={`flex flex-nowrap gap-2 md:gap-3 animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center mt-4 pb-4 overflow-x-auto' : 'mt-8 pb-2'}`}>
-                    {infoCards.map((card, index) => (
-                      <div 
-                        key={index} 
-                        className={`group relative overflow-hidden border border-border/40 bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-md rounded-xl hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-500 ${isMobilePortrait ? 'p-4 flex-1 min-w-[calc(33.333%-0.5rem)]' : 'p-4 md:p-5 flex-1 min-w-0'}`}
-                      >
-                        {/* Subtle gradient overlay on hover */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/[0.03] group-hover:to-transparent transition-all duration-500" />
-                        
-                        {/* Content */}
-                        <div className="relative z-10">
-                          <h3 className={`font-body font-semibold uppercase tracking-[0.2em] text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-300 ${isMobilePortrait ? 'text-[9px] mb-2' : 'text-[10px] mb-3'}`}>
-                            {card.label}
-                          </h3>
-                          <p className={`font-display font-medium text-foreground/90 group-hover:text-primary leading-tight transition-all duration-300 ${isMobilePortrait ? 'text-sm' : 'text-base md:text-lg'}`}>
-                            {card.value}
-                          </p>
-                        </div>
-                        
-                        {/* Bottom accent line */}
-                        <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-primary to-primary/0 group-hover:w-full transition-all duration-500" />
-                      </div>
-                    ))}
-                  </div>
-
+            {/* Left Content Area - Constrained to not overlap with profile card */}
+            <div className={`flex flex-col ${isMobilePortrait ? 'gap-4 w-full' : 'gap-12 w-full md:w-1/2 md:max-w-[55%]'}`}>
+              <div className={`flex flex-col text-left ${isMobilePortrait ? 'gap-3' : 'gap-8'}`}>
+                <div className={`animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-3'}`}>
+                  <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-sm' : 'text-xs md:text-sm'}`}>{content.introSubtitle}</span>
+                  <h1 className={`font-display font-bold text-primary tracking-tight ${isMobilePortrait ? 'text-4xl whitespace-normal leading-tight' : 'text-4xl md:text-5xl lg:text-6xl whitespace-nowrap'}`}>
+                    {content.introTitle}
+                  </h1>
                 </div>
+
+                <div className={`max-w-2xl animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-4'}`}>
+                  <p className={`font-light text-foreground/80 leading-relaxed ${isMobilePortrait ? 'text-lg leading-relaxed' : 'text-base md:text-lg'}`}>
+                    {content.introText}
+                  </p>
+
+                  <div
+                    className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-base min-h-[2.5rem]' : 'text-sm md:text-base min-h-[2rem]'}`}
+                  >
+                    <EncryptedText
+                      text={content.encryptedText}
+                      encryptedClassName="text-muted-foreground/30"
+                      revealedClassName="text-foreground"
+                      revealDelayMs={isMobilePortrait ? 40 : 30}
+                      animate={startEncryption}
+                    />
+                  </div>
+
+                  {/* Profile Card - Inside Introduction Area (Mobile Portrait Only) */}
+                  {isMobilePortrait && (
+                    <div className="flex justify-center items-center mt-3 w-full">
+                      <Suspense fallback={null}>
+                        <div className="relative w-full max-w-[280px]">
+                          <DecayCard
+                            image={(profileCardSettings?.imageUrl || profileCardSettings?.cardImageUrl) ? convertDriveUrlToDirectImageUrl(profileCardSettings.imageUrl || profileCardSettings.cardImageUrl) : 'https://picsum.photos/300/400?grayscale'}
+                            width={280}
+                            height={373}
+                          />
+                        </div>
+                      </Suspense>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info Cards - Modern Production Layout (Left Side Only - Single Line) */}
+                <div className={`flex flex-nowrap gap-2 md:gap-3 animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center mt-4 pb-4 overflow-x-auto' : 'mt-8 pb-2'}`}>
+                  {infoCards.map((card, index) => (
+                    <div
+                      key={index}
+                      className={`group relative overflow-hidden border border-border/40 bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-md rounded-xl hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-500 ${isMobilePortrait ? 'p-4 flex-1 min-w-[calc(33.333%-0.5rem)]' : 'p-4 md:p-5 flex-1 min-w-0'}`}
+                    >
+                      {/* Subtle gradient overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/[0.03] group-hover:to-transparent transition-all duration-500" />
+
+                      {/* Content */}
+                      <div className="relative z-10">
+                        <h3 className={`font-body font-semibold uppercase tracking-[0.2em] text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-300 ${isMobilePortrait ? 'text-[9px] mb-2' : 'text-[10px] mb-3'}`}>
+                          {card.label}
+                        </h3>
+                        <p className={`font-display font-medium text-foreground/90 group-hover:text-primary leading-tight transition-all duration-300 ${isMobilePortrait ? 'text-sm' : 'text-base md:text-lg'}`}>
+                          {card.value}
+                        </p>
+                      </div>
+
+                      {/* Bottom accent line */}
+                      <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-primary to-primary/0 group-hover:w-full transition-all duration-500" />
+                    </div>
+                  ))}
+                </div>
+
               </div>
+            </div>
           </div>
         </div>
 
         {/* Image Overlay */}
         <div className="image-container absolute inset-0 z-[60] w-full h-full overflow-hidden pointer-events-none" style={{ perspective: "500px" }}>
-          <img 
+          <img
             ref={imageRef}
-            src="https://assets-global.website-files.com/63ec206c5542613e2e5aa784/643312a6bc4ac122fc4e3afa_main%20home.webp" 
-            alt="overlay" 
+            src="https://assets-global.website-files.com/63ec206c5542613e2e5aa784/643312a6bc4ac122fc4e3afa_main%20home.webp"
+            alt="overlay"
             className="w-full h-full object-cover object-center will-change-transform"
           />
         </div>
@@ -709,40 +715,40 @@ const About = () => {
       {/* Timeline Section */}
       <div ref={timelineRef} className="relative z-10 bg-background opacity-0 will-change-[transform,opacity]">
         <Timeline data={timelineData} />
-        
+
         {/* Creative Ending */}
         <div ref={footerRef} className="w-full py-32 md:py-48 flex flex-col items-center justify-center relative overflow-hidden">
-            {/* Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
-            
-            <p className="text-muted-foreground text-sm md:text-sm uppercase tracking-[0.3em] mb-12 animate-pulse">The Journey Continues</p>
-            
-            <Link to="/contact" className="relative z-10 group flex flex-col items-center">
-              <VariableProximity
-                label={footerText.createText || "LET'S CREATE"}
-                className="text-5xl md:text-8xl lg:text-9xl font-display font-bold text-primary cursor-pointer transition-colors duration-500 text-center leading-tight tracking-tighter"
-                fromFontVariationSettings="'wght' 400, 'wdth' 100"
-                toFontVariationSettings="'wght' 900, 'wdth' 125"
-                radius={300}
-                falloff="gaussian"
-                containerRef={footerRef as RefObject<HTMLElement>}
-              />
-              <VariableProximity
-                label={footerText.togetherText || "TOGETHER"}
-                className="text-5xl md:text-8xl lg:text-9xl font-display font-bold text-primary cursor-pointer transition-colors duration-500 text-center leading-tight tracking-tighter"
-                fromFontVariationSettings="'wght' 400, 'wdth' 100"
-                toFontVariationSettings="'wght' 900, 'wdth' 125"
-                radius={300}
-                falloff="gaussian"
-                containerRef={footerRef as RefObject<HTMLElement>}
-              />
-              <div className="h-px w-0 group-hover:w-full bg-primary transition-all duration-500 mx-auto mt-4" />
-            </Link>
+          {/* Background Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
-            <div className="mt-24 flex flex-col items-center gap-4 opacity-60 hover:opacity-100 transition-opacity duration-500">
-               <div className="font-display italic text-2xl md:text-3xl text-muted-foreground">{content.introTitle}</div>
-               <div className="text-[10px] uppercase tracking-widest text-muted-foreground/50">{content.role}</div>
-            </div>
+          <p className="text-muted-foreground text-sm md:text-sm uppercase tracking-[0.3em] mb-12 animate-pulse">The Journey Continues</p>
+
+          <Link to="/contact" className="relative z-10 group flex flex-col items-center">
+            <VariableProximity
+              label={footerText.createText || "LET'S CREATE"}
+              className="text-5xl md:text-8xl lg:text-9xl font-display font-bold text-primary cursor-pointer transition-colors duration-500 text-center leading-tight tracking-tighter"
+              fromFontVariationSettings="'wght' 400, 'wdth' 100"
+              toFontVariationSettings="'wght' 900, 'wdth' 125"
+              radius={300}
+              falloff="gaussian"
+              containerRef={footerRef as RefObject<HTMLElement>}
+            />
+            <VariableProximity
+              label={footerText.togetherText || "TOGETHER"}
+              className="text-5xl md:text-8xl lg:text-9xl font-display font-bold text-primary cursor-pointer transition-colors duration-500 text-center leading-tight tracking-tighter"
+              fromFontVariationSettings="'wght' 400, 'wdth' 100"
+              toFontVariationSettings="'wght' 900, 'wdth' 125"
+              radius={300}
+              falloff="gaussian"
+              containerRef={footerRef as RefObject<HTMLElement>}
+            />
+            <div className="h-px w-0 group-hover:w-full bg-primary transition-all duration-500 mx-auto mt-4" />
+          </Link>
+
+          <div className="mt-24 flex flex-col items-center gap-4 opacity-60 hover:opacity-100 transition-opacity duration-500">
+            <div className="font-display italic text-2xl md:text-3xl text-muted-foreground">{content.introTitle}</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground/50">{content.role}</div>
+          </div>
         </div>
       </div>
     </div>

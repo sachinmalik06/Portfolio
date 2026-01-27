@@ -485,3 +485,495 @@ export function useDeleteCertification() {
 
   return { mutate, isLoading, error };
 }
+
+// --- RESUME HOOKS ---
+
+// Experiences
+export function useResumeExperiences(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getResumeExperiences(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateResumeExperience() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (experience: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createResumeExperience(experience);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateResumeExperience() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeExperience(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteResumeExperience() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteResumeExperience(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+// Projects
+export function useResumeProjects(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getResumeProjects(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateResumeProject() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (project: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createResumeProject(project);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateResumeProject() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeProject(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteResumeProject() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteResumeProject(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+// Education
+export function useResumeEducation(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getResumeEducation(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateResumeEducation() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (education: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createResumeEducation(education);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateResumeEducation() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeEducation(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteResumeEducation() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteResumeEducation(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+// Skills
+export function useResumeSkills(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getResumeSkills(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateResumeSkill() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (skill: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createResumeSkill(skill);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateResumeSkill() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeSkill(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteResumeSkill() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteResumeSkill(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+// Certifications
+export function useResumeCertifications(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getResumeCertifications(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateResumeCertification() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (certification: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createResumeCertification(certification);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateResumeCertification() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeCertification(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteResumeCertification() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteResumeCertification(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+// Languages
+export function useResumeLanguages(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getResumeLanguages(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateResumeLanguage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (language: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createResumeLanguage(language);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateResumeLanguage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeLanguage(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteResumeLanguage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteResumeLanguage(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+// Stats
+export function useResumeStats(includeInactive = false) {
+  return useSupabaseQuery(
+    () => cms.getResumeStats(includeInactive),
+    [includeInactive]
+  );
+}
+
+export function useCreateResumeStat() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (stat: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.createResumeStat(stat);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useUpdateResumeStat() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeStat(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
+export function useDeleteResumeStat() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await cms.deleteResumeStat(id);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}

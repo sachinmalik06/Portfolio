@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { Mail, Linkedin, Twitter, ArrowUpRight, User, Briefcase, Github, Instagram, Facebook, Youtube, MessageCircle, Send, MessageSquare, Share2 } from "lucide-react";
+import { Mail, Linkedin, Twitter, ArrowUpRight, User, Briefcase, Github, Instagram, Facebook, Youtube, MessageCircle, Send, MessageSquare, Share2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router";
@@ -34,28 +34,28 @@ const Contact = () => {
   useEffect(() => {
     setTheme('dark');
   }, [setTheme]);
-  
+
   // Only use CMS content when loaded, prevent default text flash
   const content = (pageData as any)?.content ? (pageData as any).content : (
-    isLoading 
+    isLoading
       ? {
-          tagline: "",
-          title: "",
-          description: "",
-          socialLinks: [] as any[],
-        }
+        tagline: "",
+        title: "",
+        description: "",
+        socialLinks: [] as any[],
+      }
       : {
-          tagline: "Harsh Jeswani",
-          title: "Let's Connect",
-          description: "Available for strategic consulting, creative collaborations, and meaningful conversations about design and innovation.",
-          socialLinks: [] as any[],
-        }
+        tagline: "Sachin Malik",
+        title: "Let's Connect",
+        description: "Available for strategic consulting, creative collaborations, and meaningful conversations about design and innovation.",
+        socialLinks: [] as any[],
+      }
   );
 
   // Map platform names to icons (same as Landing.tsx)
   const getIcon = (platform: string) => {
     const normalized = platform.toLowerCase();
-    
+
     if (normalized === "gmail" || normalized === "email" || normalized.includes("mail")) {
       return Mail;
     }
@@ -123,19 +123,19 @@ const Contact = () => {
 
   const allLinks: ContactLink[] = pageSocialLinks.length > 0
     ? pageSocialLinks.map((link: any) => {
-        const IconComponent = getIcon(link.platform);
-        const platformLabel = getPlatformLabel(link.platform);
-        const isEmail = link.platform === "gmail" || link.href.startsWith("mailto:");
-        return {
-          icon: IconComponent,
-          label: platformLabel,
-          href: link.href,
-          value: isEmail 
-            ? (link.label || link.href.replace("mailto:", "")) // Use label if provided, otherwise email address
-            : (link.label || link.href), // Use label if provided, otherwise URL
-          platform: link.platform,
-        };
-      })
+      const IconComponent = getIcon(link.platform);
+      const platformLabel = getPlatformLabel(link.platform);
+      const isEmail = link.platform === "gmail" || link.href.startsWith("mailto:");
+      return {
+        icon: IconComponent,
+        label: platformLabel,
+        href: link.href,
+        value: isEmail
+          ? (link.label || link.href.replace("mailto:", "")) // Use label if provided, otherwise email address
+          : (link.label || link.href), // Use label if provided, otherwise URL
+        platform: link.platform,
+      };
+    })
     : [];
 
   // Animate pill navbar from top on mount (Desktop only)
@@ -147,7 +147,7 @@ const Contact = () => {
         visibility: 'visible',
         display: 'block'
       });
-      
+
       gsap.to(pillNavRef.current, {
         y: 0,
         opacity: 1,
@@ -189,6 +189,11 @@ const Contact = () => {
               onClick: () => navigate("/expertise"),
               Icon: <Briefcase className="w-4 h-4" />,
             },
+            {
+              label: "Resume",
+              onClick: () => navigate("/resume"),
+              Icon: <GraduationCap className="w-4 h-4" />,
+            },
           ]}
         />
       </div>
@@ -200,6 +205,7 @@ const Contact = () => {
             { label: 'Home', href: '/' },
             { label: 'About', href: '/about' },
             { label: 'Expertise', href: '/expertise' },
+            { label: 'Resume', href: '/resume' },
             { label: 'Contact', href: '/contact' }
           ]}
           activeHref={location.pathname}
@@ -234,7 +240,7 @@ const Contact = () => {
                 {content.tagline || (isLoading ? "" : "")}
               </span>
             </motion.div>
-            
+
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-light text-foreground mb-6">
               {content.title ? (
                 <>
@@ -244,7 +250,7 @@ const Contact = () => {
                 <span className="invisible">Let's Connect</span>
               )}
             </h1>
-            
+
             <motion.p
               {...fadeInUp}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -283,7 +289,7 @@ const Contact = () => {
                 <h3 className="text-lg font-display text-foreground">
                   {link.label}
                 </h3>
-                
+
                 {/* Hover Glow Effect */}
                 <div className="absolute inset-0 rounded-lg bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               </motion.a>
@@ -307,7 +313,7 @@ const Contact = () => {
             </p>
             {(() => {
               // Find first email link (Gmail platform or mailto: href)
-              const firstEmailLink = allLinks.find((link: ContactLink) => 
+              const firstEmailLink = allLinks.find((link: ContactLink) =>
                 link.href.startsWith("mailto:") || link.platform === "gmail"
               );
               return firstEmailLink ? (

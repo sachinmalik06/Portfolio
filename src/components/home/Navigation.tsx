@@ -24,6 +24,7 @@ const Navigation = () => {
     { label: "Home", href: "/" },
     { label: "About", href: "/about" },
     { label: "Expertise", href: "/expertise" },
+    { label: "Resume", href: "/resume" },
     { label: "Contact", href: "/contact" },
   ];
 
@@ -35,9 +36,8 @@ const Navigation = () => {
   return (
     <>
       <motion.header
-        className={`fixed top-0 left-0 right-0 z-50 px-4 md:px-12 lg:px-20 py-2 md:py-4 transition-all duration-300 ${
-          scrolled ? "bg-background/80 backdrop-blur-md shadow-sm" : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 px-4 md:px-12 lg:px-20 py-2 md:py-4 transition-all duration-300 ${scrolled ? "bg-background/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+          }`}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
@@ -50,17 +50,17 @@ const Navigation = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-            {logoSettings?.logoUrl ? (
-              <img
-                src={convertDriveUrlToDirectImageUrl(logoSettings.logoUrl)}
-                alt="Logo"
-                className="h-8 w-8 object-contain"
-              />
-            ) : (
-              <span className="text-xl font-bold text-primary">
-                {logoSettings?.logoText || "SM"}
-              </span>
-            )}
+              {logoSettings?.logoUrl ? (
+                <img
+                  src={convertDriveUrlToDirectImageUrl(logoSettings.logoUrl)}
+                  alt="Logo"
+                  className="h-8 w-8 object-contain"
+                />
+              ) : (
+                <span className="text-xl font-bold text-primary">
+                  {logoSettings?.logoText || "SM"}
+                </span>
+              )}
             </motion.div>
           </Link>
 
@@ -78,7 +78,7 @@ const Navigation = () => {
                     <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-3/4 transition-all duration-300 rounded-full" />
                   </motion.div>
                 </Link>
-                
+
                 {index < navItems.length - 1 && (
                   <motion.span
                     className="w-1.5 h-1.5 bg-primary rotate-45 mx-2"
@@ -107,7 +107,7 @@ const Navigation = () => {
               <span className="text-primary group-hover:text-primary-foreground text-lg">+</span>
               <span className="text-sm text-foreground group-hover:text-primary-foreground">Open to Work</span>
             </motion.div>
-            
+
             <ThemeToggle />
 
             {/* Mobile Menu Button */}

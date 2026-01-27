@@ -566,3 +566,320 @@ export async function deleteCertification(id: string) {
   if (error) throw error;
 }
 
+
+// --- RESUME CMS ---
+
+// Resume Experiences
+export async function getResumeExperiences(includeInactive = false) {
+  let query = supabase
+    .from('resume_experiences')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createResumeExperience(experience: any) {
+  const { data, error } = await supabase
+    .from('resume_experiences')
+    .insert(experience)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateResumeExperience(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('resume_experiences')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteResumeExperience(id: string) {
+  const { error } = await supabase
+    .from('resume_experiences')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// Resume Projects
+export async function getResumeProjects(includeInactive = false) {
+  let query = supabase
+    .from('resume_projects')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createResumeProject(project: any) {
+  const { data, error } = await supabase
+    .from('resume_projects')
+    .insert(project)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateResumeProject(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('resume_projects')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteResumeProject(id: string) {
+  const { error } = await supabase
+    .from('resume_projects')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// Resume Education
+export async function getResumeEducation(includeInactive = false) {
+  let query = supabase
+    .from('resume_education')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createResumeEducation(education: any) {
+  const { data, error } = await supabase
+    .from('resume_education')
+    .insert(education)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateResumeEducation(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('resume_education')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteResumeEducation(id: string) {
+  const { error } = await supabase
+    .from('resume_education')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// Resume Skills
+export async function getResumeSkills(includeInactive = false) {
+  let query = supabase
+    .from('resume_skills')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createResumeSkill(skill: any) {
+  const { data, error } = await supabase
+    .from('resume_skills')
+    .insert(skill)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateResumeSkill(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('resume_skills')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteResumeSkill(id: string) {
+  const { error } = await supabase
+    .from('resume_skills')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// Resume Certifications
+export async function getResumeCertifications(includeInactive = false) {
+  let query = supabase
+    .from('resume_certifications')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createResumeCertification(certification: any) {
+  const { data, error } = await supabase
+    .from('resume_certifications')
+    .insert(certification)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateResumeCertification(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('resume_certifications')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteResumeCertification(id: string) {
+  const { error } = await supabase
+    .from('resume_certifications')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// Resume Languages
+export async function getResumeLanguages(includeInactive = false) {
+  let query = supabase
+    .from('resume_languages')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createResumeLanguage(language: any) {
+  const { data, error } = await supabase
+    .from('resume_languages')
+    .insert(language)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateResumeLanguage(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('resume_languages')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteResumeLanguage(id: string) {
+  const { error } = await supabase
+    .from('resume_languages')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// Resume Stats
+export async function getResumeStats(includeInactive = false) {
+  let query = supabase
+    .from('resume_stats')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createResumeStat(stat: any) {
+  const { data, error } = await supabase
+    .from('resume_stats')
+    .insert(stat)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateResumeStat(id: string, updates: any) {
+  const { data, error } = await supabase
+    .from('resume_stats')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteResumeStat(id: string) {
+  const { error } = await supabase
+    .from('resume_stats')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
