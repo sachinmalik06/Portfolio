@@ -70,9 +70,9 @@ export async function getSiteSettings() {
     .select('*')
     .eq('key', 'general')
     .single() as any);
-  
+
   if (error && error.code !== 'PGRST116') throw error;
-  const settings = ((data as any)?.value as any) || { 
+  const settings = ((data as any)?.value as any) || {
     headerTitle: "CINEMATIC STRATEGY",
     pageTitle: "Cinematic Strategy - Strategic Consulting & Creative Direction",
     faviconUrl: ""
@@ -86,7 +86,7 @@ export async function getLogoSettings() {
     .select('*')
     .eq('key', 'logo')
     .maybeSingle();
-  
+
   if (error && error.code !== 'PGRST116') {
     console.error('Error fetching logo settings:', error);
     return {
@@ -95,7 +95,7 @@ export async function getLogoSettings() {
       faviconUrl: '',
     };
   }
-  
+
   return ((data as any)?.value as any) || {
     logoUrl: '',
     logoText: 'CS',
@@ -109,18 +109,18 @@ export async function updateLogoSettings(settings: { logoUrl?: string; logoText?
     .select('id, value')
     .eq('key', 'logo')
     .maybeSingle();
-  
+
   const { data: existing } = await (existingQuery as any);
 
   if (existing && (existing as any).id) {
     const currentValue = ((existing as any).value as any) || {};
     const result = await ((supabase.from('site_settings') as any)
-      .update({ 
-        value: { ...currentValue, ...settings }, 
-        updated_at: new Date().toISOString() 
+      .update({
+        value: { ...currentValue, ...settings },
+        updated_at: new Date().toISOString()
       })
       .eq('key', 'logo'));
-    
+
     if (result.error) throw result.error;
     return { ...currentValue, ...settings };
   } else {
@@ -129,7 +129,7 @@ export async function updateLogoSettings(settings: { logoUrl?: string; logoText?
       .insert({ key: 'logo', value: settings } as any)
       .select()
       .single();
-    
+
     if (error) throw error;
     return ((data as any)?.value as any) || settings;
   }
@@ -141,7 +141,7 @@ export async function getProfileCardSettings() {
     .select('*')
     .eq('key', 'profile_card')
     .single();
-  
+
   if (error && error.code !== 'PGRST116') {
     // If not found, return defaults
     return {
@@ -149,7 +149,7 @@ export async function getProfileCardSettings() {
       imageUrl: '',
     };
   }
-  
+
   const value = (data as any)?.value;
   return {
     cardImageUrl: value?.imageUrl || value?.cardImageUrl || '',
@@ -164,12 +164,12 @@ export async function getFooterSettings() {
     .select('*')
     .eq('key', 'footer')
     .single();
-  
+
   if (error && error.code !== 'PGRST116') {
     console.error('Error fetching footer settings:', error);
     return null;
   }
-  
+
   return ((data as any)?.value as any) || null;
 }
 
@@ -184,7 +184,7 @@ export async function updateFooterSettings(settings: any) {
     const result = await ((supabase.from('site_settings') as any)
       .update({ value: settings, updated_at: new Date().toISOString() })
       .eq('key', 'footer'));
-    
+
     if (result.error) throw result.error;
     return settings;
   } else {
@@ -193,7 +193,7 @@ export async function updateFooterSettings(settings: any) {
       .insert({ key: 'footer', value: settings } as any)
       .select()
       .single();
-    
+
     if (error) throw error;
     return (data as any)?.value as any;
   }
@@ -205,12 +205,12 @@ export async function getAboutFooterText() {
     .select('*')
     .eq('key', 'about_footer_text')
     .single() as any;
-  
+
   if (error && error.code !== 'PGRST116') {
     console.error('Error fetching about footer text:', error);
     return null;
   }
-  
+
   return ((data as any)?.value as any) || null;
 }
 
@@ -225,7 +225,7 @@ export async function updateAboutFooterText(settings: any) {
     const result = await ((supabase.from('site_settings') as any)
       .update({ value: settings, updated_at: new Date().toISOString() })
       .eq('key', 'about_footer_text'));
-    
+
     if (result.error) throw result.error;
     return settings;
   } else {
@@ -234,7 +234,7 @@ export async function updateAboutFooterText(settings: any) {
       .insert({ key: 'about_footer_text', value: settings } as any)
       .select()
       .single();
-    
+
     if (error) throw error;
     return (data as any)?.value as any;
   }
@@ -248,12 +248,12 @@ export async function getMetaTags() {
       .select('*')
       .eq('key', 'meta_tags')
       .maybeSingle() as any;
-    
+
     if (error && error.code !== 'PGRST116') {
       // Silently handle 406 and other errors - return null if not found
       return null;
     }
-    
+
     return ((data as any)?.value as any) || null;
   } catch (err) {
     // Silently handle any errors
@@ -278,7 +278,7 @@ export async function updateMetaTags(settings: any) {
     const result = await ((supabase.from('site_settings') as any)
       .update({ value: settings, updated_at: new Date().toISOString() })
       .eq('key', 'meta_tags'));
-    
+
     if (result.error) throw result.error;
     return settings;
   } else {
@@ -288,13 +288,13 @@ export async function updateMetaTags(settings: any) {
       .insert({ key: 'meta_tags', value: settings } as any)
       .select()
       .single();
-    
+
     if (insertError) throw insertError;
     return (data as any)?.value as any;
   }
 }
 
-export async function updateProfileCardSettings(settings: { 
+export async function updateProfileCardSettings(settings: {
   cardImageUrl?: string;
   imageUrl?: string;
   name?: string;
@@ -313,13 +313,13 @@ export async function updateProfileCardSettings(settings: {
     .single() as any;
 
   const currentValue = (existing?.value as any) || {};
-  
+
   // If cardImageUrl is provided, also set imageUrl for backward compatibility
   const updatedSettings = { ...settings };
   if (settings.cardImageUrl !== undefined) {
     updatedSettings.imageUrl = settings.cardImageUrl;
   }
-  
+
   const newValue = {
     ...currentValue,
     ...updatedSettings
@@ -475,12 +475,12 @@ export async function getGalleryTextSettings() {
     .select('*')
     .eq('key', 'gallery_text')
     .maybeSingle();
-  
+
   if (error && error.code !== 'PGRST116') {
     console.error('Error fetching gallery text settings:', error);
     return null;
   }
-  
+
   return ((data as any)?.value as any) || {
     startText: { first: 'Ariel', second: 'Croze' },
     endText: { first: 'Daria', second: 'Gaita' }
@@ -493,9 +493,9 @@ export async function updateGalleryTextSettings(settings: any) {
     .select('id')
     .eq('key', 'gallery_text')
     .maybeSingle();
-  
+
   const { data: existing } = await (existingQuery as any);
-  
+
   if (existing && (existing as any).id) {
     const updateQuery = (supabase
       .from('site_settings') as any)
@@ -596,8 +596,8 @@ export async function createResumeExperience(experience: any) {
 }
 
 export async function updateResumeExperience(id: string, updates: any) {
-  const { data, error } = await supabase
-    .from('resume_experiences')
+  const { data, error } = await (supabase
+    .from('resume_experiences') as any)
     .update(updates)
     .eq('id', id)
     .select()
@@ -641,8 +641,8 @@ export async function createResumeProject(project: any) {
 }
 
 export async function updateResumeProject(id: string, updates: any) {
-  const { data, error } = await supabase
-    .from('resume_projects')
+  const { data, error } = await (supabase
+    .from('resume_projects') as any)
     .update(updates)
     .eq('id', id)
     .select()
@@ -686,8 +686,8 @@ export async function createResumeEducation(education: any) {
 }
 
 export async function updateResumeEducation(id: string, updates: any) {
-  const { data, error } = await supabase
-    .from('resume_education')
+  const { data, error } = await (supabase
+    .from('resume_education') as any)
     .update(updates)
     .eq('id', id)
     .select()
@@ -731,8 +731,8 @@ export async function createResumeSkill(skill: any) {
 }
 
 export async function updateResumeSkill(id: string, updates: any) {
-  const { data, error } = await supabase
-    .from('resume_skills')
+  const { data, error } = await (supabase
+    .from('resume_skills') as any)
     .update(updates)
     .eq('id', id)
     .select()
@@ -776,8 +776,8 @@ export async function createResumeCertification(certification: any) {
 }
 
 export async function updateResumeCertification(id: string, updates: any) {
-  const { data, error } = await supabase
-    .from('resume_certifications')
+  const { data, error } = await (supabase
+    .from('resume_certifications') as any)
     .update(updates)
     .eq('id', id)
     .select()
@@ -821,8 +821,8 @@ export async function createResumeLanguage(language: any) {
 }
 
 export async function updateResumeLanguage(id: string, updates: any) {
-  const { data, error } = await supabase
-    .from('resume_languages')
+  const { data, error } = await (supabase
+    .from('resume_languages') as any)
     .update(updates)
     .eq('id', id)
     .select()
@@ -866,8 +866,8 @@ export async function createResumeStat(stat: any) {
 }
 
 export async function updateResumeStat(id: string, updates: any) {
-  const { data, error } = await supabase
-    .from('resume_stats')
+  const { data, error } = await (supabase
+    .from('resume_stats') as any)
     .update(updates)
     .eq('id', id)
     .select()
