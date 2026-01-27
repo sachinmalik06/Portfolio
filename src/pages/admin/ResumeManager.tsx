@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import HeroTab from "./resume/HeroTab";
 import ExperiencesTab from "./resume/ExperiencesTab";
 import ProjectsTab from "./resume/ProjectsTab";
 import EducationTab from "./resume/EducationTab";
@@ -7,10 +8,10 @@ import SkillsTab from "./resume/SkillsTab";
 import CertificationsTab from "./resume/CertificationsTab";
 import LanguagesTab from "./resume/LanguagesTab";
 import StatsTab from "./resume/StatsTab";
-import { Briefcase, Folder, GraduationCap, Zap, Award, Languages, BarChart3 } from "lucide-react";
+import { User, Briefcase, Folder, GraduationCap, Zap, Award, Languages, BarChart3 } from "lucide-react";
 
 export default function ResumeManager() {
-    const [activeTab, setActiveTab] = useState("experiences");
+    const [activeTab, setActiveTab] = useState("hero");
 
     return (
         <div className="space-y-6">
@@ -21,6 +22,9 @@ export default function ResumeManager() {
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                 <TabsList className="bg-muted/50 p-1 rounded-lg flex flex-wrap h-auto gap-2 justify-start overflow-x-auto">
+                    <TabsTrigger value="hero" className="gap-2">
+                        <User className="w-4 h-4" /> Hero
+                    </TabsTrigger>
                     <TabsTrigger value="experiences" className="gap-2">
                         <Briefcase className="w-4 h-4" /> Experiences
                     </TabsTrigger>
@@ -45,6 +49,10 @@ export default function ResumeManager() {
                 </TabsList>
 
                 <div className="border bg-card rounded-lg p-6 shadow-sm">
+                    <TabsContent value="hero" className="mt-0 space-y-4">
+                        <HeroTab />
+                    </TabsContent>
+
                     <TabsContent value="experiences" className="mt-0 space-y-4">
                         <ExperiencesTab />
                     </TabsContent>

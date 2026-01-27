@@ -883,3 +883,26 @@ export async function deleteResumeStat(id: string) {
     .eq('id', id);
   if (error) throw error;
 }
+
+// Resume Hero Section
+export async function getResumeHero() {
+  const { data, error } = await supabase
+    .from('resume_hero')
+    .select('*')
+    .eq('active', true)
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+export async function updateResumeHero(id: string, updates: any) {
+  const { data, error } = await (supabase
+    .from('resume_hero') as any)
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}

@@ -977,3 +977,32 @@ export function useDeleteResumeStat() {
 
   return { mutate, isLoading, error };
 }
+
+// Resume Hero
+export function useResumeHero() {
+  return useSupabaseQuery(
+    () => cms.getResumeHero(),
+    []
+  );
+}
+
+export function useUpdateResumeHero() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (id: string, updates: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateResumeHero(id, updates);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}

@@ -34,7 +34,8 @@ import {
   useResumeSkills,
   useResumeCertifications,
   useResumeLanguages,
-  useResumeStats
+  useResumeStats,
+  useResumeHero
 } from "@/hooks/use-cms";
 import PillNav from "@/components/PillNav";
 import FloatingActionMenu from "@/components/FloatingActionMenu";
@@ -151,15 +152,23 @@ const Resume = () => {
   const certY = useTransform(smoothProgress, [0.6, 0.75], [80, 0]);
   const langY = useTransform(smoothProgress, [0.7, 0.85], [80, 0]);
 
+  // Fetch hero data from CMS
+  const { data: heroDataRaw } = useResumeHero();
+  const heroData = heroDataRaw as any;
+
   // Resume Data - Enhanced with more details
   const about = {
-    name: "Sachin Malik",
-    role: "International Business Management Professional",
-    bio: "Internationally oriented and ambitious postgraduate student pursuing MSc in International Business Management at GISMA University, Berlin. With 2+ years of hands-on experience in management and business operations, I bring a strong understanding of global business dynamics, strategic decision-making, and data-driven insights to drive organizational growth.",
-    email: "sachinmalikofficial6@gmail.com",
-    phone: "+49 XXX XXX XXXX",
-    location: "Berlin, Germany"
+    name: heroData?.name || "Sachin Malik",
+    role: heroData?.role || "International Business Management Professional",
+    bio: heroData?.bio || "Internationally oriented and ambitious postgraduate student pursuing MSc in International Business Management at GISMA University, Berlin.",
+    email: heroData?.email || "sachinmalikofficial6@gmail.com",
+    phone: heroData?.phone || "+49 XXX XXX XXXX",
+    location: heroData?.location || "Berlin, Germany"
   };
+
+  const professionalSummary = heroData?.professional_summary || "Internationally oriented and ambitious postgraduate student pursuing MSc in International Business Management at GISMA University, Berlin. With 2+ years of hands-on experience in management and business operations, I bring a strong understanding of global business dynamics, strategic decision-making, and data-driven insights to drive organizational growth.";
+
+  const summaryTags = heroData?.summary_tags || ["Business Analytics", "Strategic Planning", "Team Leadership", "Data-Driven", "International Business", "Process Optimization"];
 
   // Statistics
   const { data: statsRaw = [] } = useResumeStats();
@@ -184,9 +193,9 @@ const Resume = () => {
   const { data: languagesRaw = [] } = useResumeLanguages();
   const languages = languagesRaw as any[];
 
-  const socialLinks = [
-    { id: "1", platform: "LinkedIn", url: "https://www.linkedin.com/in/sachinmalik6", icon_name: "linkedin" },
-    { id: "2", platform: "GitHub", url: "https://github.com/sachinmalik06", icon_name: "github" }
+  const socialLinks = heroData?.social_links || [
+    { platform: "LinkedIn", url: "https://www.linkedin.com/in/sachinmalik6", icon_name: "linkedin" },
+    { platform: "GitHub", url: "https://github.com/sachinmalik06", icon_name: "github" }
   ];
 
   const skillsByCategory = skills.reduce(
@@ -320,11 +329,11 @@ const Resume = () => {
               Download Resume
             </motion.button>
             <div className="flex items-center gap-3">
-              {socialLinks.map((link) => {
+              {socialLinks.map((link: any, index: number) => {
                 const Icon = iconMap[link.icon_name?.toLowerCase()] || Globe;
                 return (
                   <motion.a
-                    key={link.id}
+                    key={link.id || index}
                     whileHover={{ scale: 1.1, y: -2 }}
                     href={link.url}
                     target="_blank"
@@ -409,10 +418,10 @@ const Resume = () => {
             className="rounded-2xl border border-border bg-gradient-to-br from-card to-transparent p-6 md:p-8 backdrop-blur-sm"
           >
             <p className="text-lg leading-relaxed text-muted-foreground">
-              {about.bio}
+              {professionalSummary}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              {["Business Analytics", "Strategic Planning", "Team Leadership", "Data-Driven", "International Business", "Process Optimization"].map((tag) => (
+              {summaryTags.map((tag: string) => (
                 <motion.span
                   key={tag}
                   initial={{ opacity: 0, y: 20 }}
