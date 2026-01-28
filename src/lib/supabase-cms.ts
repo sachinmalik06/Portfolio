@@ -518,6 +518,57 @@ export async function updateGalleryTextSettings(settings: any) {
   }
 }
 
+// --- HOME PROJECTS SETTINGS ---
+export async function getHomeProjectsSettings() {
+  const { data, error } = await supabase
+    .from('site_settings')
+    .select('*')
+    .eq('key', 'home_projects')
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching home projects settings:', error);
+    return { enabled: true, title: 'Featured Projects', subtitle: 'Portfolio' };
+  }
+
+  return ((data as any)?.value as any) || {
+    enabled: true,
+    title: 'Featured Projects',
+    subtitle: 'Portfolio'
+  };
+}
+
+export async function updateHomeProjectsSettings(settings: any) {
+  const existingQuery = supabase
+    .from('site_settings')
+    .select('id')
+    .eq('key', 'home_projects')
+    .maybeSingle();
+
+  const { data: existing } = await (existingQuery as any);
+
+  if (existing && (existing as any).id) {
+    const updateQuery = (supabase
+      .from('site_settings') as any)
+      .update({ value: settings, updated_at: new Date().toISOString() })
+      .eq('id', (existing as any).id)
+      .select()
+      .single();
+    const { data, error } = await updateQuery;
+    if (error) throw error;
+    return (data as any)?.value as any;
+  } else {
+    const insertQuery = (supabase
+      .from('site_settings') as any)
+      .insert({ key: 'home_projects', value: settings })
+      .select()
+      .single();
+    const { data, error } = await insertQuery;
+    if (error) throw error;
+    return (data as any)?.value as any;
+  }
+}
+
 // --- CERTIFICATIONS ---
 export async function getCertifications(includeInactive = false) {
   let query = supabase

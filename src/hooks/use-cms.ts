@@ -416,6 +416,35 @@ export function useUpdateGalleryTextSettings() {
   return { mutate, isLoading, error };
 }
 
+// Home Projects Settings
+export function useHomeProjectsSettings() {
+  return useSupabaseQuery(
+    () => cms.getHomeProjectsSettings(),
+    []
+  );
+}
+
+export function useUpdateHomeProjectsSettings() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const mutate = async (settings: Parameters<typeof cms.updateHomeProjectsSettings>[0]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await cms.updateHomeProjectsSettings(settings);
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setError(err as Error);
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  return { mutate, isLoading, error };
+}
+
 // Certifications
 export function useCertifications() {
   return useSupabaseQuery(

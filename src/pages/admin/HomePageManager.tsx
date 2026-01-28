@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, FolderCode } from "lucide-react";
 import ImageUploadWithCrop from "@/components/admin/ImageUploadWithCrop";
+import { Switch } from "@/components/ui/switch";
 
 interface SocialLink {
   label: string;
@@ -53,6 +54,13 @@ export default function HomePageManager() {
     phone: "+49 176 2135 1793",
     location: "Berlin, Germany",
     linkedin: "https://www.linkedin.com/in/sachinmalik6"
+  });
+
+  // Projects Section State
+  const [projectsData, setProjectsData] = useState({
+    enabled: true,
+    title: "Featured Projects",
+    subtitle: "Portfolio"
   });
 
   useEffect(() => {
@@ -126,6 +134,19 @@ export default function HomePageManager() {
       const contactDataRaw = contactSettings as any;
       if (contactDataRaw?.value) {
         setContactData({ ...contactData, ...contactDataRaw.value });
+      }
+
+      // Fetch projects settings
+      const { data: projectsSettings, error: projectsError } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('key', 'home_projects')
+        .single();
+
+      if (projectsError && projectsError.code !== 'PGRST116') throw projectsError;
+
+      if (projectsSettings?.value) {
+        setProjectsData(prev => ({ ...prev, ...projectsSettings.value }));
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -212,6 +233,26 @@ export default function HomePageManager() {
     }
   };
 
+  const saveProjectsSettings = async () => {
+    setSaving(true);
+    try {
+      const { error } = await ((supabase.from('site_settings') as any)
+        .upsert({
+          key: 'home_projects',
+          value: projectsData
+        }, { onConflict: 'key' }));
+
+      if (error) throw error;
+
+      toast.success('Projects section settings saved successfully');
+    } catch (error) {
+      console.error('Error saving projects settings:', error);
+      toast.error('Failed to save projects settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const addSocialLink = () => {
     setHeroData({
       ...heroData,
@@ -268,9 +309,10 @@ export default function HomePageManager() {
       </div>
 
       <Tabs defaultValue="hero" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="hero">Hero Section</TabsTrigger>
           <TabsTrigger value="about">About Section</TabsTrigger>
+          <TabsTrigger value="projects">Projects Section</TabsTrigger>
           <TabsTrigger value="contact">Contact Section</TabsTrigger>
         </TabsList>
 
@@ -494,6 +536,61 @@ export default function HomePageManager() {
 
               <Button onClick={saveAboutSettings} disabled={saving} className="w-full">
                 {saving ? "Saving..." : "Save About Section"}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Projects Section Tab */}
+        <TabsContent value="projects" className="space-y-6">
+          <Card className="bg-card/50 border-white/5">
+            <CardHeader>
+              <CardTitle>Projects Section</CardTitle>
+              <CardDescription>Configure how projects appear on your home page</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between p-4 border border-white/5 rounded-lg bg-background/50">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Enable Projects Gallery</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Show or hide the "Featured Projects" section on the home page.
+                  </p>
+                </div>
+                <Switch
+                  checked={projectsData.enabled}
+                  onCheckedChange={(checked) => setProjectsData({ ...projectsData, enabled: checked })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Section Title</Label>
+                <Input
+                  value={projectsData.title}
+                  onChange={(e) => setProjectsData({ ...projectsData, title: e.target.value })}
+                  placeholder="Featured Projects"
+                  disabled={!projectsData.enabled}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Section Subtitle</Label>
+                <Input
+                  value={projectsData.subtitle}
+                  onChange={(e) => setProjectsData({ ...projectsData, subtitle: e.target.value })}
+                  placeholder="Portfolio"
+                  disabled={!projectsData.enabled}
+                />
+              </div>
+
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                <p className="text-sm text-blue-200">
+                  <FolderCode className="w-4 h-4 inline mr-2" />
+                  Individual projects are managed in the <strong>Gallery</strong> section.
+                </p>
+              </div>
+
+              <Button onClick={saveProjectsSettings} disabled={saving} className="w-full">
+                {saving ? "Saving..." : "Save Projects Settings"}
               </Button>
             </CardContent>
           </Card>

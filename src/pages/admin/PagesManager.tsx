@@ -12,7 +12,8 @@ import { SocialLinksEditor, type SocialLink } from "@/components/admin/SocialLin
 import { useLocation } from "react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, GripVertical, Link as LinkIcon, Upload } from "lucide-react";
+import ImageUpload from "@/components/admin/ImageUpload";
 import {
   DndContext,
   closestCenter,
@@ -425,6 +426,8 @@ function TimelineSection() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<any>(null);
   const [entriesList, setEntriesList] = useState<any[]>([]);
+  const [imageMode, setImageMode] = useState<"url" | "upload">("url");
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
   useEffect(() => {
     if (entries && entries.length > 0) {
@@ -464,6 +467,31 @@ function TimelineSection() {
     }
   };
 
+  const handleImageUploaded = (url: string) => {
+    setUploadedImageUrl(url);
+  };
+
+  const handleModeChange = (mode: "url" | "upload") => {
+    setImageMode(mode);
+    if (mode === "url") {
+      setUploadedImageUrl("");
+    }
+  };
+
+  const openEdit = (entry: any) => {
+    setEditingEntry(entry);
+    setImageMode("url");
+    setUploadedImageUrl("");
+    setIsDialogOpen(true);
+  };
+
+  const openCreate = () => {
+    setEditingEntry(null);
+    setImageMode("url");
+    setUploadedImageUrl("");
+    setIsDialogOpen(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -495,7 +523,9 @@ function TimelineSection() {
       year: formData.get("year") as string,
       title: formData.get("title") as string,
       content: formData.get("content") as string,
-      images: images,
+      images: imageMode === "upload" && (uploadedImageUrl || editingEntry?.images?.[0])
+        ? [uploadedImageUrl || editingEntry?.images?.[0]]
+        : images,
       year_styles: yearStyles,
       title_styles: titleStyles,
       content_styles: contentStyles,
@@ -558,6 +588,13 @@ function TimelineSection() {
         </TableCell>
         <TableCell className="font-bold">{entry.year}</TableCell>
         <TableCell>{entry.title}</TableCell>
+        <TableCell>
+          {entry.images && entry.images.length > 0 && (
+            <div className="w-12 h-12 rounded overflow-hidden border border-white/10">
+              <img src={entry.images[0]} alt="" className="w-full h-full object-cover" />
+            </div>
+          )}
+        </TableCell>
         <TableCell className="text-muted-foreground truncate max-w-xs">
           {typeof entry.content === 'string' ? entry.content : 'Complex content'}
         </TableCell>
@@ -583,7 +620,7 @@ function TimelineSection() {
             <CardTitle>Timeline</CardTitle>
             <CardDescription>Manage your career journey milestones displayed on the About page.</CardDescription>
           </div>
-          <Button onClick={() => { setEditingEntry(null); setIsDialogOpen(true); }}>
+          <Button onClick={openCreate}>
             <Plus className="w-4 h-4 mr-2" />
             Add Entry
           </Button>
@@ -614,7 +651,7 @@ function TimelineSection() {
                     <SortableRow
                       key={entry.id}
                       entry={entry}
-                      onEdit={(entry) => { setEditingEntry(entry); setIsDialogOpen(true); }}
+                      onEdit={openEdit}
                       onDelete={handleDelete}
                       isDeleting={isDeleting}
                     />
@@ -808,15 +845,58 @@ function TimelineSection() {
                 </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Images (comma-separated URLs)</label>
-              <Textarea
-                name="images"
-                defaultValue={editingEntry?.images?.join(', ') || ''}
-                className="h-20"
-                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-              />
-              <p className="text-xs text-muted-foreground">Enter image URLs separated by commas</p>
+            {/* Images Section with URL/Upload Mode Toggle */}
+            <div className="space-y-3 border-t pt-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Entry Images</label>
+                <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                  <Button
+                    type="button"
+                    variant={imageMode === "url" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => handleModeChange("url")}
+                    className="gap-2"
+                  >
+                    <LinkIcon className="w-4 h-4" />
+                    URL
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={imageMode === "upload" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => handleModeChange("upload")}
+                    className="gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Upload
+                  </Button>
+                </div>
+              </div>
+
+              {imageMode === "url" ? (
+                <div className="space-y-2">
+                  <Textarea
+                    name="images"
+                    defaultValue={editingEntry?.images?.join(', ') || ''}
+                    className="h-20"
+                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                  />
+                  <p className="text-xs text-muted-foreground">Enter image URLs separated by commas</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <ImageUpload
+                    currentImageUrl={uploadedImageUrl || editingEntry?.images?.[0] || ""}
+                    onImageUploaded={handleImageUploaded}
+                    bucket="images"
+                    folder="timeline"
+                    label=""
+                    description="PNG, JPG, WebP, or GIF (max 5MB)"
+                    acceptedFormats="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                    maxSizeMB={5}
+                  />
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-4">
               <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
