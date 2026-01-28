@@ -131,7 +131,7 @@ function AboutEditor({ initialData, onSave }: { initialData: any, onSave: (data:
   const [formData, setFormData] = useState({
     introTitle: "Sachin Malik",
     introSubtitle: "About",
-    introText: "Strategic thinker and creative problem solver.",
+    introText: "International Business Management graduate student in Berlin with 2+ years of hands-on experience. I specialize in business analytics, strategic planning, and operations—turning data into decisions that drive sustainable growth in global markets.",
     encryptedText: "Building the future through innovation, leadership, and relentless pursuit of excellence.",
     role: "Strategist & Leader",
     focus: "Innovation & Growth",

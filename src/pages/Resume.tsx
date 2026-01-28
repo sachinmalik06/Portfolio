@@ -721,51 +721,35 @@ const Resume = () => {
             style={{ y: langY }}
           >
             <SectionHeader icon={<Globe className="h-5 w-5" />} title="Languages" />
-            <div className="grid gap-6 sm:grid-cols-3">
-              {languages.map((lang) => (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {languages.map((lang, index) => (
                 <motion.div
                   key={lang.id}
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  whileHover={{ scale: 1.05, y: -4 }}
-                  className="group rounded-2xl border border-border bg-card p-6 text-center transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.03, y: -4 }}
+                  className="group relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-6 transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"
                 >
-                  <div className="relative mx-auto mb-4 h-24 w-24">
-                    <svg className="h-24 w-24 -rotate-90 transform">
-                      <circle
-                        cx="48"
-                        cy="48"
-                        r="44"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        fill="none"
-                        className="text-card/50"
-                      />
-                      <motion.circle
-                        cx="48"
-                        cy="48"
-                        r="44"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        fill="none"
-                        strokeLinecap="round"
-                        className="text-primary"
-                        initial={{ strokeDasharray: "0 276" }}
-                        whileInView={{ strokeDasharray: `${(lang.proficiency / 100) * 276} 276` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.3 }}
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xl font-bold text-foreground">{lang.proficiency}%</span>
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="relative flex flex-col items-center text-center">
+                    {/* Language Icon */}
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Globe className="h-7 w-7 text-primary" />
+                    </div>
+
+                    {/* Language Name */}
+                    <h3 className="mb-3 text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                      {lang.name}
+                    </h3>
+
+                    {/* Proficiency Level Badge */}
+                    <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-medium text-primary">
+                      <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                      {lang.level}
                     </div>
                   </div>
-                  <h3 className="mb-1 text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                    {lang.name}
-                  </h3>
-                  <p className="text-sm text-primary/70">{lang.level}</p>
                 </motion.div>
               ))}
             </div>

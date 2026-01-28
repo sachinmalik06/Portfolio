@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, GripVertical, Link as LinkIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
+import ImageUpload from "@/components/admin/ImageUpload";
 import {
   DndContext,
   closestCenter,
@@ -58,8 +59,8 @@ function SortableRow({ item, onEdit, onDelete, isDeleting }: { item: any; onEdit
       <TableCell className="font-medium">{item.title || "-"}</TableCell>
       <TableCell>
         <div className="w-16 h-10 rounded overflow-hidden border border-white/10">
-          <img 
-            src={item.image} 
+          <img
+            src={item.image}
             alt={item.title || "Gallery item"}
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -105,6 +106,8 @@ export default function GalleryManager() {
   const [endTextSecond, setEndTextSecond] = useState("");
   const [itemsList, setItemsList] = useState<any[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [imageMode, setImageMode] = useState<"url" | "upload">("url");
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
   // Initialize items when gallery items load
   useEffect(() => {
@@ -171,7 +174,7 @@ export default function GalleryManager() {
         second: endTextSecond || 'Gaita'
       }
     };
-    
+
     updateTextSettings(settings)
       .then(() => {
         toast.success("Gallery text settings saved successfully");
@@ -185,28 +188,28 @@ export default function GalleryManager() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    
+
     // Get title styling options
     const titleStyles = {
       fontSize: formData.get("titleFontSize") as string || 'lg',
       fontWeight: formData.get("titleFontWeight") as string || 'bold',
       color: formData.get("titleColor") as string || '',
     };
-    
+
     // Get short description styling options
     const descriptionStyles = {
       fontSize: formData.get("descriptionFontSize") as string || 'base',
       fontWeight: formData.get("descriptionFontWeight") as string || 'normal',
       color: formData.get("descriptionColor") as string || '',
     };
-    
+
     // Get detailed description styling options
     const detailedDescriptionStyles = {
       fontSize: formData.get("detailedDescriptionFontSize") as string || 'base',
       fontWeight: formData.get("detailedDescriptionFontWeight") as string || 'normal',
       color: formData.get("detailedDescriptionColor") as string || '',
     };
-    
+
     const data = {
       title: formData.get("title") as string,
       number: formData.get("number") as string,
@@ -236,10 +239,6 @@ export default function GalleryManager() {
       setEditingItem(null);
       // Trigger refetch by incrementing key
       setRefreshKey(prev => prev + 1);
-      // Force reload after a short delay to ensure database is updated
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
     } catch (error) {
       console.error("Save error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to save gallery item");
@@ -260,11 +259,31 @@ export default function GalleryManager() {
   const openEdit = (item: any) => {
     setEditingItem(item);
     setIsDialogOpen(true);
+    // Reset image mode and uploaded URL when opening dialog
+    setImageMode("url");
+    setUploadedImageUrl("");
   };
 
   const openCreate = () => {
     setEditingItem(null);
     setIsDialogOpen(true);
+    // Reset image mode and uploaded URL when opening dialog
+    setImageMode("url");
+    setUploadedImageUrl("");
+  };
+
+  // Handle image uploaded via ImageUpload component
+  const handleImageUploaded = (url: string) => {
+    setUploadedImageUrl(url);
+  };
+
+  // Handle mode toggle between URL and Upload
+  const handleModeChange = (mode: "url" | "upload") => {
+    setImageMode(mode);
+    // Clear uploaded URL when switching to URL mode
+    if (mode === "url") {
+      setUploadedImageUrl("");
+    }
   };
 
   return (
@@ -360,7 +379,7 @@ export default function GalleryManager() {
                 <p className="text-xs text-muted-foreground">Main project title</p>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Short Description</label>
               <Input name="description" defaultValue={editingItem?.description || ""} placeholder="Brief description visible on card" />
@@ -384,15 +403,15 @@ export default function GalleryManager() {
               <Input name="link" defaultValue={editingItem?.link || ""} placeholder="https://example.com/project" />
               <p className="text-xs text-muted-foreground">External link to the project. Leave empty if no link.</p>
             </div>
-            
+
             {/* Title Styling */}
             <div className="space-y-3 border-t pt-4">
               <h4 className="text-sm font-semibold text-primary">Title Styling</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
-                  <select 
-                    name="titleFontSize" 
+                  <select
+                    name="titleFontSize"
                     defaultValue={editingItem?.title_styles?.fontSize || 'lg'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
@@ -413,8 +432,8 @@ export default function GalleryManager() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="titleFontWeight" 
+                  <select
+                    name="titleFontWeight"
                     defaultValue={editingItem?.title_styles?.fontWeight || 'bold'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
@@ -427,24 +446,24 @@ export default function GalleryManager() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="titleColor" 
+                  <Input
+                    type="text"
+                    name="titleColor"
                     defaultValue={editingItem?.title_styles?.color || ''}
                     placeholder="#00ADB5 or leave empty"
                   />
                 </div>
               </div>
             </div>
-            
+
             {/* Description Styling */}
             <div className="space-y-3 border-t pt-4">
               <h4 className="text-sm font-semibold text-primary">Short Description Styling</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
-                  <select 
-                    name="descriptionFontSize" 
+                  <select
+                    name="descriptionFontSize"
                     defaultValue={editingItem?.description_styles?.fontSize || 'base'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
@@ -465,8 +484,8 @@ export default function GalleryManager() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="descriptionFontWeight" 
+                  <select
+                    name="descriptionFontWeight"
                     defaultValue={editingItem?.description_styles?.fontWeight || 'normal'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
@@ -479,24 +498,24 @@ export default function GalleryManager() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="descriptionColor" 
+                  <Input
+                    type="text"
+                    name="descriptionColor"
                     defaultValue={editingItem?.description_styles?.color || ''}
                     placeholder="#FFFFFF or leave empty"
                   />
                 </div>
               </div>
             </div>
-            
+
             {/* Detailed Description Styling */}
             <div className="space-y-3 border-t pt-4">
               <h4 className="text-sm font-semibold text-primary">Detailed Description Styling</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Size</label>
-                  <select 
-                    name="detailedDescriptionFontSize" 
+                  <select
+                    name="detailedDescriptionFontSize"
                     defaultValue={editingItem?.detailed_description_styles?.fontSize || 'base'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
@@ -517,8 +536,8 @@ export default function GalleryManager() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Font Weight</label>
-                  <select 
-                    name="detailedDescriptionFontWeight" 
+                  <select
+                    name="detailedDescriptionFontWeight"
                     defaultValue={editingItem?.detailed_description_styles?.fontWeight || 'normal'}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
@@ -531,29 +550,85 @@ export default function GalleryManager() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Text Color</label>
-                  <Input 
-                    type="text" 
-                    name="detailedDescriptionColor" 
+                  <Input
+                    type="text"
+                    name="detailedDescriptionColor"
                     defaultValue={editingItem?.detailed_description_styles?.color || ''}
                     placeholder="#FFFFFF or leave empty"
                   />
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Image URL</label>
-              <Input name="image" defaultValue={editingItem?.image || ""} placeholder="https://example.com/image.jpg" required />
-              {editingItem?.image && (
-                <div className="mt-2 w-full max-w-xs rounded-lg overflow-hidden border border-white/10 bg-white/5">
-                  <img 
-                    src={editingItem.image} 
-                    alt="Preview"
-                    className="w-full h-auto object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
+
+
+            {/* Image Section with URL/Upload Mode Toggle */}
+            <div className="space-y-3 border-t pt-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Project Image</label>
+                <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                  <Button
+                    type="button"
+                    variant={imageMode === "url" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => handleModeChange("url")}
+                    className="gap-2"
+                  >
+                    <LinkIcon className="w-4 h-4" />
+                    URL
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={imageMode === "upload" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => handleModeChange("upload")}
+                    className="gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Upload
+                  </Button>
+                </div>
+              </div>
+
+              {imageMode === "url" ? (
+                <div className="space-y-2">
+                  <Input
+                    name="image"
+                    defaultValue={editingItem?.image || ""}
+                    placeholder="https://example.com/image.jpg"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">Enter the URL of an image hosted online</p>
+                  {editingItem?.image && (
+                    <div className="mt-2 w-full max-w-xs rounded-lg overflow-hidden border border-white/10 bg-white/5">
+                      <img
+                        src={editingItem.image}
+                        alt="Preview"
+                        className="w-full h-auto object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <ImageUpload
+                    currentImageUrl={uploadedImageUrl || editingItem?.image || ""}
+                    onImageUploaded={handleImageUploaded}
+                    bucket="project-images"
+                    folder="gallery"
+                    label=""
+                    description="PNG, JPG, WebP, or GIF (max 5MB)"
+                    acceptedFormats="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                    maxSizeMB={5}
+                  />
+                  {/* Hidden input to store the uploaded image URL for form submission */}
+                  <input
+                    type="hidden"
+                    name="image"
+                    value={uploadedImageUrl || editingItem?.image || ""}
                   />
                 </div>
               )}
@@ -566,9 +641,9 @@ export default function GalleryManager() {
               </div>
               <div className="space-y-2 flex items-end">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    name="active" 
+                  <input
+                    type="checkbox"
+                    name="active"
                     key={editingItem?.id || 'new-active'}
                     defaultChecked={editingItem?.active !== false}
                     className="w-4 h-4 rounded border-white/20"

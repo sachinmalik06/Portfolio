@@ -31,8 +31,23 @@ const About = () => {
   const pillNavRef = useRef<HTMLDivElement>(null);
   const profileCardInnerRef = useRef<HTMLDivElement>(null);
   const [startEncryption, setStartEncryption] = useState(false);
-  const [isMobileLandscape, setIsMobileLandscape] = useState(false);
-  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
+
+  // Initialize mobile states immediately to avoid delay
+  const getInitialMobileState = () => {
+    if (typeof window === 'undefined') return { landscape: false, portrait: false };
+    const isMobileDevice = window.innerWidth <= 768;
+    const isLandscape = window.innerHeight < window.innerWidth;
+    const isPortrait = window.innerHeight >= window.innerWidth;
+    return {
+      landscape: isMobileDevice && isLandscape,
+      portrait: isMobileDevice && isPortrait
+    };
+  };
+
+  const initialMobileState = getInitialMobileState();
+  const [isMobileLandscape, setIsMobileLandscape] = useState(initialMobileState.landscape);
+  const [isMobilePortrait, setIsMobilePortrait] = useState(initialMobileState.portrait);
+
   const [maskingComplete, setMaskingComplete] = useState(false);
   const [introVisible, setIntroVisible] = useState(false);
   const [overlayDismissed, setOverlayDismissed] = useState(false);
@@ -78,7 +93,7 @@ const About = () => {
   const content = (pageContent || {
     introTitle: "Sachin Malik",
     introSubtitle: "About",
-    introText: "Strategic thinker and creative problem solver.",
+    introText: "International Business Management graduate student in Berlin with 2+ years of hands-on experience. I specialize in business analytics, strategic planning, and operations—turning data into decisions that drive sustainable growth in global markets.",
     encryptedText: "Building the future through innovation, leadership, and relentless pursuit of excellence.",
     role: "Strategist & Leader",
     focus: "Innovation & Growth",
@@ -627,20 +642,30 @@ const About = () => {
             {/* Left Content Area - Constrained to not overlap with profile card */}
             <div className={`flex flex-col ${isMobilePortrait ? 'gap-4 w-full' : 'gap-12 w-full md:w-1/2 md:max-w-[55%]'}`}>
               <div className={`flex flex-col text-left ${isMobilePortrait ? 'gap-3' : 'gap-8'}`}>
-                <div className={`animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-3'}`}>
+                <div
+                  className={`${isMobilePortrait ? '' : 'animate-text opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-1' : 'space-y-3'}`}
+                  style={isMobilePortrait ? { opacity: 1, visibility: 'visible' } : undefined}
+                >
                   <span className={`font-body tracking-widest uppercase text-muted-foreground ${isMobilePortrait ? 'text-sm' : 'text-xs md:text-sm'}`}>{content.introSubtitle}</span>
                   <h1 className={`font-display font-bold text-primary tracking-tight ${isMobilePortrait ? 'text-4xl whitespace-normal leading-tight' : 'text-4xl md:text-5xl lg:text-6xl whitespace-nowrap'}`}>
                     {content.introTitle}
                   </h1>
                 </div>
 
-                <div className={`max-w-2xl animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-4'}`}>
-                  <p className={`font-light text-foreground/80 leading-relaxed ${isMobilePortrait ? 'text-lg leading-relaxed' : 'text-base md:text-lg'}`}>
+                <div
+                  className={`max-w-2xl ${isMobilePortrait ? '' : 'animate-text opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'space-y-3' : 'space-y-4'}`}
+                  style={isMobilePortrait ? { opacity: 1, visibility: 'visible' } : undefined}
+                >
+                  <p
+                    className={`font-light text-foreground/80 leading-relaxed ${isMobilePortrait ? 'text-lg leading-relaxed' : 'text-base md:text-lg'}`}
+                    style={isMobilePortrait ? { opacity: 1, visibility: 'visible' } : undefined}
+                  >
                     {content.introText}
                   </p>
 
                   <div
                     className={`leading-relaxed font-light text-muted-foreground ${isMobilePortrait ? 'text-base min-h-[2.5rem]' : 'text-sm md:text-base min-h-[2rem]'}`}
+                    style={isMobilePortrait ? { opacity: 1, visibility: 'visible' } : undefined}
                   >
                     <EncryptedText
                       text={content.encryptedText}
@@ -668,7 +693,10 @@ const About = () => {
                 </div>
 
                 {/* Info Cards - Modern Production Layout (Left Side Only - Single Line) */}
-                <div className={`flex flex-nowrap gap-2 md:gap-3 animate-text ${isMobilePortrait ? '' : 'opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center mt-4 pb-4 overflow-x-auto' : 'mt-8 pb-2'}`}>
+                <div
+                  className={`flex flex-nowrap gap-2 md:gap-3 ${isMobilePortrait ? '' : 'animate-text opacity-0 invisible'} will-change-[transform,opacity] ${isMobilePortrait ? 'justify-center mt-4 pb-4 overflow-x-auto' : 'mt-8 pb-2'}`}
+                  style={isMobilePortrait ? { opacity: 1, visibility: 'visible' } : undefined}
+                >
                   {infoCards.map((card, index) => (
                     <div
                       key={index}

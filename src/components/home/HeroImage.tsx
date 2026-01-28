@@ -2,19 +2,30 @@ import { motion } from "framer-motion";
 import { Globe, ArrowUpRight, BarChart3, GraduationCap } from "lucide-react";
 import { useProfileCardSettings } from "@/hooks/use-cms";
 import { convertDriveUrlToDirectImageUrl } from "@/lib/image-utils";
+import { useEffect } from "react";
+
+// Default hero image URL - matches the actual image in database
+// This allows the image to start loading immediately without waiting for CMS data
+const DEFAULT_HERO_IMAGE = "https://ezdyscvjstfmilgucshr.supabase.co/storage/v1/object/public/images/hero/1768303245907-s499rs.jpeg";
 
 const HeroImage = () => {
   const { data: profileData } = useProfileCardSettings();
-  
+
+  // Preload the image as soon as component mounts
+  useEffect(() => {
+    const img = new Image();
+    img.src = DEFAULT_HERO_IMAGE;
+  }, []);
+
   // Get image from CMS or use default
   const rawImageUrl = profileData?.imageUrl || profileData?.cardImageUrl;
-  
+
   // Check if it's already a Supabase URL (no conversion needed)
   const isSupabaseUrl = rawImageUrl?.includes('/storage/v1/object/public/');
-  
+
   const heroImageUrl = rawImageUrl
     ? (isSupabaseUrl ? rawImageUrl : convertDriveUrlToDirectImageUrl(rawImageUrl))
-    : null;
+    : DEFAULT_HERO_IMAGE; // Use default instead of null
 
   return (
     <motion.div
@@ -25,24 +36,15 @@ const HeroImage = () => {
     >
       {/* Main image container */}
       <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl h-full bg-card">
-        {heroImageUrl ? (
-          <img
-            src={heroImageUrl}
-            alt="Profile Portrait"
-            className="w-full h-full object-cover object-top max-h-[50vh] md:max-h-[60vh] lg:max-h-[80vh]"
-            loading="eager"
-            decoding="async"
-            fetchPriority="high"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
-            <div className="text-center p-8">
-              <div className="text-6xl font-bold text-primary mb-4">Profile</div>
-              <p className="text-muted-foreground">Add your image in admin panel</p>
-            </div>
-          </div>
-        )}
-        
+        <img
+          src={heroImageUrl}
+          alt="Profile Portrait"
+          className="w-full h-full object-cover object-top max-h-[50vh] md:max-h-[60vh] lg:max-h-[80vh]"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
+
         {/* Signature overlay - top left */}
         <div className="absolute top-4 left-4 md:top-6 md:left-6 bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full">
           <span className="text-foreground text-sm md:text-base font-medium">Business & Strategy</span>
@@ -75,7 +77,7 @@ const HeroImage = () => {
         >
           <BarChart3 className="w-4 h-4 md:w-5 md:h-5" />
         </motion.a>
-        
+
         <motion.a
           href="#about"
           className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-card border-2 border-background overflow-hidden shadow-lg flex items-center justify-center text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"

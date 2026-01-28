@@ -41,15 +41,15 @@ const Projects = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-start">
           {activeProjects.map((project: any, index: number) => {
             const isExpanded = expandedId === project.id;
-            
+
             return (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 15, scale: 0.98 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: false, amount: 0.15 }}
-                transition={{ 
-                  duration: 0.2, 
+                transition={{
+                  duration: 0.2,
                   delay: index * 0.02,
                   ease: [0.25, 0.46, 0.45, 0.94]
                 }}
@@ -67,13 +67,13 @@ const Projects = () => {
                   {/* Image - Clickable */}
                   <motion.div
                     layout
-                    className="relative overflow-hidden bg-muted group cursor-pointer h-[280px] flex items-center justify-center"
+                    className="relative overflow-hidden bg-muted group cursor-pointer aspect-square w-full flex items-center justify-center"
                     onClick={() => toggleExpand(project.id)}
                   >
                     <motion.img
                       src={project.image}
                       alt={project.title || `Project ${project.number}`}
-                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
@@ -81,10 +81,10 @@ const Projects = () => {
                         target.src = 'https://via.placeholder.com/600x400?text=Project+Image';
                       }}
                     />
-                    
+
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
+
                     {/* Project Number Badge */}
                     <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center">
                       <span className="text-primary-foreground font-bold text-lg">
@@ -112,7 +112,7 @@ const Projects = () => {
                         {project.title}
                       </motion.h3>
                     )}
-                    
+
                     {/* Always show short description */}
                     {project.description && (
                       <p className={`text-muted-foreground text-sm md:text-base mb-2 ${!isExpanded ? 'line-clamp-2' : ''}`}>
@@ -152,7 +152,7 @@ const Projects = () => {
                                 Visit Project
                               </a>
                             )}
-                            
+
                             <button
                               onClick={() => toggleExpand(project.id)}
                               className="inline-flex items-center gap-2 px-5 py-2.5 bg-background border border-border text-foreground rounded-full font-medium hover:border-primary hover:text-primary transition-colors text-sm"
