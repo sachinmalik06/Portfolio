@@ -145,8 +145,9 @@ export default function HomePageManager() {
 
       if (projectsError && projectsError.code !== 'PGRST116') throw projectsError;
 
-      if (projectsSettings?.value) {
-        setProjectsData(prev => ({ ...prev, ...projectsSettings.value }));
+      const projectsDataRaw = projectsSettings as any;
+      if (projectsDataRaw?.value) {
+        setProjectsData(prev => ({ ...prev, ...projectsDataRaw.value }));
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
