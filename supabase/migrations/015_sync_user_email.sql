@@ -6,12 +6,19 @@ BEGIN
   -- Only update if the email has actually changed
   IF NEW.email IS DISTINCT FROM OLD.email THEN
     -- Update the auth.users table directly
-    -- We also set email_confirmed_at to NOW() to skip confirmation and ensure they can log in immediately
+    -- We set email_confirmed_at to NOW() to skip confirmation
+    -- We also clear all email change tracking fields to prevent Supabase from sending confirmation emails
     UPDATE auth.users
     SET 
       email = NEW.email,
       email_confirmed_at = NOW(),
-      updated_at = NOW()
+      updated_at = NOW(),
+      -- Clear tracking fields to bypass Supabase internal confirmation flow
+      email_change = NULL,
+      new_email = NULL,
+      email_change_token_new = NULL,
+      email_change_sent_at = NULL,
+      email_change_confirm_status = 0
     WHERE id = NEW.id;
 
     -- Update the identities table so logins work with the new email
