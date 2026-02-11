@@ -32,11 +32,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
   useEffect(() => {
     // Store original theme
     originalThemeRef.current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
-    
+
     // Force dark theme
     document.documentElement.classList.remove('light');
     document.documentElement.classList.add('dark');
-    
+
     // Cleanup: restore original theme when component unmounts
     return () => {
       if (originalThemeRef.current === 'light') {
@@ -60,49 +60,49 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     const formData = new FormData(event.currentTarget);
     const email = (formData.get("email") as string).toLowerCase();
     const password = formData.get("password") as string;
-    
+
     try {
-      // Check if user exists in users table first (must be pre-approved admin)
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email.toLowerCase())
-        .maybeSingle();  // Use maybeSingle() instead of single() to handle no results gracefully
-
-      console.log('User lookup result:', { userData, userError, email: email.toLowerCase() });
-
-      if (userError) {
-        console.error('User lookup error:', userError);
-        setError(`Database error: ${userError.message}. Please check DEBUG_AUTH_ISSUE.md`);
-        setIsLoading(false);
-        return;
-      }
-
-      if (!userData) {
-        console.error('User not found in public.users table');
-        setError("Access denied. Account not found. Only pre-approved administrators can access. Please check QUICK_FIX_ADMIN_ACCESS.md for setup instructions.");
-        setIsLoading(false);
-        return;
-      }
-
-      if (!(userData as any)?.is_admin) {
-        setError("Access denied. You don't have administrator privileges.");
-        setIsLoading(false);
-        return;
-      }
-
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      // Perform sign in first
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) throw signInError;
-      
-      // Success - auth state will update automatically
+
+      if (!authData.user) {
+        throw new Error("Unexpected error: User not found after successful sign-in.");
+      }
+
+      // After successful sign in, check if user exists in public.users and is admin
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .maybeSingle();
+
+      if (userError) {
+        console.error('User profile lookup error:', userError);
+        setError("Your account was authenticated, but we couldn't verify your admin status. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // If user doesn't exist in public.users yet, it might be because the trigger hasn't finished
+      // or they are a brand new user. For admin panel, they MUST be marked as admin.
+      if (!userData || !(userData as any)?.is_admin) {
+        // If not an admin, sign them out immediately to prevent unauthorized access
+        await supabase.auth.signOut();
+        setError("Access denied. You don't have administrator privileges. Please contact the site owner to authorize your account.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Success - auth state will update automatically and SupabaseAuthProvider will handle redirect
     } catch (err: any) {
       console.error("Error:", err);
       setError(err.message || "Invalid credentials. Please try again.");
@@ -133,7 +133,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       }}
                     />
                   ) : null}
-                  <div 
+                  <div
                     className={`text-primary font-bold text-xl ${logoSettings?.logoUrl ? 'hidden' : ''}`}
                     style={{ display: logoSettings?.logoUrl ? 'none' : 'flex' }}
                   >

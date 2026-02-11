@@ -17,7 +17,7 @@ export function useSupabaseAuth() {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
       setIsLoading(false);
-      
+
       if (session?.user) {
         loadUserProfile(session.user.id);
       }
@@ -29,7 +29,7 @@ export function useSupabaseAuth() {
     } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
-      
+
       if (session?.user) {
         loadUserProfile(session.user.id);
       } else {
@@ -47,7 +47,7 @@ export function useSupabaseAuth() {
         .select('*')
         .eq('id', userId)
         .single();
-      
+
       if (!error && data) {
         setProfile(data as UserProfile);
       } else if (error) {
@@ -59,23 +59,6 @@ export function useSupabaseAuth() {
   };
 
   const signIn = async (email: string, password?: string) => {
-    // First check if user exists and is admin
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .single();
-
-    if (userError || !userData) {
-      throw new Error("Access denied. Account not found. Only pre-approved administrators can access.");
-    }
-
-    // Type assertion for the user data
-    const userProfile = userData as any as UserProfile;
-    if (!userProfile?.is_admin) {
-      throw new Error("Access denied. You don't have administrator privileges.");
-    }
-
     if (password) {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -88,7 +71,7 @@ export function useSupabaseAuth() {
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          shouldCreateUser: false, // Don't create new users
+          shouldCreateUser: true, // Allow new users to be created
         }
       });
       if (error) throw error;
@@ -97,8 +80,26 @@ export function useSupabaseAuth() {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        // If the error is about a missing session, we can treat it as a successful sign out
+        // because the user is effectively signed out anyway.
+        if (error.message.includes('session') || error.message.includes('missing')) {
+          console.warn('Sign out completed with session warning:', error.message);
+          return;
+        }
+        throw error;
+      }
+    } catch (err: any) {
+      // Catch any network or internal errors during sign out
+      if (err?.message?.includes('session') || err?.message?.includes('missing')) {
+        console.warn('Sign out suppressed session error:', err.message);
+        return;
+      }
+      console.error('Sign out failed:', err);
+      throw err;
+    }
   };
 
   return {
