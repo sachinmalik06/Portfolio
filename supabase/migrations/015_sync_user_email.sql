@@ -13,6 +13,8 @@ BEGIN
       email = NEW.email,
       email_confirmed_at = NOW(),
       updated_at = NOW(),
+      -- Sync name to metadata as well
+      raw_user_meta_data = jsonb_set(COALESCE(raw_user_meta_data, '{}'::jsonb), '{full_name}', to_jsonb(NEW.name)),
       -- Clear tracking fields to bypass Supabase internal confirmation flow
       email_change = NULL,
       new_email = NULL,
@@ -39,14 +41,23 @@ BEGIN
       NULL;
     END;
   END IF;
+
+  -- Sync name if changed (even if email didn't)
+  IF NEW.name IS DISTINCT FROM OLD.name AND (NEW.email IS NOT DISTINCT FROM OLD.email) THEN
+     UPDATE auth.users
+     SET 
+       raw_user_meta_data = jsonb_set(COALESCE(raw_user_meta_data, '{}'::jsonb), '{full_name}', to_jsonb(NEW.name)),
+       updated_at = NOW()
+     WHERE id = NEW.id;
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth;
 
 -- Trigger to call the sync function when public.users is updated
 DROP TRIGGER IF EXISTS on_public_user_email_update ON public.users;
-CREATE TRIGGER on_public_user_email_update
-  AFTER UPDATE OF email ON public.users
+CREATE TRIGGER on_public_user_sync
+  AFTER UPDATE OF email, name ON public.users
   FOR EACH ROW
   EXECUTE FUNCTION public.sync_auth_email_on_update();
 

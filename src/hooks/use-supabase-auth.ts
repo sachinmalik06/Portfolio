@@ -87,18 +87,41 @@ export function useSupabaseAuth() {
         // because the user is effectively signed out anyway.
         if (error.message.includes('session') || error.message.includes('missing')) {
           console.warn('Sign out completed with session warning:', error.message);
-          return;
+        } else {
+          throw error;
         }
-        throw error;
       }
     } catch (err: any) {
       // Catch any network or internal errors during sign out
       if (err?.message?.includes('session') || err?.message?.includes('missing')) {
         console.warn('Sign out suppressed session error:', err.message);
-        return;
+      } else {
+        console.error('Sign out failed:', err);
+        throw err;
       }
-      console.error('Sign out failed:', err);
-      throw err;
+    } finally {
+      // ALWAYS clear local state
+      setUser(null);
+      setProfile(null);
+      setIsAuthenticated(false);
+
+      // Explicitly clear any lingering supabase items from localStorage
+      // to prevent the provider from picking up an old session on reload
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('supabase') || key.includes('sb-'))) {
+            localStorage.removeItem(key);
+            i--; // Adjust index
+          }
+        }
+      } catch (e) {
+        console.warn('Could not clear localStorage:', e);
+      }
+
+      // Use replace to avoid keeping the admin page in history
+      // and force a clean reload to the auth page with a logout flag
+      window.location.replace('/auth?logout=true');
     }
   };
 

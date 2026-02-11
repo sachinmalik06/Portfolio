@@ -188,14 +188,14 @@ export default function AdminLayout() {
                       isActive={location.pathname === "/admin"}
                       tooltip="Dashboard"
                       className={`transition-all duration-200 rounded-lg ${location.pathname === "/admin"
-                          ? 'bg-sidebar-accent/30 text-foreground font-semibold'
-                          : 'hover:bg-sidebar-accent/50 hover:translate-x-1 group-data-[collapsible=icon]:hover:translate-x-0'
+                        ? 'bg-sidebar-accent/30 text-foreground font-semibold'
+                        : 'hover:bg-sidebar-accent/50 hover:translate-x-1 group-data-[collapsible=icon]:hover:translate-x-0'
                         } active:scale-95`}
                     >
                       <Link to="/admin" className="flex items-center justify-center gap-3 w-full group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
                         <LayoutDashboard className={`w-4 h-4 shrink-0 transition-all duration-200 ${location.pathname === "/admin"
-                            ? 'text-foreground scale-110'
-                            : 'group-hover:scale-110'
+                          ? 'text-foreground scale-110'
+                          : 'group-hover:scale-110'
                           }`} />
                         <span className="font-medium transition-colors duration-200 text-foreground group-data-[collapsible=icon]:hidden">
                           Dashboard
@@ -225,8 +225,8 @@ export default function AdminLayout() {
                 <SidebarGroup key={group.id} className="px-2">
                   <SidebarGroupLabel
                     className={`flex items-center justify-between cursor-pointer rounded-md px-3 py-2.5 -mx-2 transition-all duration-200 group select-none group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:opacity-100 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 ${hasActiveItem
-                        ? 'bg-sidebar-accent/30 text-foreground'
-                        : 'hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground'
+                      ? 'bg-sidebar-accent/30 text-foreground'
+                      : 'hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground'
                       }`}
                     onClick={() => toggleGroup(group.id)}
                     onKeyDown={(e) => {
@@ -280,22 +280,22 @@ export default function AdminLayout() {
                                 isActive={isActive}
                                 tooltip={item.label}
                                 className={`pl-8 h-auto py-2.5 rounded-lg transition-all duration-200 ${isActive
-                                    ? 'bg-sidebar-accent/30 text-foreground font-semibold'
-                                    : 'hover:bg-sidebar-accent/50 hover:translate-x-1'
+                                  ? 'bg-sidebar-accent/30 text-foreground font-semibold'
+                                  : 'hover:bg-sidebar-accent/50 hover:translate-x-1'
                                   } active:scale-95`}
                               >
                                 <Link to={item.to} className="flex items-center gap-3 w-full group/item">
                                   <item.icon className={`w-4 h-4 shrink-0 transition-all duration-200 ${isActive
-                                      ? 'text-foreground scale-110'
-                                      : 'group-hover/item:scale-110 group-hover/item:text-primary'
+                                    ? 'text-foreground scale-110'
+                                    : 'group-hover/item:scale-110 group-hover/item:text-primary'
                                     }`} />
                                   <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
                                     <span className="text-sm font-medium transition-colors duration-200 text-foreground">
                                       {item.label}
                                     </span>
                                     <span className={`text-xs transition-opacity duration-200 ${isActive
-                                        ? 'text-foreground/70 opacity-100'
-                                        : 'text-muted-foreground opacity-70 group-hover/item:opacity-100'
+                                      ? 'text-foreground/70 opacity-100'
+                                      : 'text-muted-foreground opacity-70 group-hover/item:opacity-100'
                                       } truncate w-full`}>
                                       {item.description}
                                     </span>
@@ -319,7 +319,14 @@ export default function AdminLayout() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={() => signOut()}
+                  onClick={async () => {
+                    try {
+                      await signOut();
+                    } catch (err) {
+                      console.error("Logout error:", err);
+                      window.location.href = "/auth";
+                    }
+                  }}
                   className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-200 hover:translate-x-1 active:scale-95 w-full"
                 >
                   <LogOut className="w-4 h-4 transition-transform duration-200 group-hover:rotate-12" />

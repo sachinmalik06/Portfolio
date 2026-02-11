@@ -143,10 +143,10 @@ export default function Settings() {
           });
 
           await signOut();
-          toast.success("Profile updated successfully! Logout initiated...");
+          toast.success("Profile updated successfully!");
         } catch (err) {
           console.error("Sign out after email update failed:", err);
-          // If sign out fails, force redirect to auth
+          // Fallback redirect if signOut doesn't handle it
           window.location.href = "/auth";
         }
       } else {
@@ -206,6 +206,9 @@ export default function Settings() {
       }
 
       toast.success("Password updated successfully!");
+
+      // Force a session refresh to be safe
+      await supabase.auth.getSession();
 
       // Reset form
       setCredentials({

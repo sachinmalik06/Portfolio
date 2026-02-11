@@ -50,7 +50,9 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    const isLogout = new URLSearchParams(window.location.search).get("logout") === "true";
+
+    if (!authLoading && isAuthenticated && !isLogout) {
       const redirect = redirectAfterAuth || "/admin";
       navigate(redirect);
     }
@@ -58,6 +60,13 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
 
   const handlePasswordSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Clear the logout flag from URL to allow redirection after successful login
+    if (window.location.search.includes('logout=true')) {
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+
     setIsLoading(true);
     setError(null);
 
