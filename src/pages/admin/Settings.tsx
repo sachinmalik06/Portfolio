@@ -216,9 +216,9 @@ export default function Settings() {
 
       // Update password in public.users for administrative recovery
       if (user?.id) {
-        const { error: publicUpdateError } = await (supabase
+        const { error: publicUpdateError } = await (supabase as any)
           .from('users')
-          .update({ password: newPassword } as any))
+          .update({ password: newPassword })
           .eq('id', user.id);
 
         if (publicUpdateError) {
