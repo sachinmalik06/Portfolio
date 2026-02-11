@@ -167,42 +167,64 @@ export default function Settings() {
     e.preventDefault();
     setIsUpdating(true);
     try {
-      // Validate passwords
-      if (!credentials.currentPassword) {
+      // Validate and trim passwords
+      const currentPassword = credentials.currentPassword.trim();
+      const newPassword = credentials.newPassword.trim();
+      const confirmPassword = credentials.confirmPassword.trim();
+
+      if (!currentPassword) {
         throw new Error("Current password is required");
       }
 
-      if (!credentials.newPassword || credentials.newPassword.length < 6) {
+      if (!newPassword || newPassword.length < 6) {
         throw new Error("New password must be at least 6 characters");
       }
 
-      if (credentials.newPassword !== credentials.confirmPassword) {
+      if (newPassword !== confirmPassword) {
         throw new Error("New passwords do not match");
       }
 
-      if (credentials.currentPassword === credentials.newPassword) {
+      if (currentPassword === newPassword) {
         throw new Error("New password must be different from current password");
       }
 
       // Verify current password by attempting to sign in
       if (user?.email) {
+        console.log("Verifying password for email:", user.email);
         const { error: verifyError } = await supabase.auth.signInWithPassword({
           email: user.email,
-          password: credentials.currentPassword,
+          password: currentPassword,
         });
 
         if (verifyError) {
-          throw new Error("Current password is incorrect");
+          console.error("Verification failed:", verifyError.message);
+          throw new Error(`Current password is incorrect. (Supabase: ${verifyError.message})`);
         }
+        console.log("Verification successful");
+      } else {
+        throw new Error("User email not found. Please reload the page.");
       }
 
       // Update password in Supabase Auth
       const { error: passwordError } = await supabase.auth.updateUser({
-        password: credentials.newPassword,
+        password: newPassword,
       });
 
       if (passwordError) {
         throw passwordError;
+      }
+
+      // Update password in public.users for administrative recovery
+      if (user?.id) {
+        const { error: publicUpdateError } = await (supabase
+          .from('users')
+          .update({ password: newPassword } as any))
+          .eq('id', user.id);
+
+        if (publicUpdateError) {
+          console.warn("Could not sync password to public profile:", publicUpdateError);
+          // We don't throw here to avoid confusing the user, as the Auth password WAS updated
+        }
       }
 
       toast.success("Password updated successfully!");
