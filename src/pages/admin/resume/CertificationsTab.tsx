@@ -6,8 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, GripVertical, Award } from "lucide-react";
+import { Plus, Pencil, Trash2, GripVertical, Award, Image as ImageIcon, Link as LinkIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
+import ImageUpload from "@/components/admin/ImageUpload";
 import {
     DndContext,
     closestCenter,
@@ -53,9 +54,19 @@ function SortableRow({ entry, onEdit, onDelete, isDeleting }: { entry: any; onEd
                     <GripVertical className="w-4 h-4 text-muted-foreground" />
                 </div>
             </TableCell>
+            <TableCell>
+                {entry.image_url ? (
+                    <img src={entry.image_url} alt={entry.name} className="w-10 h-10 rounded object-cover border border-white/10" />
+                ) : (
+                    <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center border border-white/5">
+                        <ImageIcon className="w-5 h-5 text-primary/40" />
+                    </div>
+                )}
+            </TableCell>
             <TableCell className="font-bold">{entry.name}</TableCell>
             <TableCell>{entry.issuer}</TableCell>
             <TableCell>{entry.year}</TableCell>
+            <TableCell className="text-muted-foreground text-sm font-mono">{entry.credential_id || "-"}</TableCell>
             <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="icon" onClick={() => onEdit(entry)}>
@@ -79,6 +90,8 @@ export default function CertificationsTab() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEntry, setEditingEntry] = useState<any>(null);
     const [entriesList, setEntriesList] = useState<any[]>([]);
+    const [imageUrl, setImageUrl] = useState("");
+    const [imageMode, setImageMode] = useState<"url" | "upload">("url");
 
     useEffect(() => {
         if (entries && entries.length > 0) {
@@ -87,6 +100,13 @@ export default function CertificationsTab() {
             setEntriesList([]);
         }
     }, [entries]);
+
+    useEffect(() => {
+        if (isDialogOpen) {
+            setImageUrl(editingEntry?.image_url || "");
+            setImageMode("url");
+        }
+    }, [isDialogOpen, editingEntry]);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -122,6 +142,8 @@ export default function CertificationsTab() {
             name: formData.get("name") as string,
             issuer: formData.get("issuer") as string,
             year: formData.get("year") as string,
+            credential_id: formData.get("credential_id") as string,
+            image_url: imageUrl,
             description: formData.get("description") as string,
             credential_url: formData.get("credential_url") as string,
             active: formData.get("active") === "on",
@@ -138,7 +160,14 @@ export default function CertificationsTab() {
             }
             setIsDialogOpen(false);
             setEditingEntry(null);
+            setImageUrl("");
+
+            // Reload to refresh the stale cache from useSupabaseQuery
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (error) {
+            console.error("Save error:", error);
             toast.error("Failed to save");
         }
     };
@@ -148,6 +177,9 @@ export default function CertificationsTab() {
             try {
                 await deleteEntry(id);
                 toast.success("Deleted");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             } catch (error) {
                 toast.error("Failed to delete");
             }
@@ -171,9 +203,11 @@ export default function CertificationsTab() {
                             <TableHeader>
                                 <TableRow className="hover:bg-white/5 border-white/5">
                                     <TableHead className="w-[50px]"></TableHead>
+                                    <TableHead className="w-[60px]">Icon</TableHead>
                                     <TableHead>Name</TableHead>
                                     <TableHead>Issuer</TableHead>
                                     <TableHead>Year</TableHead>
+                                    <TableHead>Credential ID</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -196,11 +230,15 @@ export default function CertificationsTab() {
             </DndContext>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{editingEntry ? "Edit Certification" : "Add Certification"}</DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                    <form
+                        key={editingEntry?.id || "new-cert"}
+                        onSubmit={handleSubmit}
+                        className="space-y-4 mt-4"
+                    >
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Certification Name</label>
                             <Input name="name" defaultValue={editingEntry?.name} required />
@@ -215,6 +253,59 @@ export default function CertificationsTab() {
                                 <label className="text-sm font-medium">Year</label>
                                 <Input name="year" defaultValue={editingEntry?.year} required placeholder="2023" />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Credential ID (Optional)</label>
+                            <Input name="credential_id" defaultValue={editingEntry?.credential_id} placeholder="ID-123456" />
+                        </div>
+
+                        <div className="space-y-3 pt-2">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">Certification Logo</label>
+                                <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                                    <Button
+                                        type="button"
+                                        variant={imageMode === "url" ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => setImageMode("url")}
+                                        className="h-7 px-2 text-xs gap-1"
+                                    >
+                                        <LinkIcon className="w-3 h-3" />
+                                        URL
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={imageMode === "upload" ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => setImageMode("upload")}
+                                        className="h-7 px-2 text-xs gap-1"
+                                    >
+                                        <Upload className="w-3 h-3" />
+                                        Upload
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {imageMode === "url" ? (
+                                <div className="space-y-2">
+                                    <Input
+                                        name="image_url_input"
+                                        value={imageUrl}
+                                        onChange={(e) => setImageUrl(e.target.value)}
+                                        placeholder="https://example.com/logo.png"
+                                    />
+                                    <p className="text-xs text-muted-foreground">URL of the certification logo</p>
+                                </div>
+                            ) : (
+                                <ImageUpload
+                                    label=""
+                                    currentImageUrl={imageUrl}
+                                    onImageUploaded={setImageUrl}
+                                    folder="certifications"
+                                    description="PNG, JPG, WEBP (max 2MB)"
+                                />
+                            )}
                         </div>
 
                         <div className="space-y-2">

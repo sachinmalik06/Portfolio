@@ -128,7 +128,6 @@ export default function AdminLayout() {
       items: [
         { icon: User, label: "About Page", to: "/admin/pages?tab=about", description: "About content & timeline" },
         { icon: Layers, label: "Expertise", to: "/admin/expertise", description: "Expertise cards" },
-        { icon: Award, label: "Certifications", to: "/admin/certifications", description: "Certifications & achievements" },
         { icon: FileText, label: "Resume Page", to: "/admin/resume", description: "Experience, Skills, & Stats" },
         { icon: FileText, label: "Contact Page", to: "/admin/pages?tab=contact", description: "Contact info" },
         { icon: Mail, label: "Contact Submissions", to: "/admin/contact", description: "Form submissions" },

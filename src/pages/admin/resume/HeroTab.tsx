@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { useResumeHero, useUpdateResumeHero } from "@/hooks/use-cms";
+import { useResumeHero, useUpdateResumeHero, useCreateResumeHero } from "@/hooks/use-cms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, Plus, X } from "lucide-react";
+import { Save, Plus, X, Image as ImageIcon, Link as LinkIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 export default function HeroTab() {
     const { data: heroDataRaw, isLoading } = useResumeHero();
     const heroData = heroDataRaw as any;
     const { mutate: updateHero, isLoading: isUpdating } = useUpdateResumeHero();
+    const { mutate: createHero, isLoading: isCreating } = useCreateResumeHero();
 
     const [formData, setFormData] = useState({
         name: "",
@@ -21,11 +23,13 @@ export default function HeroTab() {
         location: "",
         professional_summary: "",
         resume_url: "",
+        image_url: "",
     });
 
     const [socialLinks, setSocialLinks] = useState<any[]>([]);
     const [summaryTags, setSummaryTags] = useState<string[]>([]);
     const [newTag, setNewTag] = useState("");
+    const [imageMode, setImageMode] = useState<"url" | "upload">("url");
 
     useEffect(() => {
         if (heroData) {
@@ -38,9 +42,11 @@ export default function HeroTab() {
                 location: heroData.location || "",
                 professional_summary: heroData.professional_summary || "",
                 resume_url: heroData.resume_url || "",
+                image_url: heroData.image_url || "",
             });
             setSocialLinks(heroData.social_links || []);
             setSummaryTags(heroData.summary_tags || []);
+            setImageMode("url");
         }
     }, [heroData]);
 
@@ -53,11 +59,20 @@ export default function HeroTab() {
         }
 
         try {
-            await updateHero(heroData.id, {
-                ...formData,
-                social_links: socialLinks,
-                summary_tags: summaryTags,
-            });
+            if (heroData?.id) {
+                await updateHero(heroData.id, {
+                    ...formData,
+                    social_links: socialLinks,
+                    summary_tags: summaryTags,
+                });
+            } else {
+                await createHero({
+                    ...formData,
+                    social_links: socialLinks,
+                    summary_tags: summaryTags,
+                    active: true
+                });
+            }
             toast.success("Hero section updated successfully!");
         } catch (error) {
             toast.error("Failed to update hero section");
@@ -108,6 +123,53 @@ export default function HeroTab() {
                 <Card className="bg-card/50 border-white/5">
                     <CardContent className="p-6 space-y-4">
                         <h4 className="font-semibold text-md mb-4">Basic Information</h4>
+
+                        <div className="space-y-4 mb-6">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">Profile Picture</label>
+                                <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                                    <Button
+                                        type="button"
+                                        variant={imageMode === "url" ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => setImageMode("url")}
+                                        className="h-7 px-2 text-xs gap-1"
+                                    >
+                                        <LinkIcon className="w-3 h-3" />
+                                        URL
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={imageMode === "upload" ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => setImageMode("upload")}
+                                        className="h-7 px-2 text-xs gap-1"
+                                    >
+                                        <Upload className="w-3 h-3" />
+                                        Upload
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {imageMode === "url" ? (
+                                <div className="space-y-2">
+                                    <Input
+                                        value={formData.image_url}
+                                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                                        placeholder="https://example.com/profile.jpg"
+                                    />
+                                    <p className="text-xs text-muted-foreground">Direct URL to your professional profile picture</p>
+                                </div>
+                            ) : (
+                                <ImageUpload
+                                    label=""
+                                    currentImageUrl={formData.image_url}
+                                    onImageUploaded={(url) => setFormData({ ...formData, image_url: url })}
+                                    folder="profile"
+                                    description="Professional headshot. PNG, JPG, WEBP (max 5MB)"
+                                />
+                            )}
+                        </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -181,10 +243,10 @@ export default function HeroTab() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Resume URL (PDF link)</label>
                             <Input
-                                type="url"
+                                type="text"
                                 value={formData.resume_url}
                                 onChange={(e) => setFormData({ ...formData, resume_url: e.target.value })}
-                                placeholder="https://example.com/resume.pdf"
+                                placeholder="/resume.pdf (if file is in public folder) or https://example.com/resume.pdf"
                             />
                         </div>
                     </CardContent>
@@ -295,9 +357,9 @@ export default function HeroTab() {
 
                 {/* Save Button */}
                 <div className="flex justify-end">
-                    <Button type="submit" disabled={isUpdating} size="lg">
+                    <Button type="submit" disabled={isUpdating || isCreating} size="lg">
                         <Save className="w-4 h-4 mr-2" />
-                        {isUpdating ? "Saving..." : "Save Changes"}
+                        {isUpdating || isCreating ? "Saving..." : "Save Changes"}
                     </Button>
                 </div>
             </form>

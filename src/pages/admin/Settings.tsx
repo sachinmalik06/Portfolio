@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { User, Mail, Lock, Eye, EyeOff, Image as ImageIcon } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Image as ImageIcon, Link as LinkIcon, Upload } from "lucide-react";
+import ImageUpload from "@/components/admin/ImageUpload";
 import { useAuth } from "@/components/providers/SupabaseAuthProvider";
 import { supabase } from "@/lib/supabase";
 import { useProfileCardSettings, useUpdateProfileCardSettings, useLogoSettings, useUpdateLogoSettings } from "@/hooks/use-cms";
@@ -39,6 +40,8 @@ export default function Settings() {
   const [logoUrl, setLogoUrl] = useState("");
   const [logoText, setLogoText] = useState("CS");
   const [faviconUrl, setFaviconUrl] = useState("");
+  const [logoMode, setLogoMode] = useState<"url" | "upload">("url");
+  const [faviconMode, setFaviconMode] = useState<"url" | "upload">("url");
 
   // Initialize form when settings load
   useEffect(() => {
@@ -53,6 +56,8 @@ export default function Settings() {
       setLogoUrl(logoSettings.logoUrl || "");
       setLogoText(logoSettings.logoText || "CS");
       setFaviconUrl(logoSettings.faviconUrl || "");
+      setLogoMode("url");
+      setFaviconMode("url");
     }
   }, [logoSettings]);
 
@@ -497,18 +502,56 @@ export default function Settings() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleUpdateLogo} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="logoUrl">Logo Image URL</Label>
-                  <Input
-                    id="logoUrl"
-                    type="url"
-                    value={logoUrl}
-                    onChange={(e) => setLogoUrl(e.target.value)}
-                    placeholder="https://example.com/logo.svg"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    URL to your logo image (SVG, PNG, or JPG). This will be used in the footer, admin panel, and auth page. If the image fails to load, the logo text will be used as a fallback. Google Drive sharing URLs are automatically converted to direct image URLs.
-                  </p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="logoUrl">Logo Image URL</Label>
+                    <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                      <Button
+                        type="button"
+                        variant={logoMode === "url" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setLogoMode("url")}
+                        className="h-7 px-2 text-xs gap-1"
+                      >
+                        <LinkIcon className="w-3 h-3" />
+                        URL
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={logoMode === "upload" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setLogoMode("upload")}
+                        className="h-7 px-2 text-xs gap-1"
+                      >
+                        <Upload className="w-3 h-3" />
+                        Upload
+                      </Button>
+                    </div>
+                  </div>
+
+                  {logoMode === "url" ? (
+                    <div className="space-y-2">
+                      <Input
+                        id="logoUrl"
+                        type="url"
+                        value={logoUrl}
+                        onChange={(e) => setLogoUrl(e.target.value)}
+                        placeholder="https://example.com/logo.svg"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        URL to your logo image (SVG, PNG, or JPG).
+                      </p>
+                    </div>
+                  ) : (
+                    <ImageUpload
+                      label=""
+                      currentImageUrl={logoUrl}
+                      onImageUploaded={setLogoUrl}
+                      folder="settings"
+                      description="Logo image. PNG, WEBP, or SVG."
+                    />
+                  )}
+
                   {logoUrl && (
                     <div className="mt-2 p-4 border border-white/10 rounded-lg bg-background/50">
                       <p className="text-xs text-muted-foreground mb-2">Preview:</p>
@@ -557,18 +600,55 @@ export default function Settings() {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="faviconUrl">Favicon URL (Optional)</Label>
-                  <Input
-                    id="faviconUrl"
-                    type="url"
-                    value={faviconUrl}
-                    onChange={(e) => setFaviconUrl(e.target.value)}
-                    placeholder="https://example.com/favicon.ico"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    URL to your favicon (the small icon shown in browser tabs). Common formats: .ico, .png, .svg. Leave empty to use the default.
-                  </p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="faviconUrl">Favicon URL (Optional)</Label>
+                    <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                      <Button
+                        type="button"
+                        variant={faviconMode === "url" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setFaviconMode("url")}
+                        className="h-7 px-2 text-xs gap-1"
+                      >
+                        <LinkIcon className="w-3 h-3" />
+                        URL
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={faviconMode === "upload" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setFaviconMode("upload")}
+                        className="h-7 px-2 text-xs gap-1"
+                      >
+                        <Upload className="w-3 h-3" />
+                        Upload
+                      </Button>
+                    </div>
+                  </div>
+
+                  {faviconMode === "url" ? (
+                    <div className="space-y-2">
+                      <Input
+                        id="faviconUrl"
+                        type="url"
+                        value={faviconUrl}
+                        onChange={(e) => setFaviconUrl(e.target.value)}
+                        placeholder="https://example.com/favicon.ico"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        URL to your favicon icon.
+                      </p>
+                    </div>
+                  ) : (
+                    <ImageUpload
+                      label=""
+                      currentImageUrl={faviconUrl}
+                      onImageUploaded={setFaviconUrl}
+                      folder="settings"
+                      description="Favicon. ICO or PNG recommended."
+                    />
+                  )}
                 </div>
 
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">

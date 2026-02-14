@@ -320,14 +320,18 @@ const Resume = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-wrap items-center justify-center gap-4"
           >
-            <motion.button
+            <motion.a
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              href={heroData?.resume_url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              download="Resume.pdf"
               className="group flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
             >
               <Download className="h-5 w-5" />
               Download Resume
-            </motion.button>
+            </motion.a>
             <div className="flex items-center gap-3">
               {socialLinks.map((link: any, index: number) => {
                 const Icon = iconMap[link.icon_name?.toLowerCase()] || Globe;
@@ -696,8 +700,12 @@ const Resume = () => {
                   className="group rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
                 >
                   <div className="mb-3 flex items-start justify-between">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <Award className="h-6 w-6 text-primary" />
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors overflow-hidden border border-white/5">
+                      {cert.image_url ? (
+                        <img src={cert.image_url} alt={cert.name} className="h-full w-full object-contain p-1" />
+                      ) : (
+                        <Award className="h-6 w-6 text-primary" />
+                      )}
                     </div>
                     <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
                       {cert.year}
@@ -707,7 +715,13 @@ const Resume = () => {
                     {cert.name}
                   </h3>
                   <p className="mb-2 text-sm font-medium text-primary/80">{cert.issuer}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{cert.description}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">{cert.description}</p>
+                  {cert.credential_id && (
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 font-mono mt-auto pt-2 border-t border-white/5">
+                      <Zap className="h-3 w-3" />
+                      ID: {cert.credential_id}
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>

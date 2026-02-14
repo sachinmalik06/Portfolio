@@ -6,8 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, GripVertical, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import ImageUpload from "@/components/admin/ImageUpload";
 import {
   DndContext,
   closestCenter,
@@ -129,14 +130,14 @@ export default function ExpertiseManager() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    
+
     // Get images string and handle empty/whitespace
     const imagesString = imagesInput || (formData.get("images") as string) || "";
     const imagesArray = imagesString
       .split(",")
       .map(s => s.trim())
       .filter(Boolean); // Remove empty strings
-    
+
     const data = {
       title: formData.get("title") as string,
       description: formData.get("description") as string,
@@ -284,7 +285,7 @@ export default function ExpertiseManager() {
                 <Input name="icon" defaultValue={editingCard?.icon} placeholder="e.g. Target, Users" required />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Short Description</label>
               <Textarea name="description" defaultValue={editingCard?.description} required />
@@ -292,12 +293,12 @@ export default function ExpertiseManager() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Long Description (Modal)</label>
-              <Textarea 
-                name="longDescription" 
-                defaultValue={editingCard?.long_description || editingCard?.longDescription} 
-                className="h-32" 
+              <Textarea
+                name="longDescription"
+                defaultValue={editingCard?.long_description || editingCard?.longDescription}
+                className="h-32"
                 placeholder="This detailed description appears in the modal when users click on the card..."
-                required 
+                required
               />
               <p className="text-xs text-muted-foreground">
                 This content appears in the detailed modal view when users click on the card.
@@ -309,65 +310,80 @@ export default function ExpertiseManager() {
               <Input name="skills" defaultValue={editingCard?.skills?.join(", ")} placeholder="Strategy, Planning, Analysis" />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Image URLs (comma separated)</label>
-              <Input 
-                name="images" 
-                value={imagesInput}
-                onChange={(e) => setImagesInput(e.target.value)}
-                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg" 
-              />
-              <p className="text-xs text-muted-foreground">
-                First image appears in the modal when clicking the card. First 2 images appear as floating previews on hover (desktop only).
-              </p>
-              {/* Real-time preview of images as user types */}
-              {imagesInput && (
-                (() => {
-                  const imageUrls = imagesInput
-                    .split(",")
-                    .map(s => s.trim())
-                    .filter(Boolean)
-                    .slice(0, 2); // Show max 2 previews
-                  
-                  if (imageUrls.length > 0) {
-                    return (
-                      <div className="mt-2 grid grid-cols-2 gap-2">
-                        {imageUrls.map((img: string, idx: number) => (
-                          <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-white/10 bg-white/5">
-                            <img 
-                              src={img} 
-                              alt={`Preview ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  parent.innerHTML = `
-                                    <div class="w-full h-full flex items-center justify-center text-xs text-muted-foreground p-2 text-center">
-                                      Image failed to load
-                                    </div>
-                                  `;
-                                }
-                              }}
-                              onLoad={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.opacity = '1';
-                              }}
-                              style={{ opacity: 0, transition: 'opacity 0.3s' }}
-                            />
-                            <div className="absolute top-1 right-1 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
-                              {idx === 0 ? 'Modal' : 'Hover'}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    );
+            <div className="space-y-4">
+              <label className="text-sm font-medium">Card Images</label>
+              <ImageUpload
+                label="Upload Image"
+                onImageUploaded={(url) => {
+                  if (url) {
+                    setImagesInput(prev => prev ? `${prev}, ${url}` : url);
                   }
-                  return null;
-                })()
-              )}
+                }}
+                folder="expertise"
+                description="Upload an image to add it to the list below."
+              />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Image URLs (comma separated)</label>
+                <Input
+                  name="images"
+                  value={imagesInput}
+                  onChange={(e) => setImagesInput(e.target.value)}
+                  placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                />
+                <p className="text-xs text-muted-foreground">
+                  First image appears in the modal when clicking the card. First 2 images appear as floating previews on hover (desktop only).
+                </p>
+              </div>
             </div>
+
+            {/* Real-time preview of images as user types */}
+            {imagesInput && (
+              (() => {
+                const imageUrls = imagesInput
+                  .split(",")
+                  .map(s => s.trim())
+                  .filter(Boolean)
+                  .slice(0, 2); // Show max 2 previews
+
+                if (imageUrls.length > 0) {
+                  return (
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {imageUrls.map((img: string, idx: number) => (
+                        <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-white/10 bg-white/5">
+                          <img
+                            src={img}
+                            alt={`Preview ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="w-full h-full flex items-center justify-center text-xs text-muted-foreground p-2 text-center">
+                                    Image failed to load
+                                  </div>
+                                `;
+                              }
+                            }}
+                            onLoad={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.opacity = '1';
+                            }}
+                            style={{ opacity: 0, transition: 'opacity 0.3s' }}
+                          />
+                          <div className="absolute top-1 right-1 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
+                            {idx === 0 ? 'Modal' : 'Hover'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+                return null;
+              })()
+            )}
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Order</label>

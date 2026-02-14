@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { BarChart3, Users, Target, Layers, Brain, Globe } from "lucide-react";
-import { useExpertiseCards, useCertifications } from "@/hooks/use-cms";
+import { useExpertiseCards, useResumeCertifications } from "@/hooks/use-cms";
 
 // Icon mapping for CMS data
 const iconMap: { [key: string]: any } = {
@@ -53,20 +53,20 @@ const defaultSkills = [
 
 const Expertise = () => {
   const { data: expertiseData, isLoading } = useExpertiseCards();
-  const { data: certificationsData, isLoading: certsLoading, error: certsError } = useCertifications();
-  
+  const { data: certificationsData, isLoading: certsLoading, error: certsError } = useResumeCertifications();
+
   // Debug logging
   console.log('Certifications Data:', certificationsData);
   console.log('Certifications Loading:', certsLoading);
   console.log('Certifications Error:', certsError);
-  
+
   // Use CMS data if available, otherwise use defaults
-  const expertiseItems = expertiseData && expertiseData.length > 0 
+  const expertiseItems = expertiseData && expertiseData.length > 0
     ? expertiseData.map((card: any) => ({
-        icon: card.icon || "Target",
-        title: card.title,
-        description: card.description,
-      }))
+      icon: card.icon || "Target",
+      title: card.title,
+      description: card.description,
+    }))
     : defaultExpertiseItems;
 
   // Default certifications to always show
@@ -120,15 +120,15 @@ const Expertise = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16">
           {expertiseItems.map((item: any, index: number) => {
             const IconComponent = iconMap[item.icon] || Target;
-            
+
             return (
               <motion.div
                 key={item.title}
                 className="group p-5 md:p-8 bg-background rounded-2xl border border-border hover:border-primary transition-all duration-300 cursor-pointer"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.25, delay: index * 0.03 }}
+                viewport={{ once: false, amount: 0.3 }}
+                transition={{ duration: 0.25, delay: index * 0.03 }}
                 whileHover={{ y: -8, scale: 1.02 }}
               >
                 <motion.div
@@ -138,11 +138,11 @@ const Expertise = () => {
                 >
                   <IconComponent className="w-5 h-5 md:w-6 md:h-6" />
                 </motion.div>
-                
+
                 <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3" style={{ color: '#a77d44' }}>
                   {item.title}
                 </h3>
-                
+
                 <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
                   {item.description}
                 </p>
@@ -162,7 +162,7 @@ const Expertise = () => {
           <h3 className="text-lg md:text-xl font-bold text-foreground mb-6 md:mb-8 text-center">
             Certifications & Achievements
           </h3>
-          
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {certifications.map((cert: any, index: number) => (
               <motion.div
@@ -180,13 +180,17 @@ const Expertise = () => {
                 }}
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden border border-border/50 group-hover:bg-primary/20 transition-colors">
+                    {cert.image_url ? (
+                      <img src={cert.image_url} alt={cert.name} className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{cert.date}</span>
+                    <span className="text-xs text-muted-foreground">{cert.year || cert.date}</span>
                     {cert.credential_url && (
                       <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -194,18 +198,24 @@ const Expertise = () => {
                     )}
                   </div>
                 </div>
-                
-                <h4 className="text-base md:text-lg font-bold text-foreground mb-1">
-                  {cert.title}
+
+                <h4 className="text-base md:text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+                  {cert.name || cert.title}
                 </h4>
-                
+
                 <p className="text-sm font-medium text-primary mb-2">
                   {cert.issuer}
                 </p>
-                
+
                 <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
                   {cert.description}
                 </p>
+
+                {cert.credential_id && (
+                  <div className="mt-3 pt-3 border-t border-border flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">ID: {cert.credential_id}</span>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>

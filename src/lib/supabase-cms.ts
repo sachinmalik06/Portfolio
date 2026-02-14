@@ -569,54 +569,6 @@ export async function updateHomeProjectsSettings(settings: any) {
   }
 }
 
-// --- CERTIFICATIONS ---
-export async function getCertifications(includeInactive = false) {
-  let query = supabase
-    .from('certifications')
-    .select('*')
-    .order('order_index', { ascending: true });
-
-  if (!includeInactive) {
-    query = query.eq('is_active', true);
-  }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
-}
-
-export async function createCertification(certification: Database['public']['Tables']['certifications']['Insert']) {
-  const { data, error } = await supabase
-    .from('certifications')
-    .insert(certification as any)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
-}
-
-export async function updateCertification(
-  id: string,
-  updates: Database['public']['Tables']['certifications']['Update']
-) {
-  const { data, error } = await ((supabase
-    .from('certifications') as any)
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single());
-  if (error) throw error;
-  return data;
-}
-
-export async function deleteCertification(id: string) {
-  const { error } = await supabase
-    .from('certifications')
-    .delete()
-    .eq('id', id);
-  if (error) throw error;
-}
-
 
 // --- RESUME CMS ---
 
@@ -952,6 +904,16 @@ export async function updateResumeHero(id: string, updates: any) {
     .from('resume_hero') as any)
     .update(updates)
     .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function createResumeHero(hero: any) {
+  const { data, error } = await supabase
+    .from('resume_hero')
+    .insert(hero)
     .select()
     .single();
   if (error) throw error;

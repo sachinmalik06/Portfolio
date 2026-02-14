@@ -7,13 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useMetaTags, useUpdateMetaTags } from "@/hooks/use-cms";
-import { Globe, Image as ImageIcon, Search, Share2 } from "lucide-react";
+import { Globe, Image as ImageIcon, Search, Share2, Link as LinkIcon, Upload } from "lucide-react";
+import ImageUpload from "@/components/admin/ImageUpload";
 import { supabase } from "@/lib/supabase";
 
 export default function MetaTagsManager() {
   const { data: metaTags, isLoading } = useMetaTags();
   const { mutate: updateMetaTags, isLoading: isUpdating } = useUpdateMetaTags();
-  
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -38,6 +39,8 @@ export default function MetaTagsManager() {
       image: ""
     }
   });
+  const [ogImageMode, setOgImageMode] = useState<"url" | "upload">("url");
+  const [twitterImageMode, setTwitterImageMode] = useState<"url" | "upload">("url");
 
   useEffect(() => {
     if (metaTags) {
@@ -65,6 +68,8 @@ export default function MetaTagsManager() {
           image: metaTags.twitter?.image || ""
         }
       });
+      setOgImageMode("url");
+      setTwitterImageMode("url");
     }
   }, [metaTags]);
 
@@ -107,11 +112,11 @@ export default function MetaTagsManager() {
         .select('value')
         .eq('key', 'profile_card')
         .single();
-      
+
       if (error) throw error;
-      
+
       const imageUrl = (data as any)?.value?.imageUrl || (data as any)?.value?.cardImageUrl;
-      
+
       if (imageUrl) {
         setFormData(prev => ({
           ...prev,
@@ -266,27 +271,65 @@ export default function MetaTagsManager() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="og.image">Image URL</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="og.image"
-                    value={formData.og.image}
-                    onChange={(e) => handleChange('og.image', e.target.value)}
-                    placeholder="https://cinematicstrategy.com/og-image.png"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={useProfileImage}
-                    className="whitespace-nowrap"
-                  >
-                    <ImageIcon className="w-4 h-4 mr-2" />
-                    Use Profile Image
-                  </Button>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="og.image">Image URL</Label>
+                  <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                    <Button
+                      type="button"
+                      variant={ogImageMode === "url" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setOgImageMode("url")}
+                      className="h-7 px-2 text-xs gap-1"
+                    >
+                      <LinkIcon className="w-3 h-3" />
+                      URL
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={ogImageMode === "upload" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setOgImageMode("upload")}
+                      className="h-7 px-2 text-xs gap-1"
+                    >
+                      <Upload className="w-3 h-3" />
+                      Upload
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Full URL to an image (1200x630px recommended for best results).</p>
+
+                {ogImageMode === "url" ? (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Input
+                        id="og.image"
+                        value={formData.og.image}
+                        onChange={(e) => handleChange('og.image', e.target.value)}
+                        placeholder="https://cinematicstrategy.com/og-image.png"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={useProfileImage}
+                        className="whitespace-nowrap"
+                      >
+                        <ImageIcon className="w-4 h-4 mr-2" />
+                        Use Profile Image
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">URL to an image (1200x630px recommended).</p>
+                  </div>
+                ) : (
+                  <ImageUpload
+                    label=""
+                    currentImageUrl={formData.og.image}
+                    onImageUploaded={(url) => handleChange('og.image', url)}
+                    folder="seo"
+                    description="OG Image. 1200x630px JPG or PNG."
+                  />
+                )}
+
                 {formData.og.image && (
                   <div className="mt-2">
                     <img src={formData.og.image} alt="OG Preview" className="max-w-xs rounded border border-border/50" onError={(e) => {
@@ -358,27 +401,65 @@ export default function MetaTagsManager() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="twitter.image">Image URL</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="twitter.image"
-                    value={formData.twitter.image}
-                    onChange={(e) => handleChange('twitter.image', e.target.value)}
-                    placeholder="https://cinematicstrategy.com/twitter-image.png"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={useProfileImage}
-                    className="whitespace-nowrap"
-                  >
-                    <ImageIcon className="w-4 h-4 mr-2" />
-                    Use Profile Image
-                  </Button>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="twitter.image">Image URL</Label>
+                  <div className="flex gap-2 bg-muted/50 p-1 rounded-lg">
+                    <Button
+                      type="button"
+                      variant={twitterImageMode === "url" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setTwitterImageMode("url")}
+                      className="h-7 px-2 text-xs gap-1"
+                    >
+                      <LinkIcon className="w-3 h-3" />
+                      URL
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={twitterImageMode === "upload" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setTwitterImageMode("upload")}
+                      className="h-7 px-2 text-xs gap-1"
+                    >
+                      <Upload className="w-3 h-3" />
+                      Upload
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Full URL to an image (1200x675px recommended).</p>
+
+                {twitterImageMode === "url" ? (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Input
+                        id="twitter.image"
+                        value={formData.twitter.image}
+                        onChange={(e) => handleChange('twitter.image', e.target.value)}
+                        placeholder="https://cinematicstrategy.com/twitter-image.png"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={useProfileImage}
+                        className="whitespace-nowrap"
+                      >
+                        <ImageIcon className="w-4 h-4 mr-2" />
+                        Use Profile Image
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">URL to an image (1200x675px recommended).</p>
+                  </div>
+                ) : (
+                  <ImageUpload
+                    label=""
+                    currentImageUrl={formData.twitter.image}
+                    onImageUploaded={(url) => handleChange('twitter.image', url)}
+                    folder="seo"
+                    description="Twitter Card Image. 1200x600px recommended."
+                  />
+                )}
+
                 {formData.twitter.image && (
                   <div className="mt-2">
                     <img src={formData.twitter.image} alt="Twitter Preview" className="max-w-xs rounded border border-border/50" onError={(e) => {

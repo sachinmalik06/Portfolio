@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HeroTab from "./resume/HeroTab";
 import ExperiencesTab from "./resume/ExperiencesTab";
@@ -11,7 +12,14 @@ import StatsTab from "./resume/StatsTab";
 import { User, Briefcase, Folder, GraduationCap, Zap, Award, Languages, BarChart3 } from "lucide-react";
 
 export default function ResumeManager() {
-    const [activeTab, setActiveTab] = useState("hero");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const initialTab = searchParams.get("tab") || "hero";
+    const [activeTab, setActiveTab] = useState(initialTab);
+
+    const handleTabChange = (value: string) => {
+        setActiveTab(value);
+        setSearchParams({ tab: value });
+    };
 
     return (
         <div className="space-y-6">
@@ -20,7 +28,7 @@ export default function ResumeManager() {
                 <p className="text-muted-foreground">Manage all sections of your resume page from one place.</p>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
                 <TabsList className="bg-muted/50 p-1 rounded-lg flex flex-wrap h-auto gap-2 justify-start overflow-x-auto">
                     <TabsTrigger value="hero" className="gap-2">
                         <User className="w-4 h-4" /> Hero
