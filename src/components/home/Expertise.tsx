@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BarChart3, Users, Target, Layers, Brain, Globe } from "lucide-react";
+import { BarChart3, Users, Target, Layers, Brain, Globe, Award, ExternalLink } from "lucide-react";
 import { useExpertiseCards, useResumeCertifications } from "@/hooks/use-cms";
 
 // Icon mapping for CMS data
@@ -167,55 +167,70 @@ const Expertise = () => {
             {certifications.map((cert: any, index: number) => (
               <motion.div
                 key={cert.id || cert.title}
-                className={`bg-background rounded-2xl p-5 md:p-6 border border-border hover:border-primary transition-all duration-300 ${cert.credential_url ? 'cursor-pointer hover:shadow-lg hover:shadow-primary/10' : ''}`}
+                className={`group relative overflow-hidden bg-background/40 backdrop-blur-md rounded-2xl border border-white/10 hover:border-primary/50 transition-all duration-500 ${cert.credential_url ? 'cursor-pointer hover:shadow-2xl hover:shadow-primary/20' : ''}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4, margin: "0px 0px -150px 0px" }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                whileHover={{ y: -5 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -10, scale: 1.02 }}
                 onClick={() => {
                   if (cert.credential_url) {
                     window.open(cert.credential_url, '_blank', 'noopener,noreferrer');
                   }
                 }}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden border border-border/50 group-hover:bg-primary/20 transition-colors">
-                    {cert.image_url ? (
-                      <img src={cert.image_url} alt={cert.name} className="w-full h-full object-contain p-1" />
-                    ) : (
-                      <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{cert.year || cert.date}</span>
-                    {cert.credential_url && (
-                      <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    )}
+                {/* Image Header */}
+                <div className="relative h-48 w-full overflow-hidden bg-muted/20">
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80 z-10" />
+                  {cert.image_url ? (
+                    <motion.img
+                      src={cert.image_url}
+                      alt={cert.name || cert.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Award className="w-16 h-16 text-primary/20" />
+                    </div>
+                  )}
+
+                  {/* Floating Badge */}
+                  <div className="absolute top-4 right-4 z-20">
+                    <span className="backdrop-blur-xl bg-primary/20 border border-primary/30 text-primary-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                      {cert.year || cert.date}
+                    </span>
                   </div>
                 </div>
 
-                <h4 className="text-base md:text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-                  {cert.name || cert.title}
-                </h4>
-
-                <p className="text-sm font-medium text-primary mb-2">
-                  {cert.issuer}
-                </p>
-
-                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
-                  {cert.description}
-                </p>
-
-                {cert.credential_id && (
-                  <div className="mt-3 pt-3 border-t border-border flex items-center gap-2">
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">ID: {cert.credential_id}</span>
+                <div className="p-6 relative">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                      {cert.name || cert.title}
+                    </h4>
+                    {cert.credential_url && (
+                      <ExternalLink className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    )}
                   </div>
-                )}
+
+                  <p className="text-sm font-semibold text-primary/80 mb-3 uppercase tracking-wider">
+                    {cert.issuer}
+                  </p>
+
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+                    {cert.description}
+                  </p>
+
+                  {cert.credential_id && (
+                    <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-mono">
+                        Credential ID
+                      </span>
+                      <span className="text-[10px] text-primary/70 font-mono bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+                        {cert.credential_id}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>

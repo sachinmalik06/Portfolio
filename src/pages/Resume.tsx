@@ -695,33 +695,60 @@ const Resume = () => {
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.05 }}
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  className="group rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ y: -10, scale: 1.02 }}
+                  className="group relative overflow-hidden bg-card/40 backdrop-blur-md rounded-2xl border border-white/10 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20"
                 >
-                  <div className="mb-3 flex items-start justify-between">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors overflow-hidden border border-white/5">
-                      {cert.image_url ? (
-                        <img src={cert.image_url} alt={cert.name} className="h-full w-full object-contain p-1" />
-                      ) : (
-                        <Award className="h-6 w-6 text-primary" />
-                      )}
+                  {/* Image Header */}
+                  <div className="relative h-48 w-full overflow-hidden bg-muted/20">
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80 z-10" />
+                    {cert.image_url ? (
+                      <motion.img
+                        src={cert.image_url}
+                        alt={cert.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Award className="w-16 h-16 text-primary/20" />
+                      </div>
+                    )}
+
+                    {/* Floating Badge */}
+                    <div className="absolute top-4 right-4 z-20">
+                      <span className="backdrop-blur-xl bg-primary/20 border border-primary/30 text-primary px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                        {cert.year}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                      {cert.year}
-                    </span>
                   </div>
-                  <h3 className="mb-1 font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                    {cert.name}
-                  </h3>
-                  <p className="mb-2 text-sm font-medium text-primary/80">{cert.issuer}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">{cert.description}</p>
-                  {cert.credential_id && (
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 font-mono mt-auto pt-2 border-t border-white/5">
-                      <Zap className="h-3 w-3" />
-                      ID: {cert.credential_id}
+
+                  <div className="p-6 relative">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                        {cert.name}
+                      </h3>
+                      <ExternalLink className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                  )}
+
+                    <p className="text-sm font-semibold text-primary/80 mb-3 uppercase tracking-wider">
+                      {cert.issuer}
+                    </p>
+
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+                      {cert.description}
+                    </p>
+
+                    {cert.credential_id && (
+                      <div className="pt-4 border-t border-white/5 flex items-center justify-between mt-auto">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-mono">
+                          Credential ID
+                        </span>
+                        <span className="text-[10px] text-primary/70 font-mono bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+                          {cert.credential_id}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               ))}
             </div>
