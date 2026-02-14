@@ -698,11 +698,11 @@ const Resume = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{
-                    duration: 0.4,
-                    layout: { type: "spring", stiffness: 300, damping: 30 }
+                    duration: 0.3,
+                    layout: { type: "spring", stiffness: 450, damping: 40 }
                   }}
-                  whileHover={{ y: -8, scale: 1.01 }}
-                  layoutId={`cert-resume-${cert.id || index}`}
+                  whileHover={{ y: -5, scale: 1.01 }}
+                  layoutId={`cert-resume-${cert.id || cert.name}`}
                   onClick={() => setSelectedCert(cert)}
                   className="group relative overflow-hidden bg-card/40 backdrop-blur-md rounded-2xl border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20 cursor-pointer"
                 >
@@ -761,93 +761,97 @@ const Resume = () => {
             </div>
 
             {/* Certification Overlay */}
-            {selectedCert && (
-              <>
-                {/* Backdrop */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  onClick={() => setSelectedCert(null)}
-                  className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"
-                />
-
-                {/* Content */}
-                <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
+            <AnimatePresence>
+              {selectedCert && (
+                <>
+                  {/* Backdrop */}
                   <motion.div
-                    layoutId={`cert-resume-${selectedCert.id || certifications.indexOf(selectedCert)}`}
-                    transition={{ type: "spring", stiffness: 350, damping: 35 }}
-                    className="bg-[#111] backdrop-blur-2xl rounded-3xl border border-white/10 w-full max-w-2xl overflow-hidden pointer-events-auto relative shadow-2xl"
-                  >
-                    <button
-                      onClick={() => setSelectedCert(null)}
-                      className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                    onClick={() => setSelectedCert(null)}
+                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"
+                  />
+
+                  {/* Content */}
+                  <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
+                    <motion.div
+                      layoutId={`cert-resume-${selectedCert.id || selectedCert.name}`}
+                      transition={{ type: "spring", stiffness: 500, damping: 45, mass: 0.8 }}
+                      exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
+                      className="bg-[#111] backdrop-blur-2xl rounded-3xl border border-white/10 w-full max-w-2xl overflow-hidden pointer-events-auto relative shadow-2xl"
                     >
-                      <X className="w-6 h-6 text-white" />
-                    </button>
+                      <button
+                        onClick={() => setSelectedCert(null)}
+                        className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+                      >
+                        <X className="w-6 h-6 text-white" />
+                      </button>
 
-                    <div className="flex flex-col md:flex-row">
-                      {/* Image Area */}
-                      <div className="md:w-1/2 h-64 md:h-auto relative">
-                        {selectedCert.image_url ? (
-                          <img
-                            src={selectedCert.image_url}
-                            alt={selectedCert.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                            <Award className="w-24 h-24 text-primary" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent md:hidden" />
-                      </div>
-
-                      {/* Content Area */}
-                      <div className="md:w-1/2 p-8">
-                        <span className="text-primary text-xs font-bold uppercase tracking-widest mb-2 block">
-                          {selectedCert.issuer}
-                        </span>
-                        <h3 className="text-2xl font-bold text-foreground mb-4">
-                          {selectedCert.name}
-                        </h3>
-                        <div className="flex items-center gap-2 mb-6">
-                          <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold border border-primary/20">
-                            {selectedCert.year}
-                          </span>
-                        </div>
-
-                        <p className="text-muted-foreground leading-relaxed mb-8">
-                          {selectedCert.description}
-                        </p>
-
-                        <div className="space-y-4">
-                          {selectedCert.credential_id && (
-                            <div className="bg-white/5 p-4 rounded-xl border border-white/10">
-                              <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Credential ID</span>
-                              <span className="text-primary font-mono text-sm">{selectedCert.credential_id}</span>
+                      <div className="flex flex-col md:flex-row">
+                        {/* Image Area */}
+                        <div className="md:w-1/2 h-64 md:h-auto relative">
+                          {selectedCert.image_url ? (
+                            <img
+                              src={selectedCert.image_url}
+                              alt={selectedCert.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                              <Award className="w-24 h-24 text-primary" />
                             </div>
                           )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent md:hidden" />
+                        </div>
 
-                          {selectedCert.credential_url && (
-                            <motion.a
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              href={selectedCert.credential_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 transition-all"
-                            >
-                              <ExternalLink className="w-5 h-5" />
-                              Verify Certification
-                            </motion.a>
-                          )}
+                        {/* Content Area */}
+                        <div className="md:w-1/2 p-8">
+                          <span className="text-primary text-xs font-bold uppercase tracking-widest mb-2 block">
+                            {selectedCert.issuer}
+                          </span>
+                          <h3 className="text-2xl font-bold text-foreground mb-4">
+                            {selectedCert.name}
+                          </h3>
+                          <div className="flex items-center gap-2 mb-6">
+                            <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold border border-primary/20">
+                              {selectedCert.year}
+                            </span>
+                          </div>
+
+                          <p className="text-muted-foreground leading-relaxed mb-8">
+                            {selectedCert.description}
+                          </p>
+
+                          <div className="space-y-4">
+                            {selectedCert.credential_id && (
+                              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Credential ID</span>
+                                <span className="text-primary font-mono text-sm">{selectedCert.credential_id}</span>
+                              </div>
+                            )}
+
+                            {selectedCert.credential_url && (
+                              <motion.a
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                href={selectedCert.credential_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 transition-all"
+                              >
+                                <ExternalLink className="w-5 h-5" />
+                                Verify Certification
+                              </motion.a>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                </div>
-              </>
-            )}
+                    </motion.div>
+                  </div>
+                </>
+              )}
+            </AnimatePresence>
           </motion.section>
         )}
 
