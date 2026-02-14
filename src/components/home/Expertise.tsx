@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
-import { BarChart3, Users, Target, Layers, Brain, Globe, Award, ExternalLink } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BarChart3, Users, Target, Layers, Brain, Globe, Award, ExternalLink, X } from "lucide-react";
 import { useExpertiseCards, useResumeCertifications } from "@/hooks/use-cms";
 
 // Icon mapping for CMS data
@@ -52,6 +53,7 @@ const defaultSkills = [
 ];
 
 const Expertise = () => {
+  const [selectedCert, setSelectedCert] = useState<any>(null);
   const { data: expertiseData, isLoading } = useExpertiseCards();
   const { data: certificationsData, isLoading: certsLoading, error: certsError } = useResumeCertifications();
 
@@ -173,11 +175,8 @@ const Expertise = () => {
                 viewport={{ once: true, amount: 0.4, margin: "0px 0px -150px 0px" }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ y: -10, scale: 1.02 }}
-                onClick={() => {
-                  if (cert.credential_url) {
-                    window.open(cert.credential_url, '_blank', 'noopener,noreferrer');
-                  }
-                }}
+                layoutId={`cert-${cert.id || index}`}
+                onClick={() => setSelectedCert(cert)}
               >
                 {/* Image Header */}
                 <div className="relative h-48 w-full overflow-hidden bg-muted/20">
@@ -235,6 +234,97 @@ const Expertise = () => {
             ))}
           </div>
         </motion.div>
+
+        {/* Certification Overlay */}
+        <AnimatePresence>
+          {selectedCert && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedCert(null)}
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"
+              />
+
+              {/* Content */}
+              <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
+                <motion.div
+                  layoutId={`cert-${selectedCert.id || certifications.indexOf(selectedCert)}`}
+                  className="bg-background/90 backdrop-blur-2xl rounded-3xl border border-white/10 w-full max-w-2xl overflow-hidden pointer-events-auto relative shadow-2xl"
+                >
+                  <button
+                    onClick={() => setSelectedCert(null)}
+                    className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+                  >
+                    <X className="w-6 h-6 text-white" />
+                  </button>
+
+                  <div className="flex flex-col md:flex-row">
+                    {/* Image Area */}
+                    <div className="md:w-1/2 h-64 md:h-auto relative">
+                      {selectedCert.image_url ? (
+                        <img
+                          src={selectedCert.image_url}
+                          alt={selectedCert.name || selectedCert.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                          <Award className="w-24 h-24 text-primary" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent md:hidden" />
+                    </div>
+
+                    {/* Content Area */}
+                    <div className="md:w-1/2 p-8">
+                      <span className="text-primary text-xs font-bold uppercase tracking-widest mb-2 block">
+                        {selectedCert.issuer}
+                      </span>
+                      <h3 className="text-2xl font-bold text-foreground mb-4">
+                        {selectedCert.name || selectedCert.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mb-6">
+                        <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold border border-primary/20">
+                          {selectedCert.year || selectedCert.date}
+                        </span>
+                      </div>
+
+                      <p className="text-muted-foreground leading-relaxed mb-8">
+                        {selectedCert.description}
+                      </p>
+
+                      <div className="space-y-4">
+                        {selectedCert.credential_id && (
+                          <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Credential ID</span>
+                            <span className="text-primary font-mono text-sm">{selectedCert.credential_id}</span>
+                          </div>
+                        )}
+
+                        {selectedCert.credential_url && (
+                          <motion.a
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            href={selectedCert.credential_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/20 transition-all"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                            Verify Certification
+                          </motion.a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Skills Tags */}
         <motion.div
